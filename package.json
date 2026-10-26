@@ -1,6 +1,6 @@
 {
   "name": "masto-rss",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "description": "Postar nya inlägg från RSS- och Atom-flöden till Mastodon, med flera flöden och konton i en container",
   "repository": {

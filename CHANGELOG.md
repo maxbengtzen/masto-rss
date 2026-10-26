@@ -6,6 +6,8 @@ Alla ändringar som märks för den som kör tjänsten. Formatet följer
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-10-26
+
 ### Ändrat
 - Källkoden är publik och licensierad under AGPL-3.0. Tjänsten fungerar som förut.
 
