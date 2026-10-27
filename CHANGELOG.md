@@ -6,6 +6,8 @@ Alla ändringar som märks för den som kör tjänsten. Formatet följer
 
 ## [Unreleased]
 
+## [1.0.2] - 2026-10-27
+
 ### Fixat
 - Avvikelsespärren slog till när en sajt publicerade lika många nya poster som flödet rymmer
   på en gång (till exempel en hel morgons artiklar i ett flöde med tio poster), och då postades
