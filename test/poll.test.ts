@@ -84,6 +84,24 @@ test("decide: mer än hälften nytt i ett stort flöde är en avvikelse", () => 
   assert.equal(decide(small, [false, false, false, true], false, { maxAgeMs: 0, maxPostsPerPoll: 5, backfill: 0 }, NOW).reason, undefined);
 });
 
+test("decide: många nya poster som är nyare än det som setts är ingen avvikelse", () => {
+  const opts = { maxAgeMs: 48 * HOUR, maxPostsPerPoll: 5, backfill: 0 };
+  const items = Array.from({ length: 10 }, (_, i) => item(i, i));
+  const none = items.map(() => false);
+
+  const d = decide(items, none, false, opts, NOW, NOW - 10 * HOUR);
+  assert.equal(d.reason, undefined);
+  assert.deepEqual(titles(d.post), ["Post 9", "Post 8", "Post 7", "Post 6", "Post 5"]);
+  assert.equal(d.deferred.length, 5);
+
+  // Inte nyare än det som setts, eller utan datum: då är det fortfarande en avvikelse.
+  assert.equal(decide(items, none, false, opts, NOW, NOW).reason, "anomaly");
+  const undated = Array.from({ length: 10 }, (_, i) => item(i));
+  assert.equal(decide(undated, none, false, opts, NOW, NOW - 10 * HOUR).reason, "anomaly");
+  // Okänt datum för det som setts (äldre databas): som förut.
+  assert.equal(decide(items, none, false, opts, NOW).reason, "anomaly");
+});
+
 test("pollFeed: första varvet läser in flödet, nästa postar bara det nya", async () => {
   serve(numbered(1, 5), '"v1"');
   let result = await pollFeed(feed, store, { dryRun: false, limits: LIMITS, now: NOW });
@@ -101,6 +119,57 @@ test("pollFeed: första varvet läser in flödet, nästa postar bara det nya", a
   result = await pollFeed(feed, store, { dryRun: false, limits: LIMITS, now: NOW + 2 * HOUR });
   assert.ok(result.status === "ok" && result.decision.post.length === 0);
   assert.equal(store.getFeed("news")?.etag, undefined);
+});
+
+test("pollFeed: en hel sida nya poster postas, men gamla poster med nya nycklar är en avvikelse", async () => {
+  serve(numbered(1, 10));
+  await pollFeed(feed, store, { dryRun: false, limits: LIMITS, now: NOW });
+  assert.equal(store.getFeed("news")?.newestPublished, Date.UTC(2026, 9, 26, 12));
+
+  // Tio nya poster på en gång, alla nyare än det som setts: postas, fem per varv.
+  serve(numbered(11, 20, NOW + 10 * HOUR));
+  let result = await pollFeed(feed, store, { dryRun: false, limits: LIMITS, now: NOW + 11 * HOUR });
+  assert.ok(result.status === "ok" && result.decision.reason === undefined);
+  assert.deepEqual(titles(result.decision.post), ["Post 11", "Post 12", "Post 13", "Post 14", "Post 15"]);
+  assert.deepEqual(titles(result.decision.deferred), ["Post 16", "Post 17", "Post 18", "Post 19", "Post 20"]);
+
+  serve(numbered(11, 20, NOW + 10 * HOUR));
+  result = await pollFeed(feed, store, { dryRun: false, limits: LIMITS, now: NOW + 12 * HOUR });
+  assert.ok(result.status === "ok" && result.decision.reason === undefined);
+  assert.deepEqual(titles(result.decision.post), ["Post 16", "Post 17", "Post 18", "Post 19", "Post 20"]);
+  assert.equal(store.getFeed("news")?.newestPublished, NOW + 10 * HOUR);
+
+  // Samma poster med nya GUID och länkar har inga senare datum.
+  serve(numbered(11, 20, NOW + 10 * HOUR).map((i) => ({ ...i, guid: `${i.guid}0`, link: `${i.link}&ny=1` })));
+  result = await pollFeed(feed, store, { dryRun: false, limits: LIMITS, now: NOW + 13 * HOUR });
+  assert.ok(result.status === "ok" && result.decision.reason === "anomaly");
+  assert.deepEqual(result.queued, []);
+});
+
+test("pollFeed: väntande poster flyttar inte fram datumet, så att resten inte ser gamla ut", async () => {
+  const limited = { ...feed, maxPostsPerPoll: 1 };
+  serve(numbered(1, 10));
+  await pollFeed(limited, store, { dryRun: false, limits: LIMITS, now: NOW });
+
+  for (const [round, expected] of ["Post 11", "Post 12", "Post 13"].entries()) {
+    serve(numbered(11, 20, NOW + 10 * HOUR));
+    const result = await pollFeed(limited, store, { dryRun: false, limits: LIMITS, now: NOW + (11 + round) * HOUR });
+    assert.ok(result.status === "ok" && result.decision.reason === undefined);
+    assert.deepEqual(titles(result.decision.post), [expected]);
+  }
+});
+
+test("pollFeed: senaste datum gäller bara sin adress, och ett datum i framtiden räknas som nu", async () => {
+  serve([...numbered(10, 10, NOW + 24 * HOUR), ...numbered(1, 9)]);
+  await pollFeed(feed, store, { dryRun: false, limits: LIMITS, now: NOW });
+  assert.equal(store.getFeed("news")?.newestPublished, NOW);
+
+  // Ett annat flöde på en ny adress jämförs inte med det gamla datumet.
+  const moved = { ...feed, url: "https://example.com/ny-feed/" };
+  serve(numbered(11, 20, NOW + 10 * HOUR));
+  const result = await pollFeed(moved, store, { dryRun: false, limits: LIMITS, now: NOW + 11 * HOUR });
+  assert.ok(result.status === "ok" && result.decision.reason === "anomaly");
+  assert.equal(store.getFeed("news")?.newestPublished, NOW + 10 * HOUR);
 });
 
 test("pollFeed: 304 behåller tillståndet", async () => {

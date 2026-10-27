@@ -58,8 +58,10 @@ En okänd `FEED_*`-variabel, till exempel ett stavfel, stoppar starten med ett f
   `Idempotency-Key`, och väntar ett inlägg längre än en timme på ett omförsök kontrolleras kontots
   senaste inlägg först.
 - **Gamla poster:** äldre än `MAX_AGE` postas inte.
-- **Avvikelse:** ser mer än hälften av ett flöde med minst tio poster nytt ut på en gång, markeras
-  allt som sett och inget postas.
+- **Avvikelse:** ser mer än hälften av ett flöde med minst tio poster nytt ut på en gång, utan att
+  vara nyare än det senaste som setts i flödet (till exempel om sajten bytt adresser eller GUID),
+  markeras allt som sett och inget postas. Nya poster med senare datum postas som vanligt, även om
+  det är en hel sida på en gång.
 - **Tak:** högst `MAX_POSTS_PER_POLL` per hämtning, äldst först.
 - **Omnämnanden:** `@namn` i text från flödet blir aldrig ett omnämnande.
 
@@ -69,7 +71,7 @@ Med `SIGNAL_API_URL` och `SIGNAL_NUMBER` skickas ett Signal-meddelande till numr
 
 - ett flöde har misslyckats `FAIL_NOTIFY_AFTER` gånger i rad, och när det fungerar igen
 - Mastodon nekar ett inlägg (till exempel för långt) eller en token (kontot pausas)
-- mer än hälften av ett flöde ser nytt ut på en gång
+- mer än hälften av ett flöde ser nytt ut på en gång utan att vara nyare än det som setts
 - instansen byter Mastodon-version eller API-version, eller svarar med ett `Deprecation`-huvud
 
 ## Statussida och Homepage

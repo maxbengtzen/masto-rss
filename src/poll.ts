@@ -4,8 +4,10 @@
  * Skydden mot flod och dubbletter:
  * - En post räknas som sedd om någon av dess nycklar (GUID eller normaliserad länk) har setts.
  * - Nytt flöde: allt som finns markeras som sett, och bara de `backfill` senaste postas.
- * - Ser mer än hälften av ett flöde med minst tio poster nytt ut på en gång, är något fel
- *   (till exempel nya länkar och GUID för allt): allt markeras som sett och inget postas.
+ * - Ser mer än hälften av ett flöde med minst tio poster nytt ut på en gång, utan att vara nyare än
+ *   det senaste som setts i flödet, är något fel (till exempel nya länkar och GUID för allt): allt
+ *   markeras som sett och inget postas. Många nya poster med senare datum, som när en sajt
+ *   publicerar en hel morgons artiklar på en gång, är inget fel.
  * - Poster äldre än `maxAgeMs` postas inte.
  * - Högst `maxPostsPerPoll` per varv, äldst först. Resten väntar till nästa varv.
  */
@@ -53,6 +55,8 @@ export function decide(
   firstRun: boolean,
   opts: Pick<FeedConfig, "maxAgeMs" | "maxPostsPerPoll" | "backfill">,
   now: number,
+  /** Senaste publiceringsdatumet som setts i flödet förut, om det är känt. */
+  newestSeen?: number,
 ): Decision {
   const fresh = items.filter((_, i) => !seen[i]);
   if (firstRun) {
@@ -60,7 +64,9 @@ export function decide(
     const keep = Math.min(opts.backfill, ordered.length);
     return { post: ordered.slice(ordered.length - keep), skipped: ordered.slice(0, ordered.length - keep), deferred: [], reason: "first-run" };
   }
-  if (items.length >= ANOMALY_MIN_ITEMS && fresh.length > items.length / 2) {
+  // Bara nya poster som inte är nyare än det som redan setts kan vara gamla poster med nya nycklar.
+  const suspect = fresh.filter((i) => newestSeen === undefined || i.published === undefined || i.published <= newestSeen);
+  if (items.length >= ANOMALY_MIN_ITEMS && suspect.length > items.length / 2) {
     return { post: [], skipped: fresh, deferred: [], reason: "anomaly" };
   }
   const cutoff = opts.maxAgeMs ? now - opts.maxAgeMs : -Infinity;
@@ -129,9 +135,11 @@ export interface PollOptions {
 
 export async function pollFeed(feed: FeedConfig, store: Store, { dryRun, limits, now = Date.now() }: PollOptions): Promise<PollResult> {
   const state = store.getFeed(feed.name);
-  // ETag och Last-Modified gäller bara adressen de kom från.
-  const validators = state?.url === feed.url ? { etag: state.etag, lastModified: state.lastModified } : {};
-  const base = { name: feed.name, url: feed.url, primedAt: state?.primedAt };
+  // ETag, Last-Modified och senaste datum gäller bara adressen de kom från.
+  const sameUrl = state?.url === feed.url;
+  const validators = sameUrl ? { etag: state.etag, lastModified: state.lastModified } : {};
+  const newestSeen = sameUrl ? state.newestPublished : undefined;
+  const base = { name: feed.name, url: feed.url, primedAt: state?.primedAt, newestPublished: newestSeen };
 
   let fetched: FetchResult;
   let parsed: ParsedFeed | undefined;
@@ -154,7 +162,7 @@ export async function pollFeed(feed: FeedConfig, store: Store, { dryRun, limits,
   return store.transaction(() => {
     const items = unique(result.items);
     const seen = items.map((item) => store.isSeen(feed.name, item.keys));
-    const decision = decide(items, seen, !state?.primedAt, feed, now);
+    const decision = decide(items, seen, !state?.primedAt, feed, now, newestSeen);
 
     // Det som ska postas läggs i utkorgen i samma transaktion som det markeras som sett.
     const language = feed.language ?? result.language;
@@ -176,8 +184,14 @@ export async function pollFeed(feed: FeedConfig, store: Store, { dryRun, limits,
     store.prune(feed.name, now - FORGET_AFTER_MS);
     store.prunePosts(now - KEEP_POSTS_MS);
 
+    // Väntande poster räknas inte förrän de tagits. Ett datum i framtiden räknas som nu, så att det
+    // inte får spärren att se allt nytt som gammalt.
+    const dates = items.flatMap((i) => (deferred.has(i) || i.published === undefined ? [] : [Math.min(i.published, now)]));
+    const newestPublished = dates.length ? Math.max(newestSeen ?? -Infinity, ...dates) : newestSeen;
+
     store.saveFeed({
       ...base,
+      newestPublished,
       // Väntar poster får nästa varv inte svara 304, då skulle de bli kvar tills flödet ändras.
       etag: deferred.size ? undefined : etag,
       lastModified: deferred.size ? undefined : lastModified,

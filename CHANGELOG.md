@@ -6,6 +6,14 @@ Alla ändringar som märks för den som kör tjänsten. Formatet följer
 
 ## [Unreleased]
 
+### Fixat
+- Avvikelsespärren slog till när en sajt publicerade lika många nya poster som flödet rymmer
+  på en gång (till exempel en hel morgons artiklar i ett flöde med tio poster), och då postades
+  ingenting. Nu räknas bara nya poster som inte är nyare än det senaste som setts i flödet som
+  misstänkta, så ett verkligt byte av adresser eller GUID stoppas fortfarande. Databasen uppgraderas
+  automatiskt vid start (schemaversion 3). Behöver du backa till 1.0.1 måste schemaversionen först
+  sättas tillbaka till 2.
+
 ## [1.0.1] - 2026-10-26
 
 ### Ändrat

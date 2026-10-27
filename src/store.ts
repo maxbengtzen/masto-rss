@@ -1,7 +1,8 @@
 /**
  * Databasen: SQLite via node:sqlite, en fil i DATA_DIR.
  *
- * `feed` har ett tillstånd per flöde (ETag, senaste hämtning, fel i rad). `seen` har varje nyckel
+ * `feed` har ett tillstånd per flöde (ETag, senaste hämtning, fel i rad, senaste publiceringsdatum).
+ * `seen` har varje nyckel
  * (GUID eller normaliserad länk) som setts i ett flöde, med när den senast fanns kvar i flödet, så
  * att gamla nycklar kan rensas utan att något som fortfarande finns i flödet glöms bort.
  *
@@ -59,6 +60,7 @@ const MIGRATIONS = [
      key text primary key,
      sent_at integer not null
    ) strict;`,
+  `alter table feed add column newest_published integer;`,
 ];
 
 /** Inlägg i utkorgen. */
@@ -123,6 +125,8 @@ export interface FeedState {
   okAt?: number;
   /** Misslyckade hämtningar i rad. */
   failures: number;
+  /** Senaste publiceringsdatumet bland flödets poster hittills (ms, aldrig senare än hämtningen). */
+  newestPublished?: number;
 }
 
 interface FeedRow {
@@ -134,6 +138,7 @@ interface FeedRow {
   checked_at: number | null;
   ok_at: number | null;
   failures: number;
+  newest_published: number | null;
 }
 
 export class Store {
@@ -151,11 +156,12 @@ export class Store {
     this.#migrate();
     this.#getFeed = this.db.prepare("select * from feed where name = ?");
     this.#saveFeed = this.db.prepare(
-      `insert into feed (name, url, etag, last_modified, primed_at, checked_at, ok_at, failures)
-       values (?, ?, ?, ?, ?, ?, ?, ?)
+      `insert into feed (name, url, etag, last_modified, primed_at, checked_at, ok_at, failures, newest_published)
+       values (?, ?, ?, ?, ?, ?, ?, ?, ?)
        on conflict (name) do update set url = excluded.url, etag = excluded.etag,
          last_modified = excluded.last_modified, primed_at = excluded.primed_at,
-         checked_at = excluded.checked_at, ok_at = excluded.ok_at, failures = excluded.failures`,
+         checked_at = excluded.checked_at, ok_at = excluded.ok_at, failures = excluded.failures,
+         newest_published = excluded.newest_published`,
     );
     this.#hasKey = this.db.prepare("select 1 from seen where feed = ? and key = ?");
     this.#touchKey = this.db.prepare(
@@ -206,13 +212,14 @@ export class Store {
       checkedAt: row.checked_at ?? undefined,
       okAt: row.ok_at ?? undefined,
       failures: row.failures,
+      newestPublished: row.newest_published ?? undefined,
     };
   }
 
   saveFeed(s: FeedState): void {
     this.#saveFeed.run(
       s.name, s.url, s.etag ?? null, s.lastModified ?? null, s.primedAt ?? null,
-      s.checkedAt ?? null, s.okAt ?? null, s.failures,
+      s.checkedAt ?? null, s.okAt ?? null, s.failures, s.newestPublished ?? null,
     );
   }
 

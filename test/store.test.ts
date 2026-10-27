@@ -17,7 +17,7 @@ test("databasen skapas, versioneras och behåller sitt innehåll", () => {
 
   store = new Store(path);
   assert.equal(store.isSeen("news", ["g:1"]), true);
-  assert.equal((store.db.prepare("pragma user_version").get() as { user_version: number }).user_version, 2);
+  assert.equal((store.db.prepare("pragma user_version").get() as { user_version: number }).user_version, 3);
   assert.equal((store.db.prepare("pragma journal_mode").get() as { journal_mode: string }).journal_mode, "wal");
   store.close();
 });
@@ -83,11 +83,16 @@ test("en databas från fas 1 (schemaversion 1) uppgraderas och behåller sitt in
            create table seen (feed text not null, key text not null, first_seen integer not null, last_seen integer not null,
              primary key (feed, key)) strict, without rowid;
            insert into seen values ('news', 'g:1', 1, 1);
+           insert into feed (name, url, primed_at, failures) values ('news', 'https://example.com/feed/', 1, 0);
            pragma user_version = 1;`);
   db.close();
   const store = new Store(path);
-  assert.equal((store.db.prepare("pragma user_version").get() as { user_version: number }).user_version, 2);
+  assert.equal((store.db.prepare("pragma user_version").get() as { user_version: number }).user_version, 3);
   assert.equal(store.isSeen("news", ["g:1"]), true);
+  assert.equal(store.getFeed("news")?.primedAt, 1);
+  assert.equal(store.getFeed("news")?.newestPublished, undefined);
+  store.saveFeed({ name: "news", url: "https://example.com/feed/", primedAt: 1, failures: 0, newestPublished: 5000 });
+  assert.equal(store.getFeed("news")?.newestPublished, 5000);
   store.close();
 });
 
