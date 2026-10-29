@@ -63,9 +63,11 @@ after(() => {
   rmSync(root, { recursive: true, force: true });
 });
 
+// main.test.ts kör hela programmet mot den riktiga klockan, med åldersspärren (MAX_AGE 48 h)
+// påslagen. Posterna dateras därför relativt till nu, inte till numbered()s fasta datum.
 let dataDir = "";
 beforeEach(() => {
-  feedXml = rss(numbered(1, 3));
+  feedXml = rss(numbered(1, 3, Date.now()));
   posts = [];
   signals = [];
   dataDir = mkdtempSync(join(root, "data-"));
@@ -121,7 +123,7 @@ test("ett riktigt varv postar det nya, en gång", async () => {
   assert.equal(posts[0].body.visibility, "public");
   assert.match(posts[0].key ?? "", /^[0-9a-f]{32}$/);
 
-  feedXml = rss(numbered(1, 4));
+  feedXml = rss(numbered(1, 4, Date.now()));
   const second = await run(env());
   assert.equal(second.status, 0, second.err);
   assert.equal(posts.length, 2);
