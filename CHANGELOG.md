@@ -6,6 +6,10 @@ Alla ändringar som märks för den som kör tjänsten. Formatet följer
 
 ## [Unreleased]
 
+### Ändrat
+- Imagen bygger på den rörliga taggen `node:26-alpine` i stället för en låst 26.x-version, så
+  varje release får senaste Node 26 och Alpine. Inget behöver ändras i compose-filen.
+
 ## [1.0.2] - 2026-10-27
 
 ### Fixat

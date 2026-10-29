@@ -12,11 +12,3 @@ updates:
     directory: /
     schedule:
       interval: monthly
-  - package-ecosystem: docker
-    directory: /
-    schedule:
-      interval: monthly
-    ignore:
-      # Nya huvudversioner av Node byts för hand och testas noga.
-      - dependency-name: node
-        update-types: [version-update:semver-major]

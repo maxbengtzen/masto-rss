@@ -64,7 +64,7 @@ Lägg till eller uppdatera tester för varje beteendeändring. CI kör Node 26 (
 produktionen:
 
 ```sh
-docker run --rm -u "$(id -u):$(id -g)" -e HOME=/tmp -v "$PWD":/w -w /w node:26.11.1-alpine3.24 npm test
+docker run --rm -u "$(id -u):$(id -g)" -e HOME=/tmp -v "$PWD":/w -w /w node:26-alpine npm test
 ```
 
 ### Torrköra mot riktiga flöden
@@ -165,9 +165,9 @@ Förutsättningar: arbetskatalogen är ren, `main` är pushad, och CI på `main`
 ## Underhåll
 
 - **Beroenden:** `npm outdated`, uppdatera i `package.json`, `npm install`, testa. En patch-version.
-- **Node:** basimagen är låst i `Dockerfile` med tagg och digest. Hämta digesten för en ny 26.x med
-  `docker buildx imagetools inspect node:26.x.y-alpine3.z`. En patch-version. Ett byte av
+- **Node:** `Dockerfile` använder den rörliga taggen `node:26-alpine`, så varje release byggs på
+  senaste 26.x. Vill du bara få in en ny Node-patch, släpp en patch-version. Ett byte av
   Node-huvudversion ändrar även `engines` i `package.json`, `@types/node` och `node-version` i CI,
   och ska testas noga.
-- **GitHub Actions:** Dependabot föreslår uppdateringar av npm-paket (varje vecka), Actions och
-  basimagen (varje månad), men inte nya huvudversioner av Node.
+- **GitHub Actions:** Dependabot föreslår uppdateringar av npm-paket (varje vecka) och Actions
+  (varje månad).

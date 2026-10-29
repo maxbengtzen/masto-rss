@@ -1,5 +1,4 @@
-# Basimagen är låst med digest: samma bygge varje gång, och lagren delas med andra images på samma bas.
-FROM node:26.11.1-alpine3.24@sha256:143494b1da2945f061539253adc65e4f1569ddf07da2d384c022c791a9d90a4a
+FROM node:26-alpine
 ENV NODE_ENV=production
 WORKDIR /app
 COPY package.json package-lock.json ./
