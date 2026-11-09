@@ -1,7 +1,8 @@
 # Golden-filer
 
 Svaren TypeScript-versionen (v1.0.3, Node 26 med ICU för Unicode 17) gav, inspelade med
-`scripts/golden.ts` inför omskrivningen till Go. Testerna kräver att Go-versionen ger samma:
+`scripts/golden.ts` inför omskrivningen till Go (skriptet togs bort med TypeScript-koden och finns i
+historiken). Testerna kräver att Go-versionen ger samma:
 
 | Fil | Vad | Test |
 |---|---|---|
@@ -20,7 +21,7 @@ spårningsparametrar, långa texter), och resten är skrivna för kantfallen.
 
 Riktiga flöden versionshanteras inte, eftersom texterna tillhör andra. Den som vill kan spara egna i
 `../local/fixtures/` och spela in `../local/golden/feeds.json` och `format.json` från
-TypeScript-versionen (`scripts/golden.ts` med `FIXTURES` och `GOLDEN` satta).
+TypeScript-versionen (se `scripts/golden.ts` i historiken, med `FIXTURES` och `GOLDEN` satta).
 Testerna `TestParseGoldenLocal` och `TestFormatGoldenLocal` jämför då mot dem, och hoppas annars över.
 
 Filerna är kontraktet med den som kör tjänsten: ändra dem inte för att ett test går fel. Ändras ett
