@@ -1,7 +1,6 @@
 .git
 .github
-node_modules
-test
 data
 scripts
+testdata
 *.md
