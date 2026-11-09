@@ -1,0 +1,1816 @@
+{
+  "normalizeLink": [
+    {
+      "link": "https://www.example.com/nyheter/en-post/?utm_source=rss&utm_medium=feed",
+      "key": "example.com/nyheter/en-post"
+    },
+    {
+      "link": "http://example.com/nyheter/en-post#kommentarer",
+      "key": "example.com/nyheter/en-post"
+    },
+    {
+      "link": "  https://EXAMPLE.com/nyheter/en-post  ",
+      "key": "example.com/nyheter/en-post"
+    },
+    {
+      "link": "https://example.com/?p=12&fbclid=abc&a=1",
+      "key": "example.com?a=1&p=12"
+    },
+    {
+      "link": "https://example.com:8443/x/",
+      "key": "example.com:8443/x"
+    },
+    {
+      "link": "https://example.com:443/x/",
+      "key": "example.com/x"
+    },
+    {
+      "link": "http://example.com:80/x//",
+      "key": "example.com/x"
+    },
+    {
+      "link": "tag:example.com,2026:1",
+      "key": "tag:example.com,2026:1"
+    },
+    {
+      "link": "inte en adress",
+      "key": "inte en adress"
+    },
+    {
+      "link": "https://example.com/a?b=1&a=2&B=3&a=1&c",
+      "key": "example.com/a?B=3&a=2&a=1&b=1&c="
+    },
+    {
+      "link": "https://example.com/a?q=hej+du&r=%C3%A5&s=a%2Bb&t=~*'()!&u=%zz&v=å",
+      "key": "example.com/a?q=hej+du&r=%C3%A5&s=a%2Bb&t=%7E*%27%28%29%21&u=%25zz&v=%C3%A5"
+    },
+    {
+      "link": "https://example.com/a?=x&&y=&z",
+      "key": "example.com/a?=x&y=&z="
+    },
+    {
+      "link": "https://example.com/å/ä ö?x=ö#frag",
+      "key": "example.com/%C3%A5/%C3%A4%20%C3%B6?x=%C3%B6"
+    },
+    {
+      "link": "https://exämple.com/flöde",
+      "key": "xn--exmple-cua.com/fl%C3%B6de"
+    },
+    {
+      "link": "https://ÉXAMPLE.com/",
+      "key": "xn--xample-9ua.com"
+    },
+    {
+      "link": "https://example.com/a/./b/../c",
+      "key": "example.com/a/c"
+    },
+    {
+      "link": "https://example.com/%7Euser/%41",
+      "key": "example.com/%7Euser/%41"
+    },
+    {
+      "link": "HTTPS://WWW.EXAMPLE.COM",
+      "key": "example.com"
+    },
+    {
+      "link": "https://www.www.example.com/x",
+      "key": "www.example.com/x"
+    },
+    {
+      "link": "https://wwwexample.com/x",
+      "key": "wwwexample.com/x"
+    },
+    {
+      "link": "https://user:pass@example.com/x",
+      "key": "example.com/x"
+    },
+    {
+      "link": "https://example.com?utm_source=x",
+      "key": "example.com"
+    },
+    {
+      "link": "https://example.com/x?UTM_SOURCE=x&Fbclid=1&gclid=2&dclid=&gbraid&wbraid=1&msclkid=1&yclid=1&mc_cid=1&mc_eid=1&_hsenc=1&_hsmi=1&igshid=1&utm_=1&utm_x_y=1",
+      "key": "example.com/x?utm_=1"
+    },
+    {
+      "link": "https://127.0.0.1:8080/x",
+      "key": "127.0.0.1:8080/x"
+    },
+    {
+      "link": "https://0x7f.1/x",
+      "key": "127.0.0.1/x"
+    },
+    {
+      "link": "https://[2001:db8::1]:443/x",
+      "key": "[2001:db8::1]/x"
+    },
+    {
+      "link": "https://[2001:DB8:0:0:0:0:0:1]/",
+      "key": "[2001:db8::1]"
+    },
+    {
+      "link": "http://example.com\\a\\b",
+      "key": "example.com/a/b"
+    },
+    {
+      "link": "https:example.com/x",
+      "key": "example.com/x"
+    },
+    {
+      "link": "https://example.com/a b",
+      "key": "example.com/a%20b"
+    },
+    {
+      "link": "https://example.com/a\tb\nc",
+      "key": "example.com/abc"
+    },
+    {
+      "link": "mailto:anna@example.com",
+      "key": "mailto:anna@example.com"
+    },
+    {
+      "link": "ftp://example.com/x/",
+      "key": "ftp://example.com/x/"
+    },
+    {
+      "link": "https://example.com/x?a=1#",
+      "key": "example.com/x?a=1"
+    },
+    {
+      "link": "https://example.com/{x}|^`",
+      "key": "example.com/%7Bx%7D|%5E%60"
+    },
+    {
+      "link": "https://example.com/%E2%80%93",
+      "key": "example.com/%E2%80%93"
+    },
+    {
+      "link": "https://example.com./x",
+      "key": "example.com./x"
+    },
+    {
+      "link": "http://",
+      "key": "http://"
+    },
+    {
+      "link": "https://exa mple.com/",
+      "key": "https://exa mple.com/"
+    },
+    {
+      "link": "//example.com/x",
+      "key": "//example.com/x"
+    },
+    {
+      "link": "/relativ/väg",
+      "key": "/relativ/väg"
+    },
+    {
+      "link": "javascript:alert(1)",
+      "key": "javascript:alert(1)"
+    },
+    {
+      "link": "https://example.com/x?a=%41&a=%41",
+      "key": "example.com/x?a=A&a=A"
+    },
+    {
+      "link": "https://example.com/?a=1&a=2&a=0",
+      "key": "example.com?a=1&a=2&a=0"
+    },
+    {
+      "link": "https://xn--exmple-cua.com/",
+      "key": "xn--exmple-cua.com"
+    },
+    {
+      "link": "https://EXAMPLE.com/Väg/?Q=Ä",
+      "key": "example.com/V%C3%A4g?Q=%C3%84"
+    }
+  ],
+  "resolve": [
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "/a",
+      "href": "https://example.com/a"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "b",
+      "href": "https://example.com/feeds/a/b"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "../c",
+      "href": "https://example.com/feeds/c"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "?q=1",
+      "href": "https://example.com/feeds/a/feed.xml?q=1"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "#frag",
+      "href": "https://example.com/feeds/a/feed.xml#frag"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "//other.example/x",
+      "href": "https://other.example/x"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "https://abs.example/y",
+      "href": "https://abs.example/y"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "  /trim  ",
+      "href": "https://example.com/trim"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "",
+      "href": "https://example.com/feeds/a/feed.xml"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "javascript:x",
+      "href": "javascript:x"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "tag:a,b",
+      "href": "tag:a,b"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "/a b",
+      "href": "https://example.com/a%20b"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "/å",
+      "href": "https://example.com/%C3%A5"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "http:/x",
+      "href": "http://x/"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "mailto:x@y",
+      "href": "mailto:x@y"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "\\back",
+      "href": "https://example.com/back"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "././d/../e",
+      "href": "https://example.com/feeds/a/e"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "https://www.example.com/nyheter/en-post/?utm_source=rss&utm_medium=feed",
+      "href": "https://www.example.com/nyheter/en-post/?utm_source=rss&utm_medium=feed"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "http://example.com/nyheter/en-post#kommentarer",
+      "href": "http://example.com/nyheter/en-post#kommentarer"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "  https://EXAMPLE.com/nyheter/en-post  ",
+      "href": "https://example.com/nyheter/en-post"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "https://example.com/?p=12&fbclid=abc&a=1",
+      "href": "https://example.com/?p=12&fbclid=abc&a=1"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "https://example.com:8443/x/",
+      "href": "https://example.com:8443/x/"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "https://example.com:443/x/",
+      "href": "https://example.com/x/"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "http://example.com:80/x//",
+      "href": "http://example.com/x//"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "tag:example.com,2026:1",
+      "href": "tag:example.com,2026:1"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "inte en adress",
+      "href": "https://example.com/feeds/a/inte%20en%20adress"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "https://example.com/a?b=1&a=2&B=3&a=1&c",
+      "href": "https://example.com/a?b=1&a=2&B=3&a=1&c"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "https://example.com/a?q=hej+du&r=%C3%A5&s=a%2Bb&t=~*'()!&u=%zz&v=å",
+      "href": "https://example.com/a?q=hej+du&r=%C3%A5&s=a%2Bb&t=~*%27()!&u=%zz&v=%C3%A5"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "https://example.com/a?=x&&y=&z",
+      "href": "https://example.com/a?=x&&y=&z"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "https://example.com/å/ä ö?x=ö#frag",
+      "href": "https://example.com/%C3%A5/%C3%A4%20%C3%B6?x=%C3%B6#frag"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "https://exämple.com/flöde",
+      "href": "https://xn--exmple-cua.com/fl%C3%B6de"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "https://ÉXAMPLE.com/",
+      "href": "https://xn--xample-9ua.com/"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "https://example.com/a/./b/../c",
+      "href": "https://example.com/a/c"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "https://example.com/%7Euser/%41",
+      "href": "https://example.com/%7Euser/%41"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "HTTPS://WWW.EXAMPLE.COM",
+      "href": "https://www.example.com/"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "https://www.www.example.com/x",
+      "href": "https://www.www.example.com/x"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "https://wwwexample.com/x",
+      "href": "https://wwwexample.com/x"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "https://user:pass@example.com/x",
+      "href": "https://user:pass@example.com/x"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "https://example.com?utm_source=x",
+      "href": "https://example.com/?utm_source=x"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "https://example.com/x?UTM_SOURCE=x&Fbclid=1&gclid=2&dclid=&gbraid&wbraid=1&msclkid=1&yclid=1&mc_cid=1&mc_eid=1&_hsenc=1&_hsmi=1&igshid=1&utm_=1&utm_x_y=1",
+      "href": "https://example.com/x?UTM_SOURCE=x&Fbclid=1&gclid=2&dclid=&gbraid&wbraid=1&msclkid=1&yclid=1&mc_cid=1&mc_eid=1&_hsenc=1&_hsmi=1&igshid=1&utm_=1&utm_x_y=1"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "https://127.0.0.1:8080/x",
+      "href": "https://127.0.0.1:8080/x"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "https://0x7f.1/x",
+      "href": "https://127.0.0.1/x"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "https://[2001:db8::1]:443/x",
+      "href": "https://[2001:db8::1]/x"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "https://[2001:DB8:0:0:0:0:0:1]/",
+      "href": "https://[2001:db8::1]/"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "http://example.com\\a\\b",
+      "href": "http://example.com/a/b"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "https:example.com/x",
+      "href": "https://example.com/feeds/a/example.com/x"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "https://example.com/a b",
+      "href": "https://example.com/a%20b"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "https://example.com/a\tb\nc",
+      "href": "https://example.com/abc"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "mailto:anna@example.com",
+      "href": "mailto:anna@example.com"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "ftp://example.com/x/",
+      "href": "ftp://example.com/x/"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "https://example.com/x?a=1#",
+      "href": "https://example.com/x?a=1#"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "https://example.com/{x}|^`",
+      "href": "https://example.com/%7Bx%7D|%5E%60"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "https://example.com/%E2%80%93",
+      "href": "https://example.com/%E2%80%93"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "https://example.com./x",
+      "href": "https://example.com./x"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "http://",
+      "href": null
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "https://exa mple.com/",
+      "href": null
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "//example.com/x",
+      "href": "https://example.com/x"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "/relativ/väg",
+      "href": "https://example.com/relativ/v%C3%A4g"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "javascript:alert(1)",
+      "href": "javascript:alert(1)"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "https://example.com/x?a=%41&a=%41",
+      "href": "https://example.com/x?a=%41&a=%41"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "https://example.com/?a=1&a=2&a=0",
+      "href": "https://example.com/?a=1&a=2&a=0"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "https://xn--exmple-cua.com/",
+      "href": "https://xn--exmple-cua.com/"
+    },
+    {
+      "base": "https://example.com/feeds/a/feed.xml",
+      "link": "https://EXAMPLE.com/Väg/?Q=Ä",
+      "href": "https://example.com/V%C3%A4g/?Q=%C3%84"
+    },
+    {
+      "base": "http://example.org",
+      "link": "/a",
+      "href": "http://example.org/a"
+    },
+    {
+      "base": "http://example.org",
+      "link": "b",
+      "href": "http://example.org/b"
+    },
+    {
+      "base": "http://example.org",
+      "link": "../c",
+      "href": "http://example.org/c"
+    },
+    {
+      "base": "http://example.org",
+      "link": "?q=1",
+      "href": "http://example.org/?q=1"
+    },
+    {
+      "base": "http://example.org",
+      "link": "#frag",
+      "href": "http://example.org/#frag"
+    },
+    {
+      "base": "http://example.org",
+      "link": "//other.example/x",
+      "href": "http://other.example/x"
+    },
+    {
+      "base": "http://example.org",
+      "link": "https://abs.example/y",
+      "href": "https://abs.example/y"
+    },
+    {
+      "base": "http://example.org",
+      "link": "  /trim  ",
+      "href": "http://example.org/trim"
+    },
+    {
+      "base": "http://example.org",
+      "link": "",
+      "href": "http://example.org/"
+    },
+    {
+      "base": "http://example.org",
+      "link": "javascript:x",
+      "href": "javascript:x"
+    },
+    {
+      "base": "http://example.org",
+      "link": "tag:a,b",
+      "href": "tag:a,b"
+    },
+    {
+      "base": "http://example.org",
+      "link": "/a b",
+      "href": "http://example.org/a%20b"
+    },
+    {
+      "base": "http://example.org",
+      "link": "/å",
+      "href": "http://example.org/%C3%A5"
+    },
+    {
+      "base": "http://example.org",
+      "link": "http:/x",
+      "href": "http://example.org/x"
+    },
+    {
+      "base": "http://example.org",
+      "link": "mailto:x@y",
+      "href": "mailto:x@y"
+    },
+    {
+      "base": "http://example.org",
+      "link": "\\back",
+      "href": "http://example.org/back"
+    },
+    {
+      "base": "http://example.org",
+      "link": "././d/../e",
+      "href": "http://example.org/e"
+    },
+    {
+      "base": "http://example.org",
+      "link": "https://www.example.com/nyheter/en-post/?utm_source=rss&utm_medium=feed",
+      "href": "https://www.example.com/nyheter/en-post/?utm_source=rss&utm_medium=feed"
+    },
+    {
+      "base": "http://example.org",
+      "link": "http://example.com/nyheter/en-post#kommentarer",
+      "href": "http://example.com/nyheter/en-post#kommentarer"
+    },
+    {
+      "base": "http://example.org",
+      "link": "  https://EXAMPLE.com/nyheter/en-post  ",
+      "href": "https://example.com/nyheter/en-post"
+    },
+    {
+      "base": "http://example.org",
+      "link": "https://example.com/?p=12&fbclid=abc&a=1",
+      "href": "https://example.com/?p=12&fbclid=abc&a=1"
+    },
+    {
+      "base": "http://example.org",
+      "link": "https://example.com:8443/x/",
+      "href": "https://example.com:8443/x/"
+    },
+    {
+      "base": "http://example.org",
+      "link": "https://example.com:443/x/",
+      "href": "https://example.com/x/"
+    },
+    {
+      "base": "http://example.org",
+      "link": "http://example.com:80/x//",
+      "href": "http://example.com/x//"
+    },
+    {
+      "base": "http://example.org",
+      "link": "tag:example.com,2026:1",
+      "href": "tag:example.com,2026:1"
+    },
+    {
+      "base": "http://example.org",
+      "link": "inte en adress",
+      "href": "http://example.org/inte%20en%20adress"
+    },
+    {
+      "base": "http://example.org",
+      "link": "https://example.com/a?b=1&a=2&B=3&a=1&c",
+      "href": "https://example.com/a?b=1&a=2&B=3&a=1&c"
+    },
+    {
+      "base": "http://example.org",
+      "link": "https://example.com/a?q=hej+du&r=%C3%A5&s=a%2Bb&t=~*'()!&u=%zz&v=å",
+      "href": "https://example.com/a?q=hej+du&r=%C3%A5&s=a%2Bb&t=~*%27()!&u=%zz&v=%C3%A5"
+    },
+    {
+      "base": "http://example.org",
+      "link": "https://example.com/a?=x&&y=&z",
+      "href": "https://example.com/a?=x&&y=&z"
+    },
+    {
+      "base": "http://example.org",
+      "link": "https://example.com/å/ä ö?x=ö#frag",
+      "href": "https://example.com/%C3%A5/%C3%A4%20%C3%B6?x=%C3%B6#frag"
+    },
+    {
+      "base": "http://example.org",
+      "link": "https://exämple.com/flöde",
+      "href": "https://xn--exmple-cua.com/fl%C3%B6de"
+    },
+    {
+      "base": "http://example.org",
+      "link": "https://ÉXAMPLE.com/",
+      "href": "https://xn--xample-9ua.com/"
+    },
+    {
+      "base": "http://example.org",
+      "link": "https://example.com/a/./b/../c",
+      "href": "https://example.com/a/c"
+    },
+    {
+      "base": "http://example.org",
+      "link": "https://example.com/%7Euser/%41",
+      "href": "https://example.com/%7Euser/%41"
+    },
+    {
+      "base": "http://example.org",
+      "link": "HTTPS://WWW.EXAMPLE.COM",
+      "href": "https://www.example.com/"
+    },
+    {
+      "base": "http://example.org",
+      "link": "https://www.www.example.com/x",
+      "href": "https://www.www.example.com/x"
+    },
+    {
+      "base": "http://example.org",
+      "link": "https://wwwexample.com/x",
+      "href": "https://wwwexample.com/x"
+    },
+    {
+      "base": "http://example.org",
+      "link": "https://user:pass@example.com/x",
+      "href": "https://user:pass@example.com/x"
+    },
+    {
+      "base": "http://example.org",
+      "link": "https://example.com?utm_source=x",
+      "href": "https://example.com/?utm_source=x"
+    },
+    {
+      "base": "http://example.org",
+      "link": "https://example.com/x?UTM_SOURCE=x&Fbclid=1&gclid=2&dclid=&gbraid&wbraid=1&msclkid=1&yclid=1&mc_cid=1&mc_eid=1&_hsenc=1&_hsmi=1&igshid=1&utm_=1&utm_x_y=1",
+      "href": "https://example.com/x?UTM_SOURCE=x&Fbclid=1&gclid=2&dclid=&gbraid&wbraid=1&msclkid=1&yclid=1&mc_cid=1&mc_eid=1&_hsenc=1&_hsmi=1&igshid=1&utm_=1&utm_x_y=1"
+    },
+    {
+      "base": "http://example.org",
+      "link": "https://127.0.0.1:8080/x",
+      "href": "https://127.0.0.1:8080/x"
+    },
+    {
+      "base": "http://example.org",
+      "link": "https://0x7f.1/x",
+      "href": "https://127.0.0.1/x"
+    },
+    {
+      "base": "http://example.org",
+      "link": "https://[2001:db8::1]:443/x",
+      "href": "https://[2001:db8::1]/x"
+    },
+    {
+      "base": "http://example.org",
+      "link": "https://[2001:DB8:0:0:0:0:0:1]/",
+      "href": "https://[2001:db8::1]/"
+    },
+    {
+      "base": "http://example.org",
+      "link": "http://example.com\\a\\b",
+      "href": "http://example.com/a/b"
+    },
+    {
+      "base": "http://example.org",
+      "link": "https:example.com/x",
+      "href": "https://example.com/x"
+    },
+    {
+      "base": "http://example.org",
+      "link": "https://example.com/a b",
+      "href": "https://example.com/a%20b"
+    },
+    {
+      "base": "http://example.org",
+      "link": "https://example.com/a\tb\nc",
+      "href": "https://example.com/abc"
+    },
+    {
+      "base": "http://example.org",
+      "link": "mailto:anna@example.com",
+      "href": "mailto:anna@example.com"
+    },
+    {
+      "base": "http://example.org",
+      "link": "ftp://example.com/x/",
+      "href": "ftp://example.com/x/"
+    },
+    {
+      "base": "http://example.org",
+      "link": "https://example.com/x?a=1#",
+      "href": "https://example.com/x?a=1#"
+    },
+    {
+      "base": "http://example.org",
+      "link": "https://example.com/{x}|^`",
+      "href": "https://example.com/%7Bx%7D|%5E%60"
+    },
+    {
+      "base": "http://example.org",
+      "link": "https://example.com/%E2%80%93",
+      "href": "https://example.com/%E2%80%93"
+    },
+    {
+      "base": "http://example.org",
+      "link": "https://example.com./x",
+      "href": "https://example.com./x"
+    },
+    {
+      "base": "http://example.org",
+      "link": "http://",
+      "href": null
+    },
+    {
+      "base": "http://example.org",
+      "link": "https://exa mple.com/",
+      "href": null
+    },
+    {
+      "base": "http://example.org",
+      "link": "//example.com/x",
+      "href": "http://example.com/x"
+    },
+    {
+      "base": "http://example.org",
+      "link": "/relativ/väg",
+      "href": "http://example.org/relativ/v%C3%A4g"
+    },
+    {
+      "base": "http://example.org",
+      "link": "javascript:alert(1)",
+      "href": "javascript:alert(1)"
+    },
+    {
+      "base": "http://example.org",
+      "link": "https://example.com/x?a=%41&a=%41",
+      "href": "https://example.com/x?a=%41&a=%41"
+    },
+    {
+      "base": "http://example.org",
+      "link": "https://example.com/?a=1&a=2&a=0",
+      "href": "https://example.com/?a=1&a=2&a=0"
+    },
+    {
+      "base": "http://example.org",
+      "link": "https://xn--exmple-cua.com/",
+      "href": "https://xn--exmple-cua.com/"
+    },
+    {
+      "base": "http://example.org",
+      "link": "https://EXAMPLE.com/Väg/?Q=Ä",
+      "href": "https://example.com/V%C3%A4g/?Q=%C3%84"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "/a",
+      "href": "https://example.com/a"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "b",
+      "href": "https://example.com/feed/b"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "../c",
+      "href": "https://example.com/c"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "?q=1",
+      "href": "https://example.com/feed/?q=1"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "#frag",
+      "href": "https://example.com/feed/?x=1#frag"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "//other.example/x",
+      "href": "https://other.example/x"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "https://abs.example/y",
+      "href": "https://abs.example/y"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "  /trim  ",
+      "href": "https://example.com/trim"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "",
+      "href": "https://example.com/feed/?x=1"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "javascript:x",
+      "href": "javascript:x"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "tag:a,b",
+      "href": "tag:a,b"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "/a b",
+      "href": "https://example.com/a%20b"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "/å",
+      "href": "https://example.com/%C3%A5"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "http:/x",
+      "href": "http://x/"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "mailto:x@y",
+      "href": "mailto:x@y"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "\\back",
+      "href": "https://example.com/back"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "././d/../e",
+      "href": "https://example.com/feed/e"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "https://www.example.com/nyheter/en-post/?utm_source=rss&utm_medium=feed",
+      "href": "https://www.example.com/nyheter/en-post/?utm_source=rss&utm_medium=feed"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "http://example.com/nyheter/en-post#kommentarer",
+      "href": "http://example.com/nyheter/en-post#kommentarer"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "  https://EXAMPLE.com/nyheter/en-post  ",
+      "href": "https://example.com/nyheter/en-post"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "https://example.com/?p=12&fbclid=abc&a=1",
+      "href": "https://example.com/?p=12&fbclid=abc&a=1"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "https://example.com:8443/x/",
+      "href": "https://example.com:8443/x/"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "https://example.com:443/x/",
+      "href": "https://example.com/x/"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "http://example.com:80/x//",
+      "href": "http://example.com/x//"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "tag:example.com,2026:1",
+      "href": "tag:example.com,2026:1"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "inte en adress",
+      "href": "https://example.com/feed/inte%20en%20adress"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "https://example.com/a?b=1&a=2&B=3&a=1&c",
+      "href": "https://example.com/a?b=1&a=2&B=3&a=1&c"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "https://example.com/a?q=hej+du&r=%C3%A5&s=a%2Bb&t=~*'()!&u=%zz&v=å",
+      "href": "https://example.com/a?q=hej+du&r=%C3%A5&s=a%2Bb&t=~*%27()!&u=%zz&v=%C3%A5"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "https://example.com/a?=x&&y=&z",
+      "href": "https://example.com/a?=x&&y=&z"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "https://example.com/å/ä ö?x=ö#frag",
+      "href": "https://example.com/%C3%A5/%C3%A4%20%C3%B6?x=%C3%B6#frag"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "https://exämple.com/flöde",
+      "href": "https://xn--exmple-cua.com/fl%C3%B6de"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "https://ÉXAMPLE.com/",
+      "href": "https://xn--xample-9ua.com/"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "https://example.com/a/./b/../c",
+      "href": "https://example.com/a/c"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "https://example.com/%7Euser/%41",
+      "href": "https://example.com/%7Euser/%41"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "HTTPS://WWW.EXAMPLE.COM",
+      "href": "https://www.example.com/"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "https://www.www.example.com/x",
+      "href": "https://www.www.example.com/x"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "https://wwwexample.com/x",
+      "href": "https://wwwexample.com/x"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "https://user:pass@example.com/x",
+      "href": "https://user:pass@example.com/x"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "https://example.com?utm_source=x",
+      "href": "https://example.com/?utm_source=x"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "https://example.com/x?UTM_SOURCE=x&Fbclid=1&gclid=2&dclid=&gbraid&wbraid=1&msclkid=1&yclid=1&mc_cid=1&mc_eid=1&_hsenc=1&_hsmi=1&igshid=1&utm_=1&utm_x_y=1",
+      "href": "https://example.com/x?UTM_SOURCE=x&Fbclid=1&gclid=2&dclid=&gbraid&wbraid=1&msclkid=1&yclid=1&mc_cid=1&mc_eid=1&_hsenc=1&_hsmi=1&igshid=1&utm_=1&utm_x_y=1"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "https://127.0.0.1:8080/x",
+      "href": "https://127.0.0.1:8080/x"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "https://0x7f.1/x",
+      "href": "https://127.0.0.1/x"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "https://[2001:db8::1]:443/x",
+      "href": "https://[2001:db8::1]/x"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "https://[2001:DB8:0:0:0:0:0:1]/",
+      "href": "https://[2001:db8::1]/"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "http://example.com\\a\\b",
+      "href": "http://example.com/a/b"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "https:example.com/x",
+      "href": "https://example.com/feed/example.com/x"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "https://example.com/a b",
+      "href": "https://example.com/a%20b"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "https://example.com/a\tb\nc",
+      "href": "https://example.com/abc"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "mailto:anna@example.com",
+      "href": "mailto:anna@example.com"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "ftp://example.com/x/",
+      "href": "ftp://example.com/x/"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "https://example.com/x?a=1#",
+      "href": "https://example.com/x?a=1#"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "https://example.com/{x}|^`",
+      "href": "https://example.com/%7Bx%7D|%5E%60"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "https://example.com/%E2%80%93",
+      "href": "https://example.com/%E2%80%93"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "https://example.com./x",
+      "href": "https://example.com./x"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "http://",
+      "href": null
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "https://exa mple.com/",
+      "href": null
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "//example.com/x",
+      "href": "https://example.com/x"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "/relativ/väg",
+      "href": "https://example.com/relativ/v%C3%A4g"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "javascript:alert(1)",
+      "href": "javascript:alert(1)"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "https://example.com/x?a=%41&a=%41",
+      "href": "https://example.com/x?a=%41&a=%41"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "https://example.com/?a=1&a=2&a=0",
+      "href": "https://example.com/?a=1&a=2&a=0"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "https://xn--exmple-cua.com/",
+      "href": "https://xn--exmple-cua.com/"
+    },
+    {
+      "base": "https://example.com/feed/?x=1#y",
+      "link": "https://EXAMPLE.com/Väg/?Q=Ä",
+      "href": "https://example.com/V%C3%A4g/?Q=%C3%84"
+    }
+  ],
+  "decodeEntities": [
+    {
+      "html": "<p>Första <b>stycket</b>&nbsp;här.</p><p>Andra<br/>raden &lt;b&gt;</p><script>alert(1)</script><!-- x -->",
+      "text": "<p>Första <b>stycket</b> här.</p><p>Andra<br/>raden <b></p><script>alert(1)</script><!-- x -->"
+    },
+    {
+      "html": "  \n ",
+      "text": "  \n "
+    },
+    {
+      "html": "<SCRIPT type='x'>a</script >b<style>c</STYLE>d<scripts>e</scripts><script>f",
+      "text": "<SCRIPT type='x'>a</script >b<style>c</STYLE>d<scripts>e</scripts><script>f"
+    },
+    {
+      "html": "<pre>x</pre><prex>y<p\nclass=a>z<blockquote>q</blockquote><h7>h</h7><H2>H</H2>",
+      "text": "<pre>x</pre><prex>y<p\nclass=a>z<blockquote>q</blockquote><h7>h</h7><H2>H</H2>"
+    },
+    {
+      "html": "a<!-- b --><!-- c",
+      "text": "a<!-- b --><!-- c"
+    },
+    {
+      "html": "Hej &amp; v&#228;lkommen &#x2013; &aring;r&nbsp;2026 &okand; &#X41; &#0; &#1114112; &#xD800; &AMP; &Aring; &hellip;&shy;",
+      "text": "Hej & välkommen – år 2026 &okand; A &#0; &#1114112; \ud800 &AMP; Å …"
+    },
+    {
+      "html": "&amp;amp; &lt;p&gt;inte tagg&lt;/p&gt; &#38;#228;",
+      "text": "&amp; <p>inte tagg</p> &#228;"
+    },
+    {
+      "html": "Rad1\r\nRad2 Rad3 　slut﻿",
+      "text": "Rad1\r\nRad2 Rad3 　slut﻿"
+    },
+    {
+      "html": "<a href=\"x\">länk</a> & <img src=x> < 5 > 3",
+      "text": "<a href=\"x\">länk</a> & <img src=x> < 5 > 3"
+    },
+    {
+      "html": "<p>a</p>\n\n<p>b</p>",
+      "text": "<p>a</p>\n\n<p>b</p>"
+    },
+    {
+      "html": "<div><figure><figcaption>Bild</figcaption></figure></div>text",
+      "text": "<div><figure><figcaption>Bild</figcaption></figure></div>text"
+    },
+    {
+      "html": "<br><BR/><br />",
+      "text": "<br><BR/><br />"
+    },
+    {
+      "html": "&#128512; &#x1F600; &#55357;&#56832;",
+      "text": "😀 😀 😀"
+    }
+  ],
+  "htmlToText": [
+    {
+      "html": "<p>Första <b>stycket</b>&nbsp;här.</p><p>Andra<br/>raden &lt;b&gt;</p><script>alert(1)</script><!-- x -->",
+      "text": "Första stycket här. Andra raden <b>"
+    },
+    {
+      "html": "  \n ",
+      "text": ""
+    },
+    {
+      "html": "<SCRIPT type='x'>a</script >b<style>c</STYLE>d<scripts>e</scripts><script>f",
+      "text": "b def"
+    },
+    {
+      "html": "<pre>x</pre><prex>y<p\nclass=a>z<blockquote>q</blockquote><h7>h</h7><H2>H</H2>",
+      "text": "x y z q h H"
+    },
+    {
+      "html": "a<!-- b --><!-- c",
+      "text": "a <!-- c"
+    },
+    {
+      "html": "Hej &amp; v&#228;lkommen &#x2013; &aring;r&nbsp;2026 &okand; &#X41; &#0; &#1114112; &#xD800; &AMP; &Aring; &hellip;&shy;",
+      "text": "Hej & välkommen – år 2026 &okand; A &#0; &#1114112; \ud800 &AMP; Å …"
+    },
+    {
+      "html": "&amp;amp; &lt;p&gt;inte tagg&lt;/p&gt; &#38;#228;",
+      "text": "&amp; <p>inte tagg</p> &#228;"
+    },
+    {
+      "html": "Rad1\r\nRad2 Rad3 　slut﻿",
+      "text": "Rad1 Rad2 Rad3 slut"
+    },
+    {
+      "html": "<a href=\"x\">länk</a> & <img src=x> < 5 > 3",
+      "text": "länk & 3"
+    },
+    {
+      "html": "<p>a</p>\n\n<p>b</p>",
+      "text": "a b"
+    },
+    {
+      "html": "<div><figure><figcaption>Bild</figcaption></figure></div>text",
+      "text": "Bild text"
+    },
+    {
+      "html": "<br><BR/><br />",
+      "text": ""
+    },
+    {
+      "html": "&#128512; &#x1F600; &#55357;&#56832;",
+      "text": "😀 😀 😀"
+    }
+  ],
+  "decodeBody": [
+    {
+      "hex": "3c3f786d6c2076657273696f6e3d22312e302220656e636f64696e673d2249534f2d383835392d31223f3e3c7273733ee5e4f63c2f7273733e",
+      "contentType": "application/rss+xml",
+      "text": "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?><rss>åäö</rss>"
+    },
+    {
+      "hex": "3c7273733ee5809f3c2f7273733e",
+      "contentType": "text/xml; charset=windows-1252",
+      "text": "<rss>å€Ÿ</rss>"
+    },
+    {
+      "hex": "efbbbf3c7273733ec3a53c2f7273733e",
+      "contentType": "text/xml; charset=iso-8859-1",
+      "text": "<rss>å</rss>"
+    },
+    {
+      "hex": "3c7273733ec3a53c2f7273733e",
+      "contentType": "text/xml; charset=nonsens",
+      "text": "<rss>å</rss>"
+    },
+    {
+      "hex": "3c7273733ec3a53c2f7273733e",
+      "contentType": null,
+      "text": "<rss>å</rss>"
+    },
+    {
+      "hex": "fffe3c007200730073003e00e5003c002f007200730073003e00",
+      "contentType": "text/xml; charset=utf-8",
+      "text": "<rss>å</rss>"
+    },
+    {
+      "hex": "feff003c007200730073003e00e5003c002f007200730073003e",
+      "contentType": null,
+      "text": "<rss>å</rss>"
+    },
+    {
+      "hex": "3c007200730073003e00e5003c002f007200730073003e00",
+      "contentType": "text/xml; charset=UTF-16LE",
+      "text": "<rss>å</rss>"
+    },
+    {
+      "hex": "3c7273733ee53c2f7273733e",
+      "contentType": "text/xml; Charset = \"Latin1\"",
+      "text": "<rss>å</rss>"
+    },
+    {
+      "hex": "3c7273733ee53c2f7273733e",
+      "contentType": "text/xml; charset=us-ascii",
+      "text": "<rss>å</rss>"
+    },
+    {
+      "hex": "20203c3f786d6c2076657273696f6e3d27312e302720656e636f64696e673d2769736f2d383835392d31273f3e3c7273733ee53c2f7273733e",
+      "contentType": "text/xml; charset=",
+      "text": "  <?xml version='1.0' encoding='iso-8859-1'?><rss>å</rss>"
+    },
+    {
+      "hex": "3c7273733ee2823c2f7273733e",
+      "contentType": null,
+      "text": "<rss>�</rss>"
+    },
+    {
+      "hex": "3c7273733ec3283cf09f98ffc0afeda080e282ac3c2f7273733e",
+      "contentType": "text/xml",
+      "text": "<rss>�(<�������€</rss>"
+    },
+    {
+      "hex": "3c7273733ea43c2f7273733e",
+      "contentType": "text/xml; charset=iso-8859-15",
+      "text": "<rss>€</rss>"
+    },
+    {
+      "hex": "3c7273733ee53c2f7273733e",
+      "contentType": "text/xml; charset=ISO_8859-1:1987",
+      "text": "<rss>å</rss>"
+    },
+    {
+      "hex": "",
+      "contentType": null,
+      "text": ""
+    },
+    {
+      "hex": "ef",
+      "contentType": null,
+      "text": "�"
+    },
+    {
+      "hex": "efbbbf",
+      "contentType": null,
+      "text": ""
+    }
+  ],
+  "dates": [
+    {
+      "text": "Mon, 26 Oct 2026 08:00:00 +0100",
+      "ms": 1792998000000
+    },
+    {
+      "text": "Mon, 09 Nov 2026 20:00:00 GMT",
+      "ms": 1794254400000
+    },
+    {
+      "text": "Mon, 09 Nov 2026 08:02:00 +0000",
+      "ms": 1794211320000
+    },
+    {
+      "text": "Tue, 27 Oct 2026 08:00:00 GMT",
+      "ms": 1793088000000
+    },
+    {
+      "text": "2026-10-26T07:30:00Z",
+      "ms": 1792999800000
+    },
+    {
+      "text": "2026-10-26T07:30:00",
+      "ms": 1792996200000
+    },
+    {
+      "text": "2026-10-26T07:30",
+      "ms": 1792996200000
+    },
+    {
+      "text": "2026-10-26",
+      "ms": 1792972800000
+    },
+    {
+      "text": "2026-10",
+      "ms": 1790812800000
+    },
+    {
+      "text": "2026",
+      "ms": 1767225600000
+    },
+    {
+      "text": "2026-10-26T07:30:00.123456Z",
+      "ms": 1792999800123
+    },
+    {
+      "text": "2026-10-26T07:30:00+02:00",
+      "ms": 1792992600000
+    },
+    {
+      "text": "2026-10-26T07:30:00+0200",
+      "ms": 1792992600000
+    },
+    {
+      "text": "2026-10-26T24:00:00Z",
+      "ms": 1793059200000
+    },
+    {
+      "text": "2026-10-26T24:00:01Z",
+      "ms": null
+    },
+    {
+      "text": "2026-10-26T7:30:00Z",
+      "ms": null
+    },
+    {
+      "text": "2026-10-26 07:30:00",
+      "ms": 1792996200000
+    },
+    {
+      "text": "2026-10-26 07:30:00 +0100",
+      "ms": 1792996200000
+    },
+    {
+      "text": "2026/10/26 07:30",
+      "ms": 1792996200000
+    },
+    {
+      "text": "10/26/2026",
+      "ms": 1792969200000
+    },
+    {
+      "text": "26/10/2026",
+      "ms": null
+    },
+    {
+      "text": "26 Oct 2026",
+      "ms": 1792969200000
+    },
+    {
+      "text": "Oct 26 2026",
+      "ms": 1792969200000
+    },
+    {
+      "text": "Oct 26",
+      "ms": 1004047200000
+    },
+    {
+      "text": "26 October 2026 7:30 PM",
+      "ms": 1793039400000
+    },
+    {
+      "text": "26 okt 2026",
+      "ms": null
+    },
+    {
+      "text": "Monday, 26-Oct-26 08:00:00 GMT",
+      "ms": 1793001600000
+    },
+    {
+      "text": "Mon, 26 Oct 26 08:00:00 EST",
+      "ms": 1793019600000
+    },
+    {
+      "text": "Mon, 26 Oct 2026 08:00:00 PDT",
+      "ms": 1793026800000
+    },
+    {
+      "text": "Mon, 26 Oct 2026 08:00:00 CEST",
+      "ms": null
+    },
+    {
+      "text": "Mon, 26 Oct 2026 08:00:00 UT",
+      "ms": 1793001600000
+    },
+    {
+      "text": "Mon, 26 Oct 2026 08:00:00 Z",
+      "ms": 1793001600000
+    },
+    {
+      "text": "Mon, 26 Oct 2026 08:00 +01:00",
+      "ms": 1792998000000
+    },
+    {
+      "text": "Mon, 26 Oct 2026 08:00:00 GMT+0100",
+      "ms": 1792998000000
+    },
+    {
+      "text": "Mon, 26 Oct 2026 08:00:00 GMT-5",
+      "ms": 1793019600000
+    },
+    {
+      "text": "Mon, 26 Oct 2026 08:00:00 (CET)",
+      "ms": 1792998000000
+    },
+    {
+      "text": "trasigt datum",
+      "ms": null
+    },
+    {
+      "text": "",
+      "ms": null
+    },
+    {
+      "text": "+002026-10-26T00:00:00Z",
+      "ms": 1792972800000
+    },
+    {
+      "text": "-000001-01-01T00:00:00Z",
+      "ms": -62198755200000
+    },
+    {
+      "text": "2026-02-30",
+      "ms": 1772409600000
+    },
+    {
+      "text": "2026-13-01",
+      "ms": null
+    },
+    {
+      "text": "Feb 30 2026",
+      "ms": 1772406000000
+    },
+    {
+      "text": "2026-10-26T12:00:00.5Z",
+      "ms": 1793016000500
+    },
+    {
+      "text": "1700000000",
+      "ms": null
+    },
+    {
+      "text": "@1700000000",
+      "ms": null
+    },
+    {
+      "text": "2026-10-26T07:30:00.000+01:00",
+      "ms": 1792996200000
+    },
+    {
+      "text": "Mon Oct 26 2026 08:00:00 GMT+0100 (Central European Standard Time)",
+      "ms": 1792998000000
+    },
+    {
+      "text": "Sun, 29 Mar 2026 02:30:00",
+      "ms": 1774747800000
+    },
+    {
+      "text": "Sun, 25 Oct 2026 02:30:00",
+      "ms": 1792888200000
+    },
+    {
+      "text": "12:00",
+      "ms": null
+    },
+    {
+      "text": "Mon, 26 Oct 2026 12:00:00 am",
+      "ms": 1792969200000
+    },
+    {
+      "text": "Mon, 26 Oct 2026 12:00 pm",
+      "ms": 1793012400000
+    },
+    {
+      "text": "2026-10-26T07:30:00z",
+      "ms": 1792999800000
+    },
+    {
+      "text": "2026-10-26t07:30:00Z",
+      "ms": 1792999800000
+    },
+    {
+      "text": "  2026-10-26T07:30:00Z  ",
+      "ms": null
+    },
+    {
+      "text": "26.10.2026",
+      "ms": null
+    },
+    {
+      "text": "2026.10.26",
+      "ms": 1792969200000
+    },
+    {
+      "text": "Okt 26 2026",
+      "ms": null
+    },
+    {
+      "text": "Mon, 26 Oct 2026 08:00:00 +01",
+      "ms": 1792998000000
+    },
+    {
+      "text": "Mon, 26 Oct 2026 08:00:00 +1",
+      "ms": 1792998000000
+    },
+    {
+      "text": "Mon, 26 Oct 2026 08:00:00 +12345",
+      "ms": null
+    },
+    {
+      "text": "2026-10-26T07:30:60Z",
+      "ms": null
+    },
+    {
+      "text": "Thu, 01 Jan 1970 00:00:00 GMT",
+      "ms": 0
+    },
+    {
+      "text": "Sat, 13 Sep 275760 00:00:00 GMT",
+      "ms": 8640000000000000
+    },
+    {
+      "text": "Sat, 14 Sep 275760 00:00:00 GMT",
+      "ms": null
+    },
+    {
+      "text": "49-1-1",
+      "ms": 2493068400000
+    },
+    {
+      "text": "50-1-1",
+      "ms": -631155600000
+    },
+    {
+      "text": "0-1-1",
+      "ms": 946681200000
+    },
+    {
+      "text": "June 2026",
+      "ms": 1780264800000
+    },
+    {
+      "text": "2026 June 5",
+      "ms": 1780610400000
+    },
+    {
+      "text": "5 June 2026 10.30",
+      "ms": null
+    },
+    {
+      "text": "Mon, 26 Oct 2026 08:00:00.250 GMT",
+      "ms": 1793001600250
+    },
+    {
+      "text": "Mon, 26 Oct 2026 8:0:0 GMT",
+      "ms": 1793001600000
+    },
+    {
+      "text": "2026-10-26T07:30:00 Z",
+      "ms": null
+    }
+  ],
+  "ago": [
+    {
+      "delta": -5000,
+      "text": "nyss"
+    },
+    {
+      "delta": 20000,
+      "text": "nyss"
+    },
+    {
+      "delta": 59999,
+      "text": "nyss"
+    },
+    {
+      "delta": 60000,
+      "text": "1 min sedan"
+    },
+    {
+      "delta": 720000,
+      "text": "12 min sedan"
+    },
+    {
+      "delta": 3599999,
+      "text": "59 min sedan"
+    },
+    {
+      "delta": 10800000,
+      "text": "3 h sedan"
+    },
+    {
+      "delta": 86399999,
+      "text": "23 h sedan"
+    },
+    {
+      "delta": 93600000,
+      "text": "1 dag sedan"
+    },
+    {
+      "delta": 172800000,
+      "text": "2 dagar sedan"
+    },
+    {
+      "delta": 288000000,
+      "text": "3 dagar sedan"
+    },
+    {
+      "delta": 34560000000,
+      "text": "400 dagar sedan"
+    }
+  ],
+  "daysAgo": [
+    {
+      "now": 1793016000000,
+      "date": "2026-10-26",
+      "text": "idag"
+    },
+    {
+      "now": 1793016000000,
+      "date": "2026-10-25",
+      "text": "igår"
+    },
+    {
+      "now": 1793016000000,
+      "date": "2026-05-12",
+      "text": "167 dagar sedan"
+    },
+    {
+      "now": 1793016000000,
+      "date": "2026-10-27",
+      "text": "idag"
+    },
+    {
+      "now": 1793016000000,
+      "date": "2026-10-26T23:30:00Z",
+      "text": "idag"
+    },
+    {
+      "now": 1793016000000,
+      "date": "2025-10-26",
+      "text": "365 dagar sedan"
+    },
+    {
+      "now": 1793016000000,
+      "date": "trasigt",
+      "text": "NaN dagar sedan"
+    },
+    {
+      "now": 1793053800000,
+      "date": "2026-10-26",
+      "text": "idag"
+    },
+    {
+      "now": 1793053800000,
+      "date": "2026-10-25",
+      "text": "igår"
+    },
+    {
+      "now": 1793053800000,
+      "date": "2026-05-12",
+      "text": "167 dagar sedan"
+    },
+    {
+      "now": 1793053800000,
+      "date": "2026-10-27",
+      "text": "idag"
+    },
+    {
+      "now": 1793053800000,
+      "date": "2026-10-26T23:30:00Z",
+      "text": "idag"
+    },
+    {
+      "now": 1793053800000,
+      "date": "2025-10-26",
+      "text": "365 dagar sedan"
+    },
+    {
+      "now": 1793053800000,
+      "date": "trasigt",
+      "text": "NaN dagar sedan"
+    },
+    {
+      "now": 1774744200000,
+      "date": "2026-10-26",
+      "text": "idag"
+    },
+    {
+      "now": 1774744200000,
+      "date": "2026-10-25",
+      "text": "idag"
+    },
+    {
+      "now": 1774744200000,
+      "date": "2026-05-12",
+      "text": "idag"
+    },
+    {
+      "now": 1774744200000,
+      "date": "2026-10-27",
+      "text": "idag"
+    },
+    {
+      "now": 1774744200000,
+      "date": "2026-10-26T23:30:00Z",
+      "text": "idag"
+    },
+    {
+      "now": 1774744200000,
+      "date": "2025-10-26",
+      "text": "154 dagar sedan"
+    },
+    {
+      "now": 1774744200000,
+      "date": "trasigt",
+      "text": "NaN dagar sedan"
+    }
+  ],
+  "postId": [
+    {
+      "feed": "news",
+      "key": "g:1",
+      "id": "08b0b4cbe0ca4056f7dce13b26c4adc5"
+    },
+    {
+      "feed": "news",
+      "key": "l:example.com/a",
+      "id": "3e13d0c13a5048a70306074978cbadc8"
+    },
+    {
+      "feed": "news",
+      "key": "g:https://example.com/?p=3",
+      "id": "14f328c004cf19ef2a9e7f3ce9c02780"
+    },
+    {
+      "feed": "news",
+      "key": "g:åäö 😀",
+      "id": "2f8612d7ba8f8399cc760ee3b5f44a24"
+    }
+  ]
+}

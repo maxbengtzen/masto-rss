@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<rss version="2.0" xmlns:d="http://purl.org/dc/elements/1.1/" xmlns:c="http://purl.org/rss/1.0/modules/content/">
+<channel>
+  <title>Andra prefix</title>
+  <language>  SV  </language>
+  <item>
+    <title>Prefixet d</title>
+    <link>https://example.com/ns1</link>
+    <d:creator>Hanna</d:creator>
+    <d:date>2026-10-26T09:00:00Z</d:date>
+    <c:encoded>Innehåll</c:encoded>
+  </item>
+  <item>
+    <title>Odeklarerat prefix</title>
+    <link>https://example.com/ns2</link>
+    <dc:creator>Ivar</dc:creator>
+  </item>
+</channel>
+<item><title>Utanför kanalen</title><link>https://example.com/utanfor</link></item>
+</rss>

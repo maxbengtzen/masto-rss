@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:wfw="http://wellformedweb.org/CommentAPI/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+	<title>Exempelbloggen</title>
+	<link>https://cms.example.se/</link>
+	<description>Exempelbloggen</description>
+	<language>sv</language>
+	<pubDate>Mon, 09 Nov 2026 20:55:44 GMT</pubDate>
+	<generator>Exempel CMS</generator>
+	<managingEditor>redaktion@cms.example.se (Redaktionen)</managingEditor>
+	<webMaster>webmaster@cms.example.se (Webmaster)</webMaster>
+	<copyright>Exempel AB</copyright>
+	<atom:link href="https://cms.example.se/rss/" rel="self" type="application/rss+xml" />
+<item>
+	<title><![CDATA[Vi har testat en påhittad luftrenare]]></title>
+	<link>https://cms.example.se/kategori/exempel-1/498000/?utm_source=rss&amp;utm_medium=feed</link>
+	<comments>https://cms.example.se/kategori/exempel-1/498000/</comments>
+	<dc:creator><![CDATA[Skribent 1]]></dc:creator>
+	<description><![CDATA[<b>Vi har testat en påhittad luftrenare</b><br /><br />
+<a href="https://cms.example.se/kategori/exempel-1/498000/?utm_source=rss&amp;utm_medium=feed"><img src="https://img.cms.example.se/0.jpg"></a><br /><br />
+Det här är en påhittad text som bara finns för att testa hur flöden tolkas. Den handlar om ingenting särskilt, men den är lång nog att behöva kortas när den blir ett inlägg. Här finns å, ä och ö, citattecken ”så här”, ett tankstreck – och en länk till https://example.com/las-mer?utm_source=rss. <br /><br />
+Läs vidare och kommentera:<br /><a href="https://cms.example.se/kategori/exempel-1/498000/?utm_source=rss&amp;utm_medium=feed">https://cms.example.se/kategori/exempel-1/498000/</a><br /><br />
+Läs mer om <a href="https://cms.example.se/om/exempel/">exempel</a>, <a href="https://cms.example.se/om/test/">test</a>]]></description>
+	<pubDate>Mon, 09 Nov 2026 20:00:00 GMT</pubDate>
+	<guid>https://cms.example.se/kategori/exempel-1/498000/?utm_source=rss&amp;utm_medium=feed</guid>
+</item>
+<item>
+	<title><![CDATA[Ny mobil från Exempeltelefon – bättre kamera, sämre batteri?]]></title>
+	<link>https://cms.example.se/kategori/exempel-2/498001/?utm_source=rss&amp;utm_medium=feed</link>
+	<comments>https://cms.example.se/kategori/exempel-2/498001/</comments>
+	<dc:creator><![CDATA[Skribent 2]]></dc:creator>
+	<description><![CDATA[<b>Ny mobil från Exempeltelefon – bättre kamera, sämre batteri?</b><br /><br />
+<a href="https://cms.example.se/kategori/exempel-2/498001/?utm_source=rss&amp;utm_medium=feed"><img src="https://img.cms.example.se/1.jpg"></a><br /><br />
+Det här är en påhittad text som bara finns för att testa hur flöden tolkas. Den handlar om ingenting särskilt, men den är lång nog att behöva kortas när den blir ett inlägg. Här finns å, ä och ö, citattecken ”så här”, ett tankstreck – och en länk till https://example.com/las-mer?utm_source=rss. Det här är en påhittad text som bara finns för att testa hur flöden tolkas. Den handlar om ingenting särskilt, men den är lång nog att behöva kortas när den blir ett inlägg. Här finns å, ä och ö, citattecken ”så här”, ett tankstreck – och en länk till https://example.com/las-mer?utm_source=rss. <br /><br />
+Läs vidare och kommentera:<br /><a href="https://cms.example.se/kategori/exempel-2/498001/?utm_source=rss&amp;utm_medium=feed">https://cms.example.se/kategori/exempel-2/498001/</a><br /><br />
+Läs mer om <a href="https://cms.example.se/om/exempel/">exempel</a>, <a href="https://cms.example.se/om/test/">test</a>]]></description>
+	<pubDate>Mon, 09 Nov 2026 17:00:00 GMT</pubDate>
+	<guid>https://cms.example.se/kategori/exempel-2/498001/?utm_source=rss&amp;utm_medium=feed</guid>
+</item>
+<item>
+	<title><![CDATA[Spelet som alla pratar om får en uppföljare]]></title>
+	<link>https://cms.example.se/kategori/exempel-3/498002/?utm_source=rss&amp;utm_medium=feed</link>
+	<comments>https://cms.example.se/kategori/exempel-3/498002/</comments>
+	<dc:creator><![CDATA[Skribent 3]]></dc:creator>
+	<description><![CDATA[<b>Spelet som alla pratar om får en uppföljare</b><br /><br />
+<a href="https://cms.example.se/kategori/exempel-3/498002/?utm_source=rss&amp;utm_medium=feed"><img src="https://img.cms.example.se/2.jpg"></a><br /><br />
+Det här är en påhittad text som bara finns för att testa hur flöden tolkas. Den handlar om ingenting särskilt, men den är lång nog att behöva kortas när den blir ett inlägg. Här finns å, ä och ö, citattecken ”så här”, ett tankstreck – och en länk till https://example.com/las-mer?utm_source=rss. Det här är en påhittad text som bara finns för att testa hur flöden tolkas. Den handlar om ingenting särskilt, men den är lång nog att behöva kortas när den blir ett inlägg. Här finns å, ä och ö, citattecken ”så här”, ett tankstreck – och en länk till https://example.com/las-mer?utm_source=rss. Det här är en påhittad text som bara finns för att testa hur flöden tolkas. Den handlar om ingenting särskilt, men den är lång nog att behöva kortas när den blir ett inlägg. Här finns å, ä och ö, citattecken ”så här”, ett tankstreck – och en länk till https://example.com/las-mer?utm_source=rss. <br /><br />
+Läs vidare och kommentera:<br /><a href="https://cms.example.se/kategori/exempel-3/498002/?utm_source=rss&amp;utm_medium=feed">https://cms.example.se/kategori/exempel-3/498002/</a><br /><br />
+Läs mer om <a href="https://cms.example.se/om/exempel/">exempel</a>, <a href="https://cms.example.se/om/test/">test</a>]]></description>
+	<pubDate>Mon, 09 Nov 2026 14:00:00 GMT</pubDate>
+	<guid>https://cms.example.se/kategori/exempel-3/498002/?utm_source=rss&amp;utm_medium=feed</guid>
+</item>
+<item>
+	<title><![CDATA[Så mycket el drar en elbil på vintern]]></title>
+	<link>https://cms.example.se/kategori/exempel-4/498003/?utm_source=rss&amp;utm_medium=feed</link>
+	<comments>https://cms.example.se/kategori/exempel-4/498003/</comments>
+	<dc:creator><![CDATA[Skribent 4]]></dc:creator>
+	<description><![CDATA[<b>Så mycket el drar en elbil på vintern</b><br /><br />
+<a href="https://cms.example.se/kategori/exempel-4/498003/?utm_source=rss&amp;utm_medium=feed"><img src="https://img.cms.example.se/3.jpg"></a><br /><br />
+Det här är en påhittad text som bara finns för att testa hur flöden tolkas. Den handlar om ingenting särskilt, men den är lång nog att behöva kortas när den blir ett inlägg. Här finns å, ä och ö, citattecken ”så här”, ett tankstreck – och en länk till https://example.com/las-mer?utm_source=rss. <br /><br />
+Läs vidare och kommentera:<br /><a href="https://cms.example.se/kategori/exempel-4/498003/?utm_source=rss&amp;utm_medium=feed">https://cms.example.se/kategori/exempel-4/498003/</a><br /><br />
+Läs mer om <a href="https://cms.example.se/om/exempel/">exempel</a>, <a href="https://cms.example.se/om/test/">test</a>]]></description>
+	<pubDate>Mon, 09 Nov 2026 11:00:00 GMT</pubDate>
+	<guid>https://cms.example.se/kategori/exempel-4/498003/?utm_source=rss&amp;utm_medium=feed</guid>
+</item>
+<item>
+	<title><![CDATA[Recension: Hörlurar för 299 kronor & ett par för 2 999]]></title>
+	<link>https://cms.example.se/kategori/exempel-5/498004/?utm_source=rss&amp;utm_medium=feed</link>
+	<comments>https://cms.example.se/kategori/exempel-5/498004/</comments>
+	<dc:creator><![CDATA[Skribent 1]]></dc:creator>
+	<description><![CDATA[<b>Recension: Hörlurar för 299 kronor & ett par för 2 999</b><br /><br />
+<a href="https://cms.example.se/kategori/exempel-5/498004/?utm_source=rss&amp;utm_medium=feed"><img src="https://img.cms.example.se/4.jpg"></a><br /><br />
+Det här är en påhittad text som bara finns för att testa hur flöden tolkas. Den handlar om ingenting särskilt, men den är lång nog att behöva kortas när den blir ett inlägg. Här finns å, ä och ö, citattecken ”så här”, ett tankstreck – och en länk till https://example.com/las-mer?utm_source=rss. Det här är en påhittad text som bara finns för att testa hur flöden tolkas. Den handlar om ingenting särskilt, men den är lång nog att behöva kortas när den blir ett inlägg. Här finns å, ä och ö, citattecken ”så här”, ett tankstreck – och en länk till https://example.com/las-mer?utm_source=rss. <br /><br />
+Läs vidare och kommentera:<br /><a href="https://cms.example.se/kategori/exempel-5/498004/?utm_source=rss&amp;utm_medium=feed">https://cms.example.se/kategori/exempel-5/498004/</a><br /><br />
+Läs mer om <a href="https://cms.example.se/om/exempel/">exempel</a>, <a href="https://cms.example.se/om/test/">test</a>]]></description>
+	<pubDate>Mon, 09 Nov 2026 08:00:00 GMT</pubDate>
+	<guid>https://cms.example.se/kategori/exempel-5/498004/?utm_source=rss&amp;utm_medium=feed</guid>
+</item>
+<item>
+	<title><![CDATA[Ryktet: @Exempelbolaget visar ny surfplatta i höst]]></title>
+	<link>https://cms.example.se/kategori/exempel-6/498005/?utm_source=rss&amp;utm_medium=feed</link>
+	<comments>https://cms.example.se/kategori/exempel-6/498005/</comments>
+	<dc:creator><![CDATA[Skribent 2]]></dc:creator>
+	<description><![CDATA[<b>Ryktet: @Exempelbolaget visar ny surfplatta i höst</b><br /><br />
+<a href="https://cms.example.se/kategori/exempel-6/498005/?utm_source=rss&amp;utm_medium=feed"><img src="https://img.cms.example.se/5.jpg"></a><br /><br />
+Det här är en påhittad text som bara finns för att testa hur flöden tolkas. Den handlar om ingenting särskilt, men den är lång nog att behöva kortas när den blir ett inlägg. Här finns å, ä och ö, citattecken ”så här”, ett tankstreck – och en länk till https://example.com/las-mer?utm_source=rss. Det här är en påhittad text som bara finns för att testa hur flöden tolkas. Den handlar om ingenting särskilt, men den är lång nog att behöva kortas när den blir ett inlägg. Här finns å, ä och ö, citattecken ”så här”, ett tankstreck – och en länk till https://example.com/las-mer?utm_source=rss. Det här är en påhittad text som bara finns för att testa hur flöden tolkas. Den handlar om ingenting särskilt, men den är lång nog att behöva kortas när den blir ett inlägg. Här finns å, ä och ö, citattecken ”så här”, ett tankstreck – och en länk till https://example.com/las-mer?utm_source=rss. <br /><br />
+Läs vidare och kommentera:<br /><a href="https://cms.example.se/kategori/exempel-6/498005/?utm_source=rss&amp;utm_medium=feed">https://cms.example.se/kategori/exempel-6/498005/</a><br /><br />
+Läs mer om <a href="https://cms.example.se/om/exempel/">exempel</a>, <a href="https://cms.example.se/om/test/">test</a>]]></description>
+	<pubDate>Mon, 09 Nov 2026 05:00:00 GMT</pubDate>
+	<guid>https://cms.example.se/kategori/exempel-6/498005/?utm_source=rss&amp;utm_medium=feed</guid>
+</item>
+<item>
+	<title><![CDATA[Bilden: En katt på ett tangentbord]]></title>
+	<link>https://cms.example.se/kategori/exempel-7/498006/?utm_source=rss&amp;utm_medium=feed</link>
+	<comments>https://cms.example.se/kategori/exempel-7/498006/</comments>
+	<dc:creator><![CDATA[Skribent 3]]></dc:creator>
+	<description><![CDATA[<b>Bilden: En katt på ett tangentbord</b><br /><br />
+<a href="https://cms.example.se/kategori/exempel-7/498006/?utm_source=rss&amp;utm_medium=feed"><img src="https://img.cms.example.se/6.jpg"></a><br /><br />
+Det här är en påhittad text som bara finns för att testa hur flöden tolkas. Den handlar om ingenting särskilt, men den är lång nog att behöva kortas när den blir ett inlägg. Här finns å, ä och ö, citattecken ”så här”, ett tankstreck – och en länk till https://example.com/las-mer?utm_source=rss. <br /><br />
+Läs vidare och kommentera:<br /><a href="https://cms.example.se/kategori/exempel-7/498006/?utm_source=rss&amp;utm_medium=feed">https://cms.example.se/kategori/exempel-7/498006/</a><br /><br />
+Läs mer om <a href="https://cms.example.se/om/exempel/">exempel</a>, <a href="https://cms.example.se/om/test/">test</a>]]></description>
+	<pubDate>Mon, 09 Nov 2026 02:00:00 GMT</pubDate>
+	<guid>https://cms.example.se/kategori/exempel-7/498006/?utm_source=rss&amp;utm_medium=feed</guid>
+</item>
+<item>
+	<title><![CDATA[5 tips för en tystare dator]]></title>
+	<link>https://cms.example.se/kategori/exempel-8/498007/?utm_source=rss&amp;utm_medium=feed</link>
+	<comments>https://cms.example.se/kategori/exempel-8/498007/</comments>
+	<dc:creator><![CDATA[Skribent 4]]></dc:creator>
+	<description><![CDATA[<b>5 tips för en tystare dator</b><br /><br />
+<a href="https://cms.example.se/kategori/exempel-8/498007/?utm_source=rss&amp;utm_medium=feed"><img src="https://img.cms.example.se/7.jpg"></a><br /><br />
+Det här är en påhittad text som bara finns för att testa hur flöden tolkas. Den handlar om ingenting särskilt, men den är lång nog att behöva kortas när den blir ett inlägg. Här finns å, ä och ö, citattecken ”så här”, ett tankstreck – och en länk till https://example.com/las-mer?utm_source=rss. Det här är en påhittad text som bara finns för att testa hur flöden tolkas. Den handlar om ingenting särskilt, men den är lång nog att behöva kortas när den blir ett inlägg. Här finns å, ä och ö, citattecken ”så här”, ett tankstreck – och en länk till https://example.com/las-mer?utm_source=rss. <br /><br />
+Läs vidare och kommentera:<br /><a href="https://cms.example.se/kategori/exempel-8/498007/?utm_source=rss&amp;utm_medium=feed">https://cms.example.se/kategori/exempel-8/498007/</a><br /><br />
+Läs mer om <a href="https://cms.example.se/om/exempel/">exempel</a>, <a href="https://cms.example.se/om/test/">test</a>]]></description>
+	<pubDate>Sun, 08 Nov 2026 23:00:00 GMT</pubDate>
+	<guid>https://cms.example.se/kategori/exempel-8/498007/?utm_source=rss&amp;utm_medium=feed</guid>
+</item>
+<item>
+	<title><![CDATA[Kort: Uppdatering till routern stänger säkerhetshål]]></title>
+	<link>https://cms.example.se/kategori/exempel-9/498008/?utm_source=rss&amp;utm_medium=feed</link>
+	<comments>https://cms.example.se/kategori/exempel-9/498008/</comments>
+	<dc:creator><![CDATA[Skribent 1]]></dc:creator>
+	<description><![CDATA[<b>Kort: Uppdatering till routern stänger säkerhetshål</b><br /><br />
+<a href="https://cms.example.se/kategori/exempel-9/498008/?utm_source=rss&amp;utm_medium=feed"><img src="https://img.cms.example.se/8.jpg"></a><br /><br />
+Det här är en påhittad text som bara finns för att testa hur flöden tolkas. Den handlar om ingenting särskilt, men den är lång nog att behöva kortas när den blir ett inlägg. Här finns å, ä och ö, citattecken ”så här”, ett tankstreck – och en länk till https://example.com/las-mer?utm_source=rss. Det här är en påhittad text som bara finns för att testa hur flöden tolkas. Den handlar om ingenting särskilt, men den är lång nog att behöva kortas när den blir ett inlägg. Här finns å, ä och ö, citattecken ”så här”, ett tankstreck – och en länk till https://example.com/las-mer?utm_source=rss. Det här är en påhittad text som bara finns för att testa hur flöden tolkas. Den handlar om ingenting särskilt, men den är lång nog att behöva kortas när den blir ett inlägg. Här finns å, ä och ö, citattecken ”så här”, ett tankstreck – och en länk till https://example.com/las-mer?utm_source=rss. <br /><br />
+Läs vidare och kommentera:<br /><a href="https://cms.example.se/kategori/exempel-9/498008/?utm_source=rss&amp;utm_medium=feed">https://cms.example.se/kategori/exempel-9/498008/</a><br /><br />
+Läs mer om <a href="https://cms.example.se/om/exempel/">exempel</a>, <a href="https://cms.example.se/om/test/">test</a>]]></description>
+	<pubDate>Sun, 08 Nov 2026 20:00:00 GMT</pubDate>
+	<guid>https://cms.example.se/kategori/exempel-9/498008/?utm_source=rss&amp;utm_medium=feed</guid>
+</item>
+<item>
+	<title><![CDATA[Ny rekordvärme i oktober 🌡️]]></title>
+	<link>https://cms.example.se/kategori/exempel-10/498009/?utm_source=rss&amp;utm_medium=feed</link>
+	<comments>https://cms.example.se/kategori/exempel-10/498009/</comments>
+	<dc:creator><![CDATA[Skribent 2]]></dc:creator>
+	<description><![CDATA[<b>Ny rekordvärme i oktober 🌡️</b><br /><br />
+<a href="https://cms.example.se/kategori/exempel-10/498009/?utm_source=rss&amp;utm_medium=feed"><img src="https://img.cms.example.se/9.jpg"></a><br /><br />
+Det här är en påhittad text som bara finns för att testa hur flöden tolkas. Den handlar om ingenting särskilt, men den är lång nog att behöva kortas när den blir ett inlägg. Här finns å, ä och ö, citattecken ”så här”, ett tankstreck – och en länk till https://example.com/las-mer?utm_source=rss. <br /><br />
+Läs vidare och kommentera:<br /><a href="https://cms.example.se/kategori/exempel-10/498009/?utm_source=rss&amp;utm_medium=feed">https://cms.example.se/kategori/exempel-10/498009/</a><br /><br />
+Läs mer om <a href="https://cms.example.se/om/exempel/">exempel</a>, <a href="https://cms.example.se/om/test/">test</a>]]></description>
+	<pubDate>Sun, 08 Nov 2026 17:00:00 GMT</pubDate>
+	<guid>https://cms.example.se/kategori/exempel-10/498009/?utm_source=rss&amp;utm_medium=feed</guid>
+</item>
+<item>
+	<title><![CDATA[Nu kan du köpa den – men borde du?]]></title>
+	<link>https://cms.example.se/kategori/exempel-11/498010/?utm_source=rss&amp;utm_medium=feed</link>
+	<comments>https://cms.example.se/kategori/exempel-11/498010/</comments>
+	<dc:creator><![CDATA[Skribent 3]]></dc:creator>
+	<description><![CDATA[<b>Nu kan du köpa den – men borde du?</b><br /><br />
+<a href="https://cms.example.se/kategori/exempel-11/498010/?utm_source=rss&amp;utm_medium=feed"><img src="https://img.cms.example.se/10.jpg"></a><br /><br />
+Det här är en påhittad text som bara finns för att testa hur flöden tolkas. Den handlar om ingenting särskilt, men den är lång nog att behöva kortas när den blir ett inlägg. Här finns å, ä och ö, citattecken ”så här”, ett tankstreck – och en länk till https://example.com/las-mer?utm_source=rss. Det här är en påhittad text som bara finns för att testa hur flöden tolkas. Den handlar om ingenting särskilt, men den är lång nog att behöva kortas när den blir ett inlägg. Här finns å, ä och ö, citattecken ”så här”, ett tankstreck – och en länk till https://example.com/las-mer?utm_source=rss. <br /><br />
+Läs vidare och kommentera:<br /><a href="https://cms.example.se/kategori/exempel-11/498010/?utm_source=rss&amp;utm_medium=feed">https://cms.example.se/kategori/exempel-11/498010/</a><br /><br />
+Läs mer om <a href="https://cms.example.se/om/exempel/">exempel</a>, <a href="https://cms.example.se/om/test/">test</a>]]></description>
+	<pubDate>Sun, 08 Nov 2026 14:00:00 GMT</pubDate>
+	<guid>https://cms.example.se/kategori/exempel-11/498010/?utm_source=rss&amp;utm_medium=feed</guid>
+</item>
+<item>
+	<title><![CDATA[Veckans film 🎬 – en 📼 för nostalgiker]]></title>
+	<link>https://cms.example.se/kategori/exempel-12/498011/?utm_source=rss&amp;utm_medium=feed</link>
+	<comments>https://cms.example.se/kategori/exempel-12/498011/</comments>
+	<dc:creator><![CDATA[Skribent 4]]></dc:creator>
+	<description><![CDATA[<b>Veckans film 🎬 – en 📼 för nostalgiker</b><br /><br />
+<a href="https://cms.example.se/kategori/exempel-12/498011/?utm_source=rss&amp;utm_medium=feed"><img src="https://img.cms.example.se/11.jpg"></a><br /><br />
+Det här är en påhittad text som bara finns för att testa hur flöden tolkas. Den handlar om ingenting särskilt, men den är lång nog att behöva kortas när den blir ett inlägg. Här finns å, ä och ö, citattecken ”så här”, ett tankstreck – och en länk till https://example.com/las-mer?utm_source=rss. Det här är en påhittad text som bara finns för att testa hur flöden tolkas. Den handlar om ingenting särskilt, men den är lång nog att behöva kortas när den blir ett inlägg. Här finns å, ä och ö, citattecken ”så här”, ett tankstreck – och en länk till https://example.com/las-mer?utm_source=rss. Det här är en påhittad text som bara finns för att testa hur flöden tolkas. Den handlar om ingenting särskilt, men den är lång nog att behöva kortas när den blir ett inlägg. Här finns å, ä och ö, citattecken ”så här”, ett tankstreck – och en länk till https://example.com/las-mer?utm_source=rss. <br /><br />
+Läs vidare och kommentera:<br /><a href="https://cms.example.se/kategori/exempel-12/498011/?utm_source=rss&amp;utm_medium=feed">https://cms.example.se/kategori/exempel-12/498011/</a><br /><br />
+Läs mer om <a href="https://cms.example.se/om/exempel/">exempel</a>, <a href="https://cms.example.se/om/test/">test</a>]]></description>
+	<pubDate>Sun, 08 Nov 2026 11:00:00 GMT</pubDate>
+	<guid>https://cms.example.se/kategori/exempel-12/498011/?utm_source=rss&amp;utm_medium=feed</guid>
+</item>
+</channel>
+</rss>

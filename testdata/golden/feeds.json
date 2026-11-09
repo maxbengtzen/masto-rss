@@ -1,0 +1,624 @@
+{
+  "atom-1.xml": {
+    "title": "Atom & co",
+    "language": "en",
+    "items": [
+      {
+        "keys": [
+          "g:tag:example.com,2026:1",
+          "l:example.com/a"
+        ],
+        "title": "Hej & välkommen",
+        "link": "https://example.com/a",
+        "summary": "Sammanfattning",
+        "author": "Bo",
+        "published": 1792999800000
+      },
+      {
+        "keys": [
+          "g:tag:example.com,2026:2",
+          "l:example.com/relativ/2"
+        ],
+        "title": "Text med och å",
+        "link": "https://example.com/relativ/2",
+        "summary": "XHTML & fet",
+        "author": "Cia & Dan",
+        "published": 1792915200000
+      },
+      {
+        "keys": [
+          "l:example.com/self"
+        ],
+        "title": "Prefix div",
+        "link": "https://example.com/self",
+        "summary": "CDATA-innehåll & mer",
+        "published": 1792454400000
+      },
+      {
+        "keys": [
+          "g:urn:4"
+        ],
+        "title": "",
+        "summary": ""
+      },
+      {
+        "keys": [
+          "g:urn:5",
+          "l:example.com/versaler"
+        ],
+        "title": "Versaler",
+        "link": "https://example.com/versaler",
+        "summary": "",
+        "published": 1792281600000
+      }
+    ],
+    "skipped": 1
+  },
+  "atom-2.xml": {
+    "title": "Prefixat",
+    "items": [
+      {
+        "keys": [
+          "g:p1",
+          "l:example.com/p1"
+        ],
+        "title": "Prefixad post",
+        "link": "https://example.com/p1",
+        "summary": "",
+        "published": 1792972800000
+      }
+    ],
+    "skipped": 0
+  },
+  "body-latin1.xml": {
+    "title": "Latin åäö",
+    "items": [
+      {
+        "keys": [
+          "l:example.com/l1"
+        ],
+        "title": "Räksmörgås",
+        "link": "https://example.com/l1",
+        "summary": ""
+      }
+    ],
+    "skipped": 0
+  },
+  "html.html": {
+    "error": "DetectError: Unrecognized feed format"
+  },
+  "json-1.json": {
+    "title": "JSON & co",
+    "language": "sv",
+    "items": [
+      {
+        "keys": [
+          "g:j1",
+          "l:example.com/j1"
+        ],
+        "title": "JSON-post",
+        "link": "https://example.com/j1",
+        "summary": "Text",
+        "author": "Cia",
+        "published": 1792990800000
+      },
+      {
+        "keys": [
+          "g:2",
+          "l:example.com/extern/2"
+        ],
+        "title": "Nummer-id",
+        "link": "https://example.com/extern/2",
+        "summary": "Sammanfattning & mer",
+        "author": "Gammal författare",
+        "published": 1792987200000
+      },
+      {
+        "keys": [
+          "g:1.5e+21",
+          "l:example.com/j3"
+        ],
+        "title": "",
+        "link": "https://example.com/j3",
+        "summary": "Bara text",
+        "author": "Sträng"
+      },
+      {
+        "keys": [
+          "g:versaler",
+          "l:example.com/j4"
+        ],
+        "title": "Versaler",
+        "link": "https://example.com/j4",
+        "summary": "",
+        "published": 1792998000000
+      },
+      {
+        "keys": [
+          "l:example.com/array"
+        ],
+        "title": "5",
+        "link": "https://example.com/array",
+        "summary": ""
+      }
+    ],
+    "skipped": 2
+  },
+  "json-2.json": {
+    "title": "Utan version",
+    "items": [
+      {
+        "keys": [
+          "g:a",
+          "l:example.com/a"
+        ],
+        "title": "",
+        "link": "https://example.com/a",
+        "summary": ""
+      }
+    ],
+    "skipped": 0
+  },
+  "json-3.json": {
+    "error": "DetectError: Unrecognized feed format"
+  },
+  "rdf-1.xml": {
+    "title": "RDF & co",
+    "language": "sv",
+    "items": [
+      {
+        "keys": [
+          "g:https://example.com/r2",
+          "l:example.com/r2"
+        ],
+        "title": "RDF-post 2",
+        "link": "https://example.com/r2",
+        "summary": "Beskrivning & mer",
+        "published": 1792994400000
+      },
+      {
+        "keys": [
+          "g:https://example.com/r1",
+          "l:example.com/r1"
+        ],
+        "title": "RDF-post 1",
+        "link": "https://example.com/r1",
+        "summary": "Hela texten",
+        "author": "Eva",
+        "published": 1792994400000
+      }
+    ],
+    "skipped": 0
+  },
+  "rdf-2.xml": {
+    "title": "Netscape 0.9",
+    "items": [
+      {
+        "keys": [
+          "l:example.com/n1"
+        ],
+        "title": "Utan about",
+        "link": "https://example.com/n1",
+        "summary": ""
+      }
+    ],
+    "skipped": 1
+  },
+  "rss-091.xml": {
+    "title": "Gammalt",
+    "items": [
+      {
+        "keys": [
+          "l:example.com/o1"
+        ],
+        "title": "Item utanför kanalen",
+        "link": "https://example.com/o1",
+        "summary": ""
+      }
+    ],
+    "skipped": 0
+  },
+  "rss-cms-exempel.xml": {
+    "title": "Exempelbloggen",
+    "language": "sv",
+    "items": [
+      {
+        "keys": [
+          "g:https://cms.example.se/kategori/exempel-1/498000/?utm_source=rss&utm_medium=feed",
+          "l:cms.example.se/kategori/exempel-1/498000"
+        ],
+        "title": "Vi har testat en påhittad luftrenare",
+        "link": "https://cms.example.se/kategori/exempel-1/498000/?utm_source=rss&utm_medium=feed",
+        "summary": "Vi har testat en påhittad luftrenare Det här är en påhittad text som bara finns för att testa hur flöden tolkas. Den handlar om ingenting särskilt, men den är lång nog att behöva kortas när den blir ett inlägg. Här finns å, ä och ö, citattecken ”så här”, ett tankstreck – och en länk till https://example.com/las-mer?utm_source=rss. Läs vidare och kommentera: https://cms.example.se/kategori/exempel-1/498000/ Läs mer om exempel, test",
+        "author": "Skribent 1",
+        "published": 1794254400000
+      },
+      {
+        "keys": [
+          "g:https://cms.example.se/kategori/exempel-2/498001/?utm_source=rss&utm_medium=feed",
+          "l:cms.example.se/kategori/exempel-2/498001"
+        ],
+        "title": "Ny mobil från Exempeltelefon – bättre kamera, sämre batteri?",
+        "link": "https://cms.example.se/kategori/exempel-2/498001/?utm_source=rss&utm_medium=feed",
+        "summary": "Ny mobil från Exempeltelefon – bättre kamera, sämre batteri? Det här är en påhittad text som bara finns för att testa hur flöden tolkas. Den handlar om ingenting särskilt, men den är lång nog att behöva kortas när den blir ett inlägg. Här finns å, ä och ö, citattecken ”så här”, ett tankstreck – och en länk till https://example.com/las-mer?utm_source=rss. Det här är en påhittad text som bara finns för att testa hur flöden tolkas. Den handlar om ingenting särskilt, men den är lång nog att behöva kortas när den blir ett inlägg. Här finns å, ä och ö, citattecken ”så här”, ett tankstreck – och en länk till https://example.com/las-mer?utm_source=rss. Läs vidare och kommentera: https://cms.example.se/kategori/exempel-2/498001/ Läs mer om exempel, test",
+        "author": "Skribent 2",
+        "published": 1794243600000
+      },
+      {
+        "keys": [
+          "g:https://cms.example.se/kategori/exempel-3/498002/?utm_source=rss&utm_medium=feed",
+          "l:cms.example.se/kategori/exempel-3/498002"
+        ],
+        "title": "Spelet som alla pratar om får en uppföljare",
+        "link": "https://cms.example.se/kategori/exempel-3/498002/?utm_source=rss&utm_medium=feed",
+        "summary": "Spelet som alla pratar om får en uppföljare Det här är en påhittad text som bara finns för att testa hur flöden tolkas. Den handlar om ingenting särskilt, men den är lång nog att behöva kortas när den blir ett inlägg. Här finns å, ä och ö, citattecken ”så här”, ett tankstreck – och en länk till https://example.com/las-mer?utm_source=rss. Det här är en påhittad text som bara finns för att testa hur flöden tolkas. Den handlar om ingenting särskilt, men den är lång nog att behöva kortas när den blir ett inlägg. Här finns å, ä och ö, citattecken ”så här”, ett tankstreck – och en länk till https://example.com/las-mer?utm_source=rss. Det här är en påhittad text som bara finns för att testa hur flöden tolkas. Den handlar om ingenting särskilt, men den är lång nog att behöva kortas när den blir ett inlägg. Här finns å, ä och ö, citattecken ”så här”, ett tankstreck – och en länk till https://example.com/las-mer?utm_source=rss. Läs vidare och kommentera: https://cms.example.se/kategori/exempel-3/498002/ Läs mer om exempel, test",
+        "author": "Skribent 3",
+        "published": 1794232800000
+      },
+      {
+        "keys": [
+          "g:https://cms.example.se/kategori/exempel-4/498003/?utm_source=rss&utm_medium=feed",
+          "l:cms.example.se/kategori/exempel-4/498003"
+        ],
+        "title": "Så mycket el drar en elbil på vintern",
+        "link": "https://cms.example.se/kategori/exempel-4/498003/?utm_source=rss&utm_medium=feed",
+        "summary": "Så mycket el drar en elbil på vintern Det här är en påhittad text som bara finns för att testa hur flöden tolkas. Den handlar om ingenting särskilt, men den är lång nog att behöva kortas när den blir ett inlägg. Här finns å, ä och ö, citattecken ”så här”, ett tankstreck – och en länk till https://example.com/las-mer?utm_source=rss. Läs vidare och kommentera: https://cms.example.se/kategori/exempel-4/498003/ Läs mer om exempel, test",
+        "author": "Skribent 4",
+        "published": 1794222000000
+      },
+      {
+        "keys": [
+          "g:https://cms.example.se/kategori/exempel-5/498004/?utm_source=rss&utm_medium=feed",
+          "l:cms.example.se/kategori/exempel-5/498004"
+        ],
+        "title": "Recension: Hörlurar för 299 kronor & ett par för 2 999",
+        "link": "https://cms.example.se/kategori/exempel-5/498004/?utm_source=rss&utm_medium=feed",
+        "summary": "Recension: Hörlurar för 299 kronor & ett par för 2 999 Det här är en påhittad text som bara finns för att testa hur flöden tolkas. Den handlar om ingenting särskilt, men den är lång nog att behöva kortas när den blir ett inlägg. Här finns å, ä och ö, citattecken ”så här”, ett tankstreck – och en länk till https://example.com/las-mer?utm_source=rss. Det här är en påhittad text som bara finns för att testa hur flöden tolkas. Den handlar om ingenting särskilt, men den är lång nog att behöva kortas när den blir ett inlägg. Här finns å, ä och ö, citattecken ”så här”, ett tankstreck – och en länk till https://example.com/las-mer?utm_source=rss. Läs vidare och kommentera: https://cms.example.se/kategori/exempel-5/498004/ Läs mer om exempel, test",
+        "author": "Skribent 1",
+        "published": 1794211200000
+      },
+      {
+        "keys": [
+          "g:https://cms.example.se/kategori/exempel-6/498005/?utm_source=rss&utm_medium=feed",
+          "l:cms.example.se/kategori/exempel-6/498005"
+        ],
+        "title": "Ryktet: @Exempelbolaget visar ny surfplatta i höst",
+        "link": "https://cms.example.se/kategori/exempel-6/498005/?utm_source=rss&utm_medium=feed",
+        "summary": "Ryktet: @Exempelbolaget visar ny surfplatta i höst Det här är en påhittad text som bara finns för att testa hur flöden tolkas. Den handlar om ingenting särskilt, men den är lång nog att behöva kortas när den blir ett inlägg. Här finns å, ä och ö, citattecken ”så här”, ett tankstreck – och en länk till https://example.com/las-mer?utm_source=rss. Det här är en påhittad text som bara finns för att testa hur flöden tolkas. Den handlar om ingenting särskilt, men den är lång nog att behöva kortas när den blir ett inlägg. Här finns å, ä och ö, citattecken ”så här”, ett tankstreck – och en länk till https://example.com/las-mer?utm_source=rss. Det här är en påhittad text som bara finns för att testa hur flöden tolkas. Den handlar om ingenting särskilt, men den är lång nog att behöva kortas när den blir ett inlägg. Här finns å, ä och ö, citattecken ”så här”, ett tankstreck – och en länk till https://example.com/las-mer?utm_source=rss. Läs vidare och kommentera: https://cms.example.se/kategori/exempel-6/498005/ Läs mer om exempel, test",
+        "author": "Skribent 2",
+        "published": 1794200400000
+      },
+      {
+        "keys": [
+          "g:https://cms.example.se/kategori/exempel-7/498006/?utm_source=rss&utm_medium=feed",
+          "l:cms.example.se/kategori/exempel-7/498006"
+        ],
+        "title": "Bilden: En katt på ett tangentbord",
+        "link": "https://cms.example.se/kategori/exempel-7/498006/?utm_source=rss&utm_medium=feed",
+        "summary": "Bilden: En katt på ett tangentbord Det här är en påhittad text som bara finns för att testa hur flöden tolkas. Den handlar om ingenting särskilt, men den är lång nog att behöva kortas när den blir ett inlägg. Här finns å, ä och ö, citattecken ”så här”, ett tankstreck – och en länk till https://example.com/las-mer?utm_source=rss. Läs vidare och kommentera: https://cms.example.se/kategori/exempel-7/498006/ Läs mer om exempel, test",
+        "author": "Skribent 3",
+        "published": 1794189600000
+      },
+      {
+        "keys": [
+          "g:https://cms.example.se/kategori/exempel-8/498007/?utm_source=rss&utm_medium=feed",
+          "l:cms.example.se/kategori/exempel-8/498007"
+        ],
+        "title": "5 tips för en tystare dator",
+        "link": "https://cms.example.se/kategori/exempel-8/498007/?utm_source=rss&utm_medium=feed",
+        "summary": "5 tips för en tystare dator Det här är en påhittad text som bara finns för att testa hur flöden tolkas. Den handlar om ingenting särskilt, men den är lång nog att behöva kortas när den blir ett inlägg. Här finns å, ä och ö, citattecken ”så här”, ett tankstreck – och en länk till https://example.com/las-mer?utm_source=rss. Det här är en påhittad text som bara finns för att testa hur flöden tolkas. Den handlar om ingenting särskilt, men den är lång nog att behöva kortas när den blir ett inlägg. Här finns å, ä och ö, citattecken ”så här”, ett tankstreck – och en länk till https://example.com/las-mer?utm_source=rss. Läs vidare och kommentera: https://cms.example.se/kategori/exempel-8/498007/ Läs mer om exempel, test",
+        "author": "Skribent 4",
+        "published": 1794178800000
+      },
+      {
+        "keys": [
+          "g:https://cms.example.se/kategori/exempel-9/498008/?utm_source=rss&utm_medium=feed",
+          "l:cms.example.se/kategori/exempel-9/498008"
+        ],
+        "title": "Kort: Uppdatering till routern stänger säkerhetshål",
+        "link": "https://cms.example.se/kategori/exempel-9/498008/?utm_source=rss&utm_medium=feed",
+        "summary": "Kort: Uppdatering till routern stänger säkerhetshål Det här är en påhittad text som bara finns för att testa hur flöden tolkas. Den handlar om ingenting särskilt, men den är lång nog att behöva kortas när den blir ett inlägg. Här finns å, ä och ö, citattecken ”så här”, ett tankstreck – och en länk till https://example.com/las-mer?utm_source=rss. Det här är en påhittad text som bara finns för att testa hur flöden tolkas. Den handlar om ingenting särskilt, men den är lång nog att behöva kortas när den blir ett inlägg. Här finns å, ä och ö, citattecken ”så här”, ett tankstreck – och en länk till https://example.com/las-mer?utm_source=rss. Det här är en påhittad text som bara finns för att testa hur flöden tolkas. Den handlar om ingenting särskilt, men den är lång nog att behöva kortas när den blir ett inlägg. Här finns å, ä och ö, citattecken ”så här”, ett tankstreck – och en länk till https://example.com/las-mer?utm_source=rss. Läs vidare och kommentera: https://cms.example.se/kategori/exempel-9/498008/ Läs mer om exempel, test",
+        "author": "Skribent 1",
+        "published": 1794168000000
+      },
+      {
+        "keys": [
+          "g:https://cms.example.se/kategori/exempel-10/498009/?utm_source=rss&utm_medium=feed",
+          "l:cms.example.se/kategori/exempel-10/498009"
+        ],
+        "title": "Ny rekordvärme i oktober 🌡️",
+        "link": "https://cms.example.se/kategori/exempel-10/498009/?utm_source=rss&utm_medium=feed",
+        "summary": "Ny rekordvärme i oktober 🌡️ Det här är en påhittad text som bara finns för att testa hur flöden tolkas. Den handlar om ingenting särskilt, men den är lång nog att behöva kortas när den blir ett inlägg. Här finns å, ä och ö, citattecken ”så här”, ett tankstreck – och en länk till https://example.com/las-mer?utm_source=rss. Läs vidare och kommentera: https://cms.example.se/kategori/exempel-10/498009/ Läs mer om exempel, test",
+        "author": "Skribent 2",
+        "published": 1794157200000
+      },
+      {
+        "keys": [
+          "g:https://cms.example.se/kategori/exempel-11/498010/?utm_source=rss&utm_medium=feed",
+          "l:cms.example.se/kategori/exempel-11/498010"
+        ],
+        "title": "Nu kan du köpa den – men borde du?",
+        "link": "https://cms.example.se/kategori/exempel-11/498010/?utm_source=rss&utm_medium=feed",
+        "summary": "Nu kan du köpa den – men borde du? Det här är en påhittad text som bara finns för att testa hur flöden tolkas. Den handlar om ingenting särskilt, men den är lång nog att behöva kortas när den blir ett inlägg. Här finns å, ä och ö, citattecken ”så här”, ett tankstreck – och en länk till https://example.com/las-mer?utm_source=rss. Det här är en påhittad text som bara finns för att testa hur flöden tolkas. Den handlar om ingenting särskilt, men den är lång nog att behöva kortas när den blir ett inlägg. Här finns å, ä och ö, citattecken ”så här”, ett tankstreck – och en länk till https://example.com/las-mer?utm_source=rss. Läs vidare och kommentera: https://cms.example.se/kategori/exempel-11/498010/ Läs mer om exempel, test",
+        "author": "Skribent 3",
+        "published": 1794146400000
+      },
+      {
+        "keys": [
+          "g:https://cms.example.se/kategori/exempel-12/498011/?utm_source=rss&utm_medium=feed",
+          "l:cms.example.se/kategori/exempel-12/498011"
+        ],
+        "title": "Veckans film 🎬 – en 📼 för nostalgiker",
+        "link": "https://cms.example.se/kategori/exempel-12/498011/?utm_source=rss&utm_medium=feed",
+        "summary": "Veckans film 🎬 – en 📼 för nostalgiker Det här är en påhittad text som bara finns för att testa hur flöden tolkas. Den handlar om ingenting särskilt, men den är lång nog att behöva kortas när den blir ett inlägg. Här finns å, ä och ö, citattecken ”så här”, ett tankstreck – och en länk till https://example.com/las-mer?utm_source=rss. Det här är en påhittad text som bara finns för att testa hur flöden tolkas. Den handlar om ingenting särskilt, men den är lång nog att behöva kortas när den blir ett inlägg. Här finns å, ä och ö, citattecken ”så här”, ett tankstreck – och en länk till https://example.com/las-mer?utm_source=rss. Det här är en påhittad text som bara finns för att testa hur flöden tolkas. Den handlar om ingenting särskilt, men den är lång nog att behöva kortas när den blir ett inlägg. Här finns å, ä och ö, citattecken ”så här”, ett tankstreck – och en länk till https://example.com/las-mer?utm_source=rss. Läs vidare och kommentera: https://cms.example.se/kategori/exempel-12/498011/ Läs mer om exempel, test",
+        "author": "Skribent 4",
+        "published": 1794135600000
+      }
+    ],
+    "skipped": 0
+  },
+  "rss-kantfall.xml": {
+    "title": "Sajten & co",
+    "language": "en",
+    "items": [
+      {
+        "keys": [
+          "g:https://example.com/?p=1",
+          "l:example.com/nyheter/1"
+        ],
+        "title": "Titel – med streck … & å © ¬anentity; 😀",
+        "link": "https://example.com/nyheter/1/?utm_source=rss",
+        "summary": "Kort & gott",
+        "author": "Anna",
+        "published": 1792998000000
+      },
+      {
+        "keys": [
+          "l:example.com/2"
+        ],
+        "title": "Bara innehåll",
+        "link": "https://example.com/2",
+        "summary": "Hela texten",
+        "author": "Anna Andersson"
+      },
+      {
+        "keys": [
+          "g:https://example.com/3"
+        ],
+        "title": "Författare som e-post",
+        "summary": "",
+        "author": "bo@example.com",
+        "published": 1792922400000
+      },
+      {
+        "keys": [
+          "l:example.com/4"
+        ],
+        "title": "Författare med namn först",
+        "link": "https://example.com/4",
+        "summary": "",
+        "author": "Cia Ceder"
+      },
+      {
+        "keys": [
+          "l:example.com/5"
+        ],
+        "title": "Okodad HTML",
+        "link": "https://example.com/5",
+        "summary": "Rad ett rad två fet slut",
+        "author": "Dan"
+      },
+      {
+        "keys": [
+          "l:example.com/6"
+        ],
+        "title": "",
+        "link": "https://example.com/6",
+        "summary": "",
+        "author": "Eva"
+      },
+      {
+        "keys": [
+          "g:G7",
+          "l:example.com/7"
+        ],
+        "title": "Versaler",
+        "link": "https://example.com/7",
+        "summary": "",
+        "published": 1793088000000
+      },
+      {
+        "keys": [
+          "g:g8"
+        ],
+        "title": "Mailto",
+        "summary": "Entiteter i text: inne <x>",
+        "author": "fia@example.com"
+      },
+      {
+        "keys": [
+          "l:example.com/9"
+        ],
+        "title": "Odaterad",
+        "link": "https://www.example.com/9#kommentarer",
+        "summary": "",
+        "author": "Gustav"
+      },
+      {
+        "keys": [
+          "l:tag:example.com,2026:10"
+        ],
+        "title": "Annat schema",
+        "link": "tag:example.com,2026:10",
+        "summary": "",
+        "published": 1792972800000
+      },
+      {
+        "keys": [
+          "l:example.com/2"
+        ],
+        "title": "Samma igen",
+        "link": "https://example.com/2",
+        "summary": ""
+      }
+    ],
+    "skipped": 2
+  },
+  "rss-ns.xml": {
+    "title": "Andra prefix",
+    "language": "sv",
+    "items": [
+      {
+        "keys": [
+          "l:example.com/ns1"
+        ],
+        "title": "Prefixet d",
+        "link": "https://example.com/ns1",
+        "summary": "Innehåll",
+        "author": "Hanna",
+        "published": 1793005200000
+      },
+      {
+        "keys": [
+          "l:example.com/ns2"
+        ],
+        "title": "Odeklarerat prefix",
+        "link": "https://example.com/ns2",
+        "summary": "",
+        "author": "Ivar"
+      }
+    ],
+    "skipped": 0
+  },
+  "rss-tom.xml": {
+    "error": "ParseError: Invalid feed format"
+  },
+  "rss-utan-kanal.xml": {
+    "error": "ParseError: Invalid feed format"
+  },
+  "rss-wordpress-exempel.xml": {
+    "title": "Exempelsajten",
+    "language": "sv",
+    "items": [
+      {
+        "keys": [
+          "g:https://wp.example.se/?p=130500",
+          "l:wp.example.se/artikel-1"
+        ],
+        "title": "Kommunen bygger ny förskola vid parken",
+        "link": "https://wp.example.se/artikel-1/",
+        "summary": "Det här är en påhittad text som bara finns för att testa hur flöden tolkas. Inlägget Kommunen bygger ny förskola vid parken dök först upp på Exempelsajten.",
+        "author": "Anna Exempel",
+        "published": 1794211200000
+      },
+      {
+        "keys": [
+          "g:https://wp.example.se/?p=130501",
+          "l:wp.example.se/artikel-2"
+        ],
+        "title": "Fem frågor om det nya bostadsområdet – och svaren",
+        "link": "https://wp.example.se/artikel-2/",
+        "summary": "Det här är en påhittad text som bara finns för att testa hur flöden tolkas. Inlägget Fem frågor om det nya bostadsområdet – och svaren dök först upp på Exempelsajten.",
+        "author": "Bertil Prov",
+        "published": 1794186000000
+      },
+      {
+        "keys": [
+          "g:https://wp.example.se/?p=130502",
+          "l:wp.example.se/artikel-3"
+        ],
+        "title": "Hyresgästerna fick sista ordet: ”Vi är nöjda”",
+        "link": "https://wp.example.se/artikel-3/",
+        "summary": "Det här är en påhittad text som bara finns för att testa hur flöden tolkas. Inlägget Hyresgästerna fick sista ordet: ”Vi är nöjda” dök först upp på Exempelsajten.",
+        "author": "Cecilia Test",
+        "published": 1794160800000
+      },
+      {
+        "keys": [
+          "g:https://wp.example.se/?p=130503",
+          "l:wp.example.se/artikel-4"
+        ],
+        "title": "Ny rapport: Två av tre vill bo närmare naturen",
+        "link": "https://wp.example.se/artikel-4/",
+        "summary": "Det här är en påhittad text som bara finns för att testa hur flöden tolkas. Inlägget Ny rapport: Två av tre vill bo närmare naturen dök först upp på Exempelsajten.",
+        "author": "Anna Exempel",
+        "published": 1794135600000
+      },
+      {
+        "keys": [
+          "g:https://wp.example.se/?p=130504",
+          "l:wp.example.se/artikel-5"
+        ],
+        "title": "#12 Så fungerar en markanvisning, steg för steg",
+        "link": "https://wp.example.se/artikel-5/",
+        "summary": "Det här är en påhittad text som bara finns för att testa hur flöden tolkas. Inlägget #12 Så fungerar en markanvisning, steg för steg dök först upp på Exempelsajten.",
+        "author": "David Påhittad",
+        "published": 1794110400000
+      },
+      {
+        "keys": [
+          "g:https://wp.example.se/?p=130505",
+          "l:wp.example.se/artikel-6"
+        ],
+        "title": "Fastighetsbolaget Exempel AB köper tre kvarter i centrum & bygger om",
+        "link": "https://wp.example.se/artikel-6/",
+        "summary": "Det här är en påhittad text som bara finns för att testa hur flöden tolkas. Inlägget Fastighetsbolaget Exempel AB köper tre kvarter i centrum & bygger om dök först upp på Exempelsajten.",
+        "author": "Bertil Prov",
+        "published": 1794085200000
+      },
+      {
+        "keys": [
+          "g:https://wp.example.se/?p=130506",
+          "l:wp.example.se/artikel-7"
+        ],
+        "title": "Energikraven skärps 2027 – vad betyder det för befintliga hus?",
+        "link": "https://wp.example.se/artikel-7/",
+        "summary": "Det här är en påhittad text som bara finns för att testa hur flöden tolkas. Inlägget Energikraven skärps 2027 – vad betyder det för befintliga hus? dök först upp på Exempelsajten.",
+        "author": "Eva Fiktiv",
+        "published": 1794060000000
+      },
+      {
+        "keys": [
+          "g:https://wp.example.se/?p=130507",
+          "l:wp.example.se/artikel-8"
+        ],
+        "title": "Intervju: @arkitekten om trä, tegel och tålamod",
+        "link": "https://wp.example.se/artikel-8/",
+        "summary": "Det här är en påhittad text som bara finns för att testa hur flöden tolkas. Inlägget Intervju: @arkitekten om trä, tegel och tålamod dök först upp på Exempelsajten.",
+        "author": "Cecilia Test",
+        "published": 1794034800000
+      },
+      {
+        "keys": [
+          "g:https://wp.example.se/?p=130508",
+          "l:wp.example.se/artikel-9"
+        ],
+        "title": "Kort om veckan: 3 nyheter du kanske missade",
+        "link": "https://wp.example.se/artikel-9/",
+        "summary": "Det här är en påhittad text som bara finns för att testa hur flöden tolkas. Inlägget Kort om veckan: 3 nyheter du kanske missade dök först upp på Exempelsajten.",
+        "author": "Anna Exempel",
+        "published": 1794009600000
+      },
+      {
+        "keys": [
+          "g:https://wp.example.se/?p=130509",
+          "l:wp.example.se/artikel-10"
+        ],
+        "title": "Därför dröjer detaljplanen för Hamnkvarteret ännu ett år",
+        "link": "https://wp.example.se/artikel-10/",
+        "summary": "Det här är en påhittad text som bara finns för att testa hur flöden tolkas. Inlägget Därför dröjer detaljplanen för Hamnkvarteret ännu ett år dök först upp på Exempelsajten.",
+        "author": "David Påhittad",
+        "published": 1793984400000
+      }
+    ],
+    "skipped": 0
+  },
+  "tom.xml": {
+    "error": "DetectError: Unrecognized feed format"
+  },
+  "trasig.xml": {
+    "title": "Trasig",
+    "items": [],
+    "skipped": 1
+  }
+}

@@ -1,0 +1,150 @@
+{
+  "runs": {
+    "live": {
+      "status": 0,
+      "out": "masto-rss 1.0.3 startar\n  alpha: http://127.0.0.1:PORT/feed-a → 127.0.0.1:PORT, var 15 min, public, språk från flödet\n  beta: http://127.0.0.1:PORT/broken → 127.0.0.1:PORT, var 15 min, public, språk en\n  delta: http://127.0.0.1:PORT/old → 127.0.0.1:PORT, var 15 min, public, språk från flödet\n  gamma: http://127.0.0.1:PORT/feed-c → 127.0.0.1:PORT, var 15 min, public, språk från flödet\n  pausade: paused\n127.0.0.1:PORT: Mastodon 4.7.3, API-version 11, 500 tecken per inlägg\nalpha, beta: @alfa@127.0.0.1:PORT, 12345 följare\nMastodon säger att GET /api/v1/accounts/verify_credentials är på väg bort (Deprecation: @1700000000). masto-rss behöver uppdateras.\ndelta: @delta@127.0.0.1:PORT, 0 följare. Kontot är inte märkt som bot (Inställningar → Profil)\ngamma: token saknar write:statuses (har read). Inget postas för kontot förrän det är rättat och masto-rss startats om.\nalpha: nytt flöde, 1 poster markerade som sedda, 2 läggs i utkorgen (BACKFILL)\nalpha: postat http://127.0.0.1:PORT/@alfa/1 (Post 3 från /feed-a & @anna)\nalpha: Mastodon nekade \"Post 2 från /feed-a & @anna\": HTTP 422: Validation failed: Text character limit of 500 exceeded\nbeta: FEL (1 i rad): HttpError: HTTP 500 Internal Server Error; nästa försök om 15 min\ndelta: adressen har flyttat permanent till http://127.0.0.1:PORT/feed-d; uppdatera FEED_DELTA_URL\ndelta: nytt flöde, 3 poster markerade som sedda, inget postas\nSIGTERM: avslutar\n",
+      "err": ""
+    },
+    "again": {
+      "status": 1,
+      "out": "masto-rss 1.0.3 startar\n  alpha: http://127.0.0.1:PORT/feed-a → 127.0.0.1:PORT, var 15 min, public, språk från flödet\n  beta: http://127.0.0.1:PORT/broken → 127.0.0.1:PORT, var 15 min, public, språk en\n  delta: http://127.0.0.1:PORT/old → 127.0.0.1:PORT, var 15 min, public, språk från flödet\n  gamma: http://127.0.0.1:PORT/feed-c → 127.0.0.1:PORT, var 15 min, public, språk från flödet\n  pausade: paused\nalpha, beta: @alfa@127.0.0.1:PORT, 12345 följare\ndelta: @delta@127.0.0.1:PORT, 0 följare. Kontot är inte märkt som bot (Inställningar → Profil)\ngamma: token saknar write:statuses (har read). Inget postas för kontot förrän det är rättat och masto-rss startats om.\nalpha: inget nytt (3 poster)\nbeta: FEL (2 i rad): HttpError: HTTP 500 Internal Server Error; nästa försök om 30 min\ndelta: adressen har flyttat permanent till http://127.0.0.1:PORT/feed-d; uppdatera FEED_DELTA_URL\ndelta: inget nytt (3 poster)\ngamma: nytt flöde, 3 poster markerade som sedda, inget postas\n",
+      "err": ""
+    },
+    "dryNew": {
+      "status": 1,
+      "out": "masto-rss 1.0.3 startar i torrläge: inget postas och inget sparas\n  alpha: http://127.0.0.1:PORT/feed-a → 127.0.0.1:PORT, var 15 min, public, språk från flödet\n  beta: http://127.0.0.1:PORT/broken → 127.0.0.1:PORT, var 15 min, public, språk en\n  delta: http://127.0.0.1:PORT/old → 127.0.0.1:PORT, var 15 min, public, språk från flödet\n  gamma: http://127.0.0.1:PORT/feed-c → 127.0.0.1:PORT, var 15 min, public, språk från flödet\n  pausade: paused\n127.0.0.1:PORT: Mastodon 4.7.3, API-version 11, 500 tecken per inlägg\nalpha, beta: @alfa@127.0.0.1:PORT, 12345 följare\nMastodon säger att GET /api/v1/accounts/verify_credentials är på väg bort (Deprecation: @1700000000). masto-rss behöver uppdateras.\ndelta: @delta@127.0.0.1:PORT, 0 följare. Kontot är inte märkt som bot (Inställningar → Profil)\ngamma: token saknar write:statuses (har read). Inget postas för kontot förrän det är rättat och masto-rss startats om.\n[torrläge] skulle avisera: masto-rss: gamma: token saknar write:statuses (har read). Inget postas för kontot förrän det är rättat och masto-rss startats om.\nalpha: nytt flöde, 1 poster markerade som sedda, 2 läggs i utkorgen (BACKFILL)\nalpha: skulle posta: Post 2 från /feed-a & @​anna ⏎  ⏎ https://example.com/feed-a/post-2/?utm_source=rss\nalpha: skulle posta: Post 3 från /feed-a & @​anna ⏎  ⏎ https://example.com/feed-a/post-3/?utm_source=rss\nbeta: FEL (1 i rad): HttpError: HTTP 500 Internal Server Error; nästa försök om 15 min\n[torrläge] skulle avisera: masto-rss: beta: flödet har inte gått att hämta 1 gånger i rad (HttpError: HTTP 500 Internal Server Error)\ndelta: adressen har flyttat permanent till http://127.0.0.1:PORT/feed-d; uppdatera FEED_DELTA_URL\ndelta: nytt flöde, 3 poster markerade som sedda, inget postas\ngamma: nytt flöde, 3 poster markerade som sedda, inget postas\n",
+      "err": ""
+    },
+    "import": {
+      "status": 0,
+      "out": "alpha: importerade 2 länkar från DATA/processed_entries.txt (2 nya nycklar)\n",
+      "err": ""
+    },
+    "afterImport": {
+      "status": 1,
+      "out": "masto-rss 1.0.3 startar i torrläge: inget postas och inget sparas\n  alpha: http://127.0.0.1:PORT/feed-a → 127.0.0.1:PORT, var 15 min, public, språk från flödet\n  beta: http://127.0.0.1:PORT/broken → 127.0.0.1:PORT, var 15 min, public, språk en\n  delta: http://127.0.0.1:PORT/old → 127.0.0.1:PORT, var 15 min, public, språk från flödet\n  gamma: http://127.0.0.1:PORT/feed-c → 127.0.0.1:PORT, var 15 min, public, språk från flödet\n  pausade: paused\n127.0.0.1:PORT: Mastodon 4.7.3, API-version 11, 500 tecken per inlägg\nalpha, beta: @alfa@127.0.0.1:PORT, 12345 följare\nMastodon säger att GET /api/v1/accounts/verify_credentials är på väg bort (Deprecation: @1700000000). masto-rss behöver uppdateras.\ndelta: @delta@127.0.0.1:PORT, 0 följare. Kontot är inte märkt som bot (Inställningar → Profil)\ngamma: token saknar write:statuses (har read). Inget postas för kontot förrän det är rättat och masto-rss startats om.\n[torrläge] skulle avisera: masto-rss: gamma: token saknar write:statuses (har read). Inget postas för kontot förrän det är rättat och masto-rss startats om.\nalpha: skulle posta: Post 3 från /feed-a & @​anna ⏎  ⏎ https://example.com/feed-a/post-3/?utm_source=rss\nbeta: FEL (1 i rad): HttpError: HTTP 500 Internal Server Error; nästa försök om 15 min\n[torrläge] skulle avisera: masto-rss: beta: flödet har inte gått att hämta 1 gånger i rad (HttpError: HTTP 500 Internal Server Error)\ndelta: adressen har flyttat permanent till http://127.0.0.1:PORT/feed-d; uppdatera FEED_DELTA_URL\ndelta: nytt flöde, 3 poster markerade som sedda, inget postas\ngamma: nytt flöde, 3 poster markerade som sedda, inget postas\n",
+      "err": ""
+    },
+    "postDry": {
+      "status": 0,
+      "out": "alpha: skulle posta: Hej allihop! ⏎ Rad två\ndelta: skulle posta: Hej allihop! ⏎ Rad två\ngamma: skulle posta: Hej allihop! ⏎ Rad två\n",
+      "err": ""
+    },
+    "post": {
+      "status": 0,
+      "out": "alpha: postat http://127.0.0.1:PORT/@alfa/2\ndelta: postat http://127.0.0.1:PORT/@delta/3\n",
+      "err": ""
+    },
+    "postUsage": {
+      "status": 1,
+      "out": "",
+      "err": "Användning: node src/main.ts post [--language sv] <namn,…|alla> <text>, där namn är: alpha, beta, delta, gamma\n"
+    },
+    "importUsage": {
+      "status": 1,
+      "out": "",
+      "err": "Användning: node src/main.ts import <namn> <fil>, där namn är ett av: alpha, beta, delta, gamma\n"
+    },
+    "unknown": {
+      "status": 1,
+      "out": "",
+      "err": "Okänt kommando \"okänt\". Användning: node src/main.ts [import <namn> <fil> | post <namn,…|alla> <text>]\n"
+    },
+    "noConfig": {
+      "status": 1,
+      "out": "",
+      "err": "Fel i konfigurationen:\n  - Inga flöden: ange minst FEED_<NAMN>_URL och FEED_<NAMN>_TOKEN\n"
+    },
+    "badConfig": {
+      "status": 1,
+      "out": "",
+      "err": "Fel i konfigurationen:\n  - FEED_X_URL är ingen http(s)-adress: \"nej\"\n  - STATUS_PORT måste vara ett heltal mellan 0 och 65535: \"x\"\n"
+    },
+    "allPaused": {
+      "status": 0,
+      "out": "masto-rss 1.0.3 startar\n  pausade: x\n",
+      "err": ""
+    }
+  },
+  "status": {
+    "version": "1.0.3",
+    "totals": {
+      "feeds": 4,
+      "postedLastDay": 1,
+      "errors": 2
+    },
+    "feeds": [
+      {
+        "name": "alpha",
+        "account": "@alfa",
+        "url": "http://127.0.0.1:PORT/@alfa",
+        "followers": 12345,
+        "posts": 10,
+        "lastPost": "TID",
+        "ok": true,
+        "summary": "12 345 följare · nyss"
+      },
+      {
+        "name": "beta",
+        "account": "@alfa",
+        "url": "http://127.0.0.1:PORT/@alfa",
+        "followers": 12345,
+        "posts": 10,
+        "ok": false,
+        "summary": "fel: flödet svarar inte (1 i rad)"
+      },
+      {
+        "name": "delta",
+        "account": "@delta",
+        "url": "http://127.0.0.1:PORT/@delta",
+        "followers": 0,
+        "posts": 10,
+        "ok": true,
+        "summary": "0 följare · idag"
+      },
+      {
+        "name": "gamma",
+        "account": "gamma",
+        "ok": false,
+        "summary": "fel: token saknar write:statuses (har read)"
+      }
+    ]
+  },
+  "statusRaw": "{\"version\":\"1.0.3\",\"totals\":{\"feeds\":4,\"postedLastDay\":1,\"errors\":2},\"feeds\":[{\"name\":\"alpha\",\"account\":\"@alfa\",\"url\":\"http://127.0.0.1:PORT/@alfa\",\"followers\":12345,\"posts\":10,\"lastPost\":\"TID\",\"ok\":true,\"summary\":\"12 345 följare · nyss\"},{\"name\":\"beta\",\"account\":\"@alfa\",\"url\":\"http://127.0.0.1:PORT/@alfa\",\"followers\":12345,\"posts\":10,\"ok\":false,\"summary\":\"fel: flödet svarar inte (1 i rad)\"},{\"name\":\"delta\",\"account\":\"@delta\",\"url\":\"http://127.0.0.1:PORT/@delta\",\"followers\":0,\"posts\":10,\"ok\":true,\"summary\":\"0 följare · idag\"},{\"name\":\"gamma\",\"account\":\"gamma\",\"ok\":false,\"summary\":\"fel: token saknar write:statuses (har read)\"}]}",
+  "posts": [
+    {
+      "token": "bra",
+      "key": "d7ad4da951b7a89fcd100b6dd6f8fd2b",
+      "body": {
+        "status": "Post 3 från /feed-a & @​anna\n\nhttps://example.com/feed-a/post-3/?utm_source=rss",
+        "visibility": "public",
+        "language": "sv"
+      }
+    },
+    {
+      "token": "bra",
+      "key": "2ffe0144bbfcabbe688a05ae25ba31ac",
+      "body": {
+        "status": "Hej\n\nallihop!",
+        "visibility": "public",
+        "language": "sv"
+      }
+    },
+    {
+      "token": "bra3",
+      "key": "1be77d132d05244978dbf3a9f94f39f4",
+      "body": {
+        "status": "Hej\n\nallihop!",
+        "visibility": "public",
+        "language": "sv"
+      }
+    }
+  ],
+  "signals": [
+    "masto-rss: Mastodon nekade ett inlägg från alpha (HTTP 422: Validation failed: Text character limit of 500 exceeded): Post 2 från /feed-a & @anna",
+    "masto-rss: Mastodon säger att GET /api/v1/accounts/verify_credentials är på väg bort (Deprecation: @1700000000). masto-rss behöver uppdateras.",
+    "masto-rss: beta: flödet har inte gått att hämta 1 gånger i rad (HttpError: HTTP 500 Internal Server Error)",
+    "masto-rss: gamma: token saknar write:statuses (har read). Inget postas för kontot förrän det är rättat och masto-rss startats om.",
+    "masto-rss: gamma: token saknar write:statuses (har read). Inget postas för kontot förrän det är rättat och masto-rss startats om."
+  ]
+}

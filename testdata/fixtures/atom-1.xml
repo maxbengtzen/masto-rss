@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en-GB">
+  <title type="html">Atom &amp;amp; co</title>
+  <id>urn:feed</id>
+  <updated>2026-10-26T08:00:00Z</updated>
+  <entry>
+    <title type="html">Hej &amp;amp; v&#228;lkommen</title>
+    <id>tag:example.com,2026:1</id>
+    <link rel="enclosure" href="https://example.com/a.mp3"/>
+    <link rel="alternate" href="https://example.com/a"/>
+    <updated>2026-10-26T07:30:00Z</updated>
+    <summary type="html">&lt;p&gt;Sammanfattning&lt;/p&gt;</summary>
+    <author><name>Bo</name></author>
+  </entry>
+  <entry>
+    <title>Text med &lt;b&gt; och &aring;</title>
+    <id>  tag:example.com,2026:2  </id>
+    <link href="/relativ/2"/>
+    <link href="https://example.com/inte-denna"/>
+    <published>2026-10-25T10:00:00+02:00</published>
+    <updated>2026-10-26T10:00:00+02:00</updated>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>XHTML &amp; <b>fet</b></p></div></content>
+    <author><name><![CDATA[Cia & Dan]]></name><email>cia@example.com</email></author>
+    <author><name>Andra</name></author>
+  </entry>
+  <entry>
+    <title type="xhtml"><xhtml:div xmlns:xhtml="http://www.w3.org/1999/xhtml">Prefix <xhtml:em>div</xhtml:em></xhtml:div></title>
+    <link rel="self" href="https://example.com/self"/>
+    <link rel="replies" href="https://example.com/replies"/>
+    <issued>2026-10-20T00:00:00Z</issued>
+    <content type="html"><![CDATA[<p>CDATA-innehåll &amp; mer</p>]]></content>
+    <author>Bara text</author>
+  </entry>
+  <entry>
+    <id></id>
+    <title></title>
+    <link>https://example.com/text-lank</link>
+    <modified>2026-10-19T00:00:00Z</modified>
+  </entry>
+  <entry>
+    <id>urn:4</id>
+    <link rel="alternate"/>
+    <link href="https://example.com/efter"/>
+    <summary></summary>
+    <content src="https://example.com/content"/>
+    <created>trasigt</created>
+  </entry>
+  <entry>
+    <ID>urn:5</ID>
+    <Title>Versaler</Title>
+    <Link Href="https://example.com/versaler"/>
+    <Updated>2026-10-18</Updated>
+  </entry>
+</feed>

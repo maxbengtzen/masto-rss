@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- kommentar före roten -->
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+  <title><![CDATA[Sajten]]> &amp; <![CDATA[<b>co</b>]]></title>
+  <link>https://example.com/</link>
+  <dc:language>en-US</dc:language>
+  <item>
+    <title>Titel &#8211; med streck &hellip; &amp;amp; &aring; &copy &notanentity; &#x1F600;</title>
+    <link>/nyheter/1/?utm_source=rss</link>
+    <guid isPermaLink="false">https://example.com/?p=1</guid>
+    <pubDate>Mon, 26 Oct 2026 08:00:00 +0100</pubDate>
+    <description><![CDATA[<p>Kort &amp; gott</p>]]></description>
+    <dc:creator><![CDATA[Anna]]></dc:creator>
+  </item>
+  <item>
+    <title>Bara innehåll</title>
+    <link>https://example.com/2</link>
+    <content:encoded><![CDATA[<p>Hela texten</p>]]></content:encoded>
+    <description>   </description>
+    <pubDate>trasigt datum</pubDate>
+    <author>anna@example.com (Anna Andersson)</author>
+  </item>
+  <item><title>Varken id eller länk</title></item>
+  <item>
+    <title>Författare som e-post</title>
+    <guid>https://example.com/3</guid>
+    <author>bo@example.com</author>
+    <dc:date>2026-10-25T10:00:00Z</dc:date>
+  </item>
+  <item>
+    <title>Författare med namn först</title>
+    <link>https://example.com/4</link>
+    <author>Cia Ceder &lt;cia@example.com&gt;</author>
+    <author>Andra författaren</author>
+  </item>
+  <item>
+    <title>Okodad HTML</title>
+    <link>https://example.com/5</link>
+    <description>Rad ett<br/>rad två <b>fet</b> <!-- dold --> slut</description>
+    <author>https://example.com/profil Dan</author>
+  </item>
+  <item>
+    <title></title>
+    <title>Andra titeln</title>
+    <link>https://example.com/6</link>
+    <link>https://example.com/6b</link>
+    <guid>  </guid>
+    <dc:creator></dc:creator>
+    <dc:creator>Eva</dc:creator>
+  </item>
+  <item>
+    <TITLE>Versaler</TITLE>
+    <Link>https://example.com/7</Link>
+    <PubDate>Tue, 27 Oct 2026 08:00:00 GMT</PubDate>
+    <GUID>G7</GUID>
+  </item>
+  <item>
+    <title>Mailto</title>
+    <guid>g8</guid>
+    <author>mailto:fia@example.com?subject=hej</author>
+    <description>Entiteter i text: &lt;p&gt;inne&lt;/p&gt; &amp;lt;x&amp;gt;</description>
+  </item>
+  <item>
+    <title>Odaterad</title>
+    <link>  https://www.example.com/9#kommentarer  </link>
+    <author>(Gustav) gustav@example.com</author>
+  </item>
+  <item></item>
+  <item>
+  </item>
+  <item><enclosure url="https://example.com/a.mp3" type="audio/mpeg" length="1"/></item>
+  <item>
+    <title>Annat schema</title>
+    <link>tag:example.com,2026:10</link>
+    <pubDate>2026-10-26</pubDate>
+  </item>
+  <item>
+    <title>Samma igen</title>
+    <link>https://example.com/2</link>
+  </item>
+</channel>
+</rss>
