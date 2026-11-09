@@ -1,0 +1,752 @@
+{
+  "durations": [
+    {
+      "text": "900",
+      "ms": 900000
+    },
+    {
+      "text": "15m",
+      "ms": 900000
+    },
+    {
+      "text": "1h30m",
+      "ms": 5400000
+    },
+    {
+      "text": "2d",
+      "ms": 172800000
+    },
+    {
+      "text": " 45S ",
+      "ms": 45000
+    },
+    {
+      "text": "0",
+      "ms": 0
+    },
+    {
+      "text": "",
+      "ms": null
+    },
+    {
+      "text": "15 min",
+      "ms": null
+    },
+    {
+      "text": "m15",
+      "ms": null
+    },
+    {
+      "text": "1d2h3m4s",
+      "ms": 93784000
+    },
+    {
+      "text": "1h1h",
+      "ms": null
+    },
+    {
+      "text": "01m",
+      "ms": 60000
+    },
+    {
+      "text": "1M",
+      "ms": 60000
+    },
+    {
+      "text": "10s",
+      "ms": 10000
+    },
+    {
+      "text": "59s",
+      "ms": 59000
+    },
+    {
+      "text": "60",
+      "ms": 60000
+    },
+    {
+      "text": "1h 30m",
+      "ms": null
+    },
+    {
+      "text": "3600000000000",
+      "ms": 3600000000000000
+    },
+    {
+      "text": "1.5h",
+      "ms": null
+    },
+    {
+      "text": "-5m",
+      "ms": null
+    },
+    {
+      "text": " 15m ",
+      "ms": 900000
+    },
+    {
+      "text": "１５m",
+      "ms": null
+    }
+  ],
+  "configs": [
+    {
+      "env": [
+        [
+          "MASTODON_URL",
+          "https://mastodon.example/"
+        ],
+        [
+          "FEED_NEWS_URL",
+          "https://example.com/feed/"
+        ],
+        [
+          "FEED_NEWS_TOKEN",
+          "token-1"
+        ]
+      ],
+      "config": {
+        "feeds": [
+          {
+            "name": "news",
+            "prefix": "FEED_NEWS_",
+            "url": "https://example.com/feed/",
+            "token": "token-1",
+            "mastodonUrl": "https://mastodon.example",
+            "intervalMs": 900000,
+            "visibility": "public",
+            "template": "{title}\n\n{link}",
+            "maxAgeMs": 172800000,
+            "maxPostsPerPoll": 5,
+            "backfill": 0
+          }
+        ],
+        "paused": [],
+        "dataDir": "/data",
+        "dryRun": false,
+        "once": false,
+        "debug": false,
+        "signalUrl": "",
+        "signalNumber": "",
+        "failNotifyAfter": 3,
+        "statusPort": 8080
+      }
+    },
+    {
+      "env": [
+        [
+          "MASTODON_URL",
+          "https://mastodon.example/"
+        ],
+        [
+          "FEED_NEWS_URL",
+          "https://example.com/feed/"
+        ],
+        [
+          "FEED_NEWS_TOKEN",
+          "token-1"
+        ],
+        [
+          "INTERVAL",
+          "30m"
+        ],
+        [
+          "VISIBILITY",
+          "unlisted"
+        ],
+        [
+          "FEED_OTHER_URL",
+          "https://example.org/rss"
+        ],
+        [
+          "FEED_OTHER_TOKEN",
+          "token-2"
+        ],
+        [
+          "FEED_OTHER_INTERVAL",
+          "1h"
+        ],
+        [
+          "FEED_OTHER_MASTODON_URL",
+          "https://other.example"
+        ],
+        [
+          "FEED_OTHER_LANGUAGE",
+          "sv-SE"
+        ],
+        [
+          "FEED_OTHER_QUOTE_POLICY",
+          "Nobody"
+        ],
+        [
+          "DRY_RUN",
+          "1"
+        ],
+        [
+          "ONCE",
+          "true"
+        ],
+        [
+          "DATA_DIR",
+          "/tmp/x"
+        ],
+        [
+          "LOG_LEVEL",
+          " DEBUG "
+        ]
+      ],
+      "config": {
+        "feeds": [
+          {
+            "name": "news",
+            "prefix": "FEED_NEWS_",
+            "url": "https://example.com/feed/",
+            "token": "token-1",
+            "mastodonUrl": "https://mastodon.example",
+            "intervalMs": 1800000,
+            "visibility": "unlisted",
+            "template": "{title}\n\n{link}",
+            "maxAgeMs": 172800000,
+            "maxPostsPerPoll": 5,
+            "backfill": 0
+          },
+          {
+            "name": "other",
+            "prefix": "FEED_OTHER_",
+            "url": "https://example.org/rss",
+            "token": "token-2",
+            "mastodonUrl": "https://other.example",
+            "intervalMs": 3600000,
+            "visibility": "unlisted",
+            "language": "sv",
+            "template": "{title}\n\n{link}",
+            "quotePolicy": "nobody",
+            "maxAgeMs": 172800000,
+            "maxPostsPerPoll": 5,
+            "backfill": 0
+          }
+        ],
+        "paused": [],
+        "dataDir": "/tmp/x",
+        "dryRun": true,
+        "once": true,
+        "debug": true,
+        "signalUrl": "",
+        "signalNumber": "",
+        "failNotifyAfter": 3,
+        "statusPort": 8080
+      }
+    },
+    {
+      "env": [
+        [
+          "MASTODON_URL",
+          "https://mastodon.example"
+        ],
+        [
+          "FEED_FASTIGHETS_SVERIGE_URL",
+          "https://example.com/feed"
+        ],
+        [
+          "FEED_FASTIGHETS_SVERIGE_TOKEN",
+          "t"
+        ],
+        [
+          "FEED_FASTIGHETS_SVERIGE_MAX_POSTS_PER_POLL",
+          "2"
+        ]
+      ],
+      "config": {
+        "feeds": [
+          {
+            "name": "fastighets_sverige",
+            "prefix": "FEED_FASTIGHETS_SVERIGE_",
+            "url": "https://example.com/feed",
+            "token": "t",
+            "mastodonUrl": "https://mastodon.example",
+            "intervalMs": 900000,
+            "visibility": "public",
+            "template": "{title}\n\n{link}",
+            "maxAgeMs": 172800000,
+            "maxPostsPerPoll": 2,
+            "backfill": 0
+          }
+        ],
+        "paused": [],
+        "dataDir": "/data",
+        "dryRun": false,
+        "once": false,
+        "debug": false,
+        "signalUrl": "",
+        "signalNumber": "",
+        "failNotifyAfter": 3,
+        "statusPort": 8080
+      }
+    },
+    {
+      "env": [
+        [
+          "MASTODON_URL",
+          "https://mastodon.example/"
+        ],
+        [
+          "FEED_NEWS_URL",
+          "https://example.com/feed/"
+        ],
+        [
+          "FEED_NEWS_TOKEN",
+          "token-1"
+        ],
+        [
+          "LANGUAGE",
+          "en_US:en"
+        ],
+        [
+          "TEMPLATE",
+          "{title}\\n{link} #nyheter"
+        ],
+        [
+          "MAX_AGE",
+          "0"
+        ]
+      ],
+      "config": {
+        "feeds": [
+          {
+            "name": "news",
+            "prefix": "FEED_NEWS_",
+            "url": "https://example.com/feed/",
+            "token": "token-1",
+            "mastodonUrl": "https://mastodon.example",
+            "intervalMs": 900000,
+            "visibility": "public",
+            "template": "{title}\n{link} #nyheter",
+            "maxAgeMs": 0,
+            "maxPostsPerPoll": 5,
+            "backfill": 0
+          }
+        ],
+        "paused": [],
+        "dataDir": "/data",
+        "dryRun": false,
+        "once": false,
+        "debug": false,
+        "signalUrl": "",
+        "signalNumber": "",
+        "failNotifyAfter": 3,
+        "statusPort": 8080
+      }
+    },
+    {
+      "env": [
+        [
+          "MASTODON_URL",
+          "https://mastodon.example/"
+        ],
+        [
+          "FEED_NEWS_URL",
+          "https://example.com/feed/"
+        ],
+        [
+          "FEED_NEWS_TOKEN",
+          "token-1"
+        ],
+        [
+          "FEED_OLD_ENABLED",
+          "false"
+        ],
+        [
+          "FEED_OLD_URL",
+          "inte en adress"
+        ]
+      ],
+      "config": {
+        "feeds": [
+          {
+            "name": "news",
+            "prefix": "FEED_NEWS_",
+            "url": "https://example.com/feed/",
+            "token": "token-1",
+            "mastodonUrl": "https://mastodon.example",
+            "intervalMs": 900000,
+            "visibility": "public",
+            "template": "{title}\n\n{link}",
+            "maxAgeMs": 172800000,
+            "maxPostsPerPoll": 5,
+            "backfill": 0
+          }
+        ],
+        "paused": [
+          "old"
+        ],
+        "dataDir": "/data",
+        "dryRun": false,
+        "once": false,
+        "debug": false,
+        "signalUrl": "",
+        "signalNumber": "",
+        "failNotifyAfter": 3,
+        "statusPort": 8080
+      }
+    },
+    {
+      "env": [
+        [
+          "FEED_NEWS_URL",
+          "ftp://example.com/feed"
+        ],
+        [
+          "FEED_NEWS_TEMPLTE",
+          "{title}"
+        ],
+        [
+          "FEED_OTHER_URL",
+          "https://example.org/"
+        ],
+        [
+          "FEED_OTHER_INTERVAL",
+          "30"
+        ],
+        [
+          "FEED_OTHER_VISIBILITY",
+          "everyone"
+        ],
+        [
+          "FEED_OTHER_TEMPLATE",
+          "{title} {body}"
+        ],
+        [
+          "FEED_OTHER_MAX_POSTS_PER_POLL",
+          "0"
+        ]
+      ],
+      "problems": [
+        "Okänd inställning FEED_NEWS_TEMPLTE (stavfel?)",
+        "FEED_NEWS_URL är ingen http(s)-adress: \"ftp://example.com/feed\"",
+        "FEED_NEWS_TOKEN saknas",
+        "MASTODON_URL saknas (globalt eller som FEED_NEWS_MASTODON_URL)",
+        "FEED_OTHER_TOKEN saknas",
+        "MASTODON_URL saknas (globalt eller som FEED_OTHER_MASTODON_URL)",
+        "FEED_OTHER_INTERVAL är för kort: minst 60 s",
+        "FEED_OTHER_MAX_POSTS_PER_POLL måste vara ett heltal, minst 1: \"0\"",
+        "FEED_OTHER_VISIBILITY måste vara public, unlisted, private, direct: \"everyone\"",
+        "FEED_OTHER_TEMPLATE har okänt fält {body}; giltiga är {title}, {link}, {summary}, {author}, {feed}"
+      ]
+    },
+    {
+      "env": [
+        [
+          "MASTODON_URL",
+          "https://mastodon.example/"
+        ],
+        [
+          "FEED_NEWS_URL",
+          "https://example.com/feed/"
+        ],
+        [
+          "FEED_NEWS_TOKEN",
+          "token-1"
+        ],
+        [
+          "FEED_NEWS_ENABLED",
+          "kanske"
+        ]
+      ],
+      "problems": [
+        "FEED_NEWS_ENABLED måste vara true eller false, inte \"kanske\""
+      ]
+    },
+    {
+      "env": [
+        [
+          "MASTODON_URL",
+          "https://mastodon.example/@konto"
+        ],
+        [
+          "FEED_NEWS_URL",
+          "https://example.com/feed/"
+        ],
+        [
+          "FEED_NEWS_TOKEN",
+          "token-1"
+        ]
+      ],
+      "problems": [
+        "MASTODON_URL ska vara instansens adress, till exempel https://mastodon.nu"
+      ]
+    },
+    {
+      "env": [
+        [
+          "MASTODON_URL",
+          "https://mastodon.example/"
+        ],
+        [
+          "FEED_NEWS_URL",
+          "https://example.com/feed/"
+        ],
+        [
+          "FEED_NEWS_TOKEN",
+          "token-1"
+        ],
+        [
+          "FEED_COPY_URL",
+          "https://example.com/feed/"
+        ],
+        [
+          "FEED_COPY_TOKEN",
+          "token-1"
+        ]
+      ],
+      "problems": [
+        "FEED_COPY_ och FEED_NEWS_ postar samma flöde till samma konto"
+      ]
+    },
+    {
+      "env": [
+        [
+          "MASTODON_URL",
+          "https://mastodon.example"
+        ]
+      ],
+      "problems": [
+        "Inga flöden: ange minst FEED_<NAMN>_URL och FEED_<NAMN>_TOKEN"
+      ]
+    },
+    {
+      "env": [],
+      "problems": [
+        "Inga flöden: ange minst FEED_<NAMN>_URL och FEED_<NAMN>_TOKEN"
+      ]
+    },
+    {
+      "env": [
+        [
+          "MASTODON_URL",
+          "HTTPS://Mastodon.Example:443/"
+        ],
+        [
+          "FEED_A_URL",
+          " https://example.com/a "
+        ],
+        [
+          "FEED_A_TOKEN",
+          " t "
+        ],
+        [
+          "FEED_A_ENABLED",
+          "JA"
+        ],
+        [
+          "FEED_A_LANGUAGE",
+          "SV_se"
+        ],
+        [
+          "FEED_A_BACKFILL",
+          "3"
+        ],
+        [
+          "FEED_A_TEMPLATE",
+          "{summary} {author} {feed}"
+        ],
+        [
+          "FEED_B_URL",
+          "http://example.com/b?x=1"
+        ],
+        [
+          "FEED_B_TOKEN",
+          "t2"
+        ],
+        [
+          "FEED_B_MASTODON_URL",
+          "https://m.example/?x"
+        ],
+        [
+          "FEED_B_VISIBILITY",
+          "DIRECT"
+        ],
+        [
+          "FEED_B_QUOTE_POLICY",
+          "alla"
+        ],
+        [
+          "FEED_B_LANGUAGE",
+          "svenska"
+        ],
+        [
+          "FEED_B_MAX_AGE",
+          "fem"
+        ],
+        [
+          "FEED_B_BACKFILL",
+          "-1"
+        ],
+        [
+          "FEED_C_ENABLED",
+          "nej"
+        ],
+        [
+          "FEED_",
+          "x"
+        ],
+        [
+          "FEED_X_Y",
+          "z"
+        ],
+        [
+          "FAIL_NOTIFY_AFTER",
+          "0"
+        ],
+        [
+          "STATUS_PORT",
+          "70000"
+        ],
+        [
+          "SIGNAL_API_URL",
+          "http://signal:8080//"
+        ]
+      ],
+      "problems": [
+        "Okänd inställning FEED_ (stavfel?)",
+        "Okänd inställning FEED_X_Y (stavfel?)",
+        "FEED_B_MASTODON_URL ska vara instansens adress, till exempel https://mastodon.nu",
+        "FEED_B_MAX_AGE är ingen tid: \"fem\" (till exempel 900, 15m eller 1h30m)",
+        "FEED_B_BACKFILL måste vara ett heltal, minst 0: \"-1\"",
+        "FEED_B_QUOTE_POLICY måste vara public, followers, nobody: \"alla\"",
+        "FEED_B_LANGUAGE ska vara en språkkod som sv eller en: \"svenska\"",
+        "FAIL_NOTIFY_AFTER måste vara ett heltal mellan 1 och Infinity: \"0\"",
+        "STATUS_PORT måste vara ett heltal mellan 0 och 65535: \"70000\"",
+        "SIGNAL_API_URL och SIGNAL_NUMBER behövs båda för Signal-aviseringar"
+      ]
+    },
+    {
+      "env": [
+        [
+          "MASTODON_URL",
+          "https://mastodon.example"
+        ],
+        [
+          "FEED_A_URL",
+          "https://example.com/a"
+        ],
+        [
+          "FEED_A_TOKEN",
+          "t"
+        ],
+        [
+          "SIGNAL_NUMBER",
+          "+46700000000"
+        ],
+        [
+          "STATUS_PORT",
+          ""
+        ],
+        [
+          "FAIL_NOTIFY_AFTER",
+          " 7 "
+        ],
+        [
+          "DATA_DIR",
+          "  "
+        ]
+      ],
+      "problems": [
+        "SIGNAL_API_URL och SIGNAL_NUMBER behövs båda för Signal-aviseringar"
+      ]
+    },
+    {
+      "env": [
+        [
+          "MASTODON_URL",
+          "https://mastodon.example"
+        ],
+        [
+          "FEED_A_URL",
+          "https://example.com/a"
+        ],
+        [
+          "FEED_A_TOKEN",
+          "t"
+        ],
+        [
+          "SIGNAL_API_URL",
+          "ftp://x"
+        ],
+        [
+          "SIGNAL_NUMBER",
+          "1"
+        ],
+        [
+          "FEED_A_INTERVAL",
+          "59s"
+        ],
+        [
+          "INTERVAL",
+          "1m"
+        ],
+        [
+          "FEED_A_MAX_POSTS_PER_POLL",
+          "1"
+        ]
+      ],
+      "problems": [
+        "FEED_A_INTERVAL är för kort: minst 60 s",
+        "SIGNAL_API_URL är ingen http(s)-adress: \"ftp://x\""
+      ]
+    },
+    {
+      "env": [
+        [
+          "FEED_A_ENABLED",
+          "off"
+        ],
+        [
+          "FEED_B_ENABLED",
+          "0"
+        ]
+      ],
+      "config": {
+        "feeds": [],
+        "paused": [
+          "a",
+          "b"
+        ],
+        "dataDir": "/data",
+        "dryRun": false,
+        "once": false,
+        "debug": false,
+        "signalUrl": "",
+        "signalNumber": "",
+        "failNotifyAfter": 3,
+        "statusPort": 8080
+      }
+    },
+    {
+      "env": [
+        [
+          "MASTODON_URL",
+          "https://xn--mstodon-5wa.example"
+        ],
+        [
+          "FEED_A_URL",
+          "https://exämple.com/flöde"
+        ],
+        [
+          "FEED_A_TOKEN",
+          "t"
+        ],
+        [
+          "FEED_A_MASTODON_URL",
+          "https://[::1]:8443"
+        ],
+        [
+          "TEMPLATE",
+          "{title}{link}{constructor}"
+        ]
+      ],
+      "problems": [
+        "TEMPLATE har okänt fält {constructor}; giltiga är {title}, {link}, {summary}, {author}, {feed}"
+      ]
+    }
+  ]
+}

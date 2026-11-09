@@ -6,6 +6,22 @@ Alla ändringar som märks för den som kör tjänsten. Formatet följer
 
 ## [Unreleased]
 
+### Ändrat
+- masto-rss är omskriven i Go. Den gör samma sak som förut, med samma miljövariabler, mallfält,
+  loggtexter, aviseringar och `/status`, och den befintliga databasen används som den är. Inget
+  behöver ändras i compose-filen.
+- Imagen är på 13 MB i stället för 184 MB, och tjänsten använder runt 13 MiB minne i stället för
+  40–45 MiB. Den bygger på `scratch` och kör som användaren 1000:1000 (samma uid som förut).
+- Kommandona heter `masto-rss import …` och `masto-rss post …`. I en körande container:
+  `docker exec masto-rss /masto-rss import <namn> <fil>`, i stället för `node src/main.ts …`.
+- Hälsokontrollen är `masto-rss healthcheck`, med samma regel som förut: hälsofilen i `/tmp` ska
+  vara yngre än tre minuter. Med `read_only: true` behöver `/tmp` fortfarande vara en tmpfs.
+- Orsaken inom parentes i loggen för nätverksfel och trasig XML är formulerad annorlunda.
+- Teckenkodningar som inte är UTF-8, UTF-16, ISO-8859-1/windows-1252 eller ISO-8859-15 läses som UTF-8.
+
+### Fixat
+- Aviseringar som skickas precis innan masto-rss avslutas (till exempel med `ONCE=1`) kommer fram.
+
 ## [1.0.3] - 2026-10-29
 
 ### Ändrat

@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://my.netscape.com/rdf/simple/0.9/">
+  <channel><title>Netscape 0.9</title><link>https://example.com/</link><description>Gammal</description></channel>
+  <item><title>Utan about</title><link>https://example.com/n1</link></item>
+  <item><title>Utan länk</title></item>
+</rdf:RDF>

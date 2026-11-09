@@ -1,8 +1,12 @@
 # masto-rss
 
 Läser RSS-, Atom-, RDF- och JSON-flöden och postar nya poster till Mastodon. Alla flöden och konton
-körs i en och samma container. Skriven i TypeScript och körs direkt av Node 26 (type stripping,
-inget byggsteg), med SQLite (`node:sqlite`) för vad som redan setts och postats.
+körs i en och samma container. Skriven i Go, utan andra beroenden än standardbiblioteket och
+SQLite ([modernc.org/sqlite](https://pkg.go.dev/modernc.org/sqlite), utan cgo) för vad som redan
+setts och postats. Imagen är på 13 MB, och tjänsten använder runt 13 MiB minne med fem flöden.
+
+Fram till v1.0.3 var den skriven i TypeScript. Go-versionen gör samma sak, med samma inställningar,
+texter och databas.
 
 Inspirerad av [aserper/masto-rss](https://github.com/aserper/masto-rss), men skriven från grunden.
 Det som skiljer: flera flöden och konton i samma process, dubblettkontroll som tål ändrade
@@ -94,8 +98,9 @@ labels:
 
 ## Köra i Docker
 
-Imagen kör som användaren `node` och fungerar med skrivskyddat filsystem. Databasen ligger i `/data`
-och hälsokontrollen skriver i `/tmp`:
+Imagen bygger på `scratch`, kör som 1000:1000 och fungerar med skrivskyddat filsystem. Databasen
+ligger i `/data`, och huvudloopen skriver en hälsofil i `/tmp` som hälsokontrollen
+(`masto-rss healthcheck`) läser:
 
 ```yaml
 services:
@@ -112,10 +117,13 @@ services:
 ## Kommandon
 
 ```sh
-node src/main.ts                                 # kör tills SIGTERM (ONCE=1: ett varv)
-node src/main.ts import <namn> <fil>             # importera den gamla masto-rss:ens processed_entries.txt
-node src/main.ts post [--language sv] <namn,…|alla> <text>   # posta en fri text till kontona
+masto-rss                                        # kör tills SIGTERM (ONCE=1: ett varv)
+masto-rss import <namn> <fil>                    # importera den gamla masto-rss:ens processed_entries.txt
+masto-rss post [--language sv] <namn,…|alla> <text>   # posta en fri text till kontona
+masto-rss healthcheck                            # hälsokontrollen: lyckas om loopen är igång
 ```
+
+I en körande container: `docker exec masto-rss /masto-rss post alla "Hej!"`.
 
 Importen gör att länkarna i den gamla botens `processed_entries.txt` räknas som sedda, så att inget
 postas om efter bytet. I `post` blir `\n` en radbrytning.
@@ -138,10 +146,12 @@ Andra servrar med Mastodons API (till exempel GoToSocial) bör fungera. Saknar i
 ## Utveckling
 
 ```sh
-npm install
-npm run typecheck
-npm test
+go vet ./...
+go test ./...
 ```
+
+Utan Go lokalt går det att köra i Go-imagen:
+`docker run --rm -v "$PWD":/src -w /src golang:1.27-alpine go test ./...`.
 
 Mer om test, torrkörning och releaser står i [AGENTS.md](AGENTS.md).
 

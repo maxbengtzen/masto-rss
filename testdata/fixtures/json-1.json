@@ -1,0 +1,15 @@
+{
+  "version": "https://jsonfeed.org/version/1.1",
+  "title": "JSON &amp; co",
+  "language": "sv-SE",
+  "items": [
+    { "id": "j1", "url": "https://example.com/j1", "title": "JSON-post", "content_html": "<p>Text</p>", "date_published": "2026-10-26T05:00:00Z", "authors": [{ "name": "Cia" }] },
+    { "id": 2, "external_url": "/extern/2", "title": "  Nummer-id  ", "summary": "Sammanfattning &amp; mer", "content_text": "Inte denna", "date_modified": "2026-10-26T06:00:00+02:00", "author": { "name": "Gammal författare" } },
+    { "id": 1.5e21, "url": "https://example.com/j3", "content_text": "Bara text", "authors": ["Sträng"], "date_published": "  " },
+    { "ID": "versaler", "URL": "https://example.com/j4", "Title": "Versaler", "Date_Published": "Mon, 26 Oct 2026 08:00:00 +0100" },
+    { "title": "Varken id eller länk" },
+    "inte ett objekt",
+    { "id": "", "url": "", "title": "Tomma" },
+    { "id": { "x": 1 }, "url": ["https://example.com/array"], "title": 5 }
+  ]
+}

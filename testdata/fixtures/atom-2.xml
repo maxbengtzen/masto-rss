@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<a:feed xmlns:a="http://www.w3.org/2005/Atom">
+  <a:title>Prefixat</a:title>
+  <a:entry><a:id>p1</a:id><a:title>Prefixad post</a:title><a:link href="https://example.com/p1"/><a:updated>2026-10-26T00:00:00Z</a:updated></a:entry>
+</a:feed>

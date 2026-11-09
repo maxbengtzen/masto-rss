@@ -1,0 +1,65 @@
+{
+  "userVersion": 3,
+  "objects": [
+    {
+      "type": "table",
+      "name": "feed",
+      "tbl_name": "feed",
+      "sql": "CREATE TABLE feed (\n     name text primary key,\n     url text not null,\n     etag text,\n     last_modified text,\n     primed_at integer,\n     checked_at integer,\n     ok_at integer,\n     failures integer not null default 0\n   , newest_published integer) strict"
+    },
+    {
+      "type": "table",
+      "name": "instance",
+      "tbl_name": "instance",
+      "sql": "CREATE TABLE instance (\n     url text primary key,\n     version text not null,\n     api_version integer not null,\n     checked_at integer not null\n   ) strict"
+    },
+    {
+      "type": "table",
+      "name": "notice",
+      "tbl_name": "notice",
+      "sql": "CREATE TABLE notice (\n     key text primary key,\n     sent_at integer not null\n   ) strict"
+    },
+    {
+      "type": "table",
+      "name": "post",
+      "tbl_name": "post",
+      "sql": "CREATE TABLE post (\n     id text primary key,\n     feed text not null,\n     title text not null,\n     link text,\n     status text not null,\n     language text,\n     state text not null default 'pending',\n     attempts integer not null default 0,\n     next_attempt_at integer not null,\n     created_at integer not null,\n     posted_at integer,\n     status_url text,\n     error text\n   ) strict"
+    },
+    {
+      "type": "index",
+      "name": "post_due",
+      "tbl_name": "post",
+      "sql": "CREATE INDEX post_due on post (feed, state, next_attempt_at)"
+    },
+    {
+      "type": "table",
+      "name": "seen",
+      "tbl_name": "seen",
+      "sql": "CREATE TABLE seen (\n     feed text not null,\n     key text not null,\n     first_seen integer not null,\n     last_seen integer not null,\n     primary key (feed, key)\n   ) strict, without rowid"
+    },
+    {
+      "type": "index",
+      "name": "sqlite_autoindex_feed_1",
+      "tbl_name": "feed",
+      "sql": null
+    },
+    {
+      "type": "index",
+      "name": "sqlite_autoindex_instance_1",
+      "tbl_name": "instance",
+      "sql": null
+    },
+    {
+      "type": "index",
+      "name": "sqlite_autoindex_notice_1",
+      "tbl_name": "notice",
+      "sql": null
+    },
+    {
+      "type": "index",
+      "name": "sqlite_autoindex_post_1",
+      "tbl_name": "post",
+      "sql": null
+    }
+  ]
+}
