@@ -31,15 +31,17 @@ esac
 ! git rev-parse -q --verify "refs/tags/v$next" >/dev/null || fail "taggen v$next finns redan"
 
 scripts/changelog.sh check
+# Testerna körs med den nya versionen i VERSION, eftersom den syns i utdata som testerna jämför.
 # Go behöver inte finnas på datorn: utan den körs testerna i Go-imagen.
+printf '%s\n' "$next" >VERSION
 if command -v go >/dev/null; then
-	go vet ./... && go test ./...
+	test_cmd="go vet ./... && go test ./..."
+	sh -c "$test_cmd" || { git checkout -q -- VERSION; fail "testerna gick inte igenom"; }
 else
 	docker run --rm -u "$(id -u):$(id -g)" -e HOME=/tmp -v "$PWD":/src -w /src golang:1.27-alpine \
-		sh -c 'go vet ./... && go test ./...'
+		sh -c 'go vet ./... && go test ./...' || { git checkout -q -- VERSION; fail "testerna gick inte igenom"; }
 fi
 
-printf '%s\n' "$next" >VERSION
 scripts/changelog.sh release "$next"
 git add VERSION CHANGELOG.md
 git commit -q -m "chore(release): v$next"

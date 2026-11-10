@@ -21,6 +21,7 @@ import (
 	"testing"
 	"time"
 
+	mastorss "github.com/maxbengtzen/masto-rss"
 	"github.com/maxbengtzen/masto-rss/internal/testutil"
 )
 
@@ -198,8 +199,19 @@ type runner struct {
 
 // clean tar bort tidsstämplar och byter porten och datakatalogen mot fasta ord, som i golden.ts.
 func (r *runner) clean(s string) string {
-	s = timestamp.ReplaceAllString(s, "")
+	s = versionless(timestamp.ReplaceAllString(s, ""), mastorss.Version())
 	return strings.ReplaceAll(strings.ReplaceAll(s, r.fake.port(), "PORT"), r.root, "DATA")
+}
+
+// goldenVersion är versionen när golden-filerna spelades in.
+const goldenVersion = "1.0.3"
+
+// versionless byter versionsnumret mot ordet VERSION, så att golden-filerna gäller för varje version.
+func versionless(s, version string) string {
+	for _, format := range []string{"masto-rss %s ", `"version":"%s"`, "masto-rss/%s"} {
+		s = strings.ReplaceAll(s, fmt.Sprintf(format, version), fmt.Sprintf(format, "VERSION"))
+	}
+	return s
 }
 
 func (r *runner) run(env []string, args []string, opts Options) runResult {
@@ -294,12 +306,13 @@ func TestRunsGolden(t *testing.T) {
 	for name, want := range golden.Runs {
 		// Avsiktlig skillnad: användningstexterna nämner programmet, inte "node src/main.ts".
 		want.Err = strings.ReplaceAll(want.Err, "node src/main.ts", "masto-rss")
+		want.Out, want.Err = versionless(want.Out, goldenVersion), versionless(want.Err, goldenVersion)
 		if got[name] != want {
 			t.Errorf("körningen %s skiljer sig:\n--- fick (slutkod %d)\n%s%s\n--- väntade (slutkod %d)\n%s%s", name,
 				got[name].Status, got[name].Out, got[name].Err, want.Status, want.Out, want.Err)
 		}
 	}
-	if statusRaw != golden.StatusRaw {
+	if golden.StatusRaw = versionless(golden.StatusRaw, goldenVersion); statusRaw != golden.StatusRaw {
 		t.Errorf("statussidan:\nfick    %s\nväntade %s", statusRaw, golden.StatusRaw)
 	}
 
