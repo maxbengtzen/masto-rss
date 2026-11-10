@@ -6,6 +6,8 @@ Alla ändringar som märks för den som kör tjänsten. Formatet följer
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-11-10
+
 ### Fixat
 - 1.1.0 publicerades aldrig: testerna föll i CI på det nya versionsnumret. 1.1.1 innehåller samma
   ändringar som står under 1.1.0 nedan.
