@@ -6,6 +6,8 @@ Alla ändringar som märks för den som kör tjänsten. Formatet följer
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-11-10
+
 ### Ändrat
 - masto-rss är omskriven i Go. Den gör samma sak som förut, med samma miljövariabler, mallfält,
   loggtexter, aviseringar och `/status`, och den befintliga databasen används som den är. Inget
