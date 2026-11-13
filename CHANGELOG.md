@@ -6,6 +6,8 @@ Alla ändringar som märks för den som kör tjänsten. Formatet följer
 
 ## [Unreleased]
 
+## [1.1.2] - 2026-11-13
+
 ### Säkerhet
 - Byggd med Go 1.27.4, som rättar CVE-2026-97054 i standardbiblioteket. Go-versionen i
   Dockerfile är nu låst, så att Dependabot föreslår nya Go-patchar.
