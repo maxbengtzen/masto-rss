@@ -1,5 +1,5 @@
 # Bygget sker i Go-imagen. Det som körs är bara binären, CA-certifikaten och två tomma kataloger.
-FROM golang:1.27-alpine AS build
+FROM golang:1.27.4-alpine AS build
 WORKDIR /src
 COPY go.mod go.sum ./
 RUN go mod download

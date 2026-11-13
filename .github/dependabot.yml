@@ -12,3 +12,9 @@ updates:
     directory: /
     schedule:
       interval: monthly
+  # The Go version in the Dockerfile is pinned (golang:X.Y.Z-alpine) so that Go
+  # patch releases, including security fixes in the standard library, show up here.
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: monthly
