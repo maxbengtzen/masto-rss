@@ -6,6 +6,11 @@ Alla ändringar som märks för den som kör tjänsten. Formatet följer
 
 ## [Unreleased]
 
+### Tillagt
+- `GET /api/dashboard` på `STATUS_PORT` ger en kort sammanfattning för en startsida: antal konton,
+  inlägg senaste dygnet och fel, en rad per flöde med länk till kontot, och `status: warn` med ett
+  meddelande när något flöde felar. `/status` är oförändrad.
+
 ## [1.1.2] - 2026-11-13
 
 ### Säkerhet

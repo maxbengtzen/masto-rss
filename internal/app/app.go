@@ -699,6 +699,7 @@ func (a *app) snapshot() status.Snapshot {
 		}
 		if problem != "" {
 			fs.Summary = "fel: " + problem
+			fs.Problem = problem
 			errorsCount++
 		} else {
 			fs.Summary = followers + lastText

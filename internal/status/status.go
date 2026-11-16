@@ -1,12 +1,13 @@
 // Package status är statussidan för en samlad Homepage-ruta: GET /status ger JSON med varje flödes
-// konto, följare, senaste inlägg och eventuella fel. Den är tänkt för ett internt nätverk och visar
-// inga tokens.
+// konto, följare, senaste inlägg och eventuella fel. GET /api/dashboard ger samma sak i kort form
+// för en startsida (se Dashboard). Båda är tänkta för ett internt nätverk och visar inga tokens.
 package status
 
 import (
 	"bytes"
 	"encoding/json"
 	"net/http"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -28,6 +29,8 @@ type Feed struct {
 	OK       bool   `json:"ok"`
 	// Summary är en rad för Homepage, till exempel "195 följare · 12 min sedan".
 	Summary string `json:"summary"`
+	// Problem är felet utan prefix, "" när flödet fungerar. Det syns i /status bara via Summary.
+	Problem string `json:"-"`
 }
 
 // Totals är summorna. PostedLastDay är inlägg de senaste 24 timmarna.
@@ -44,17 +47,97 @@ type Snapshot struct {
 	Feeds   []Feed `json:"feeds"`
 }
 
-// Handler svarar på GET /status och GET /, och med 404 på allt annat.
+// Metric är ett värde i Dashboard: en kort etikett och ett tal.
+type Metric struct {
+	K string `json:"k"`
+	V int    `json:"v"`
+}
+
+// Item är en rad i Dashboard.
+type Item struct {
+	Name  string `json:"name"`
+	Label string `json:"label"`
+	Href  string `json:"href,omitempty"`
+}
+
+// Dashboard är en kort sammanfattning för en startsida: högst fyra värden, en rad per flöde och
+// status "ok" eller "warn" (med Message) när något flöde felar.
+type Dashboard struct {
+	Metrics []Metric `json:"metrics"`
+	Items   []Item   `json:"items"`
+	Status  string   `json:"status"`
+	Message string   `json:"message,omitempty"`
+}
+
+// maxItems är hur många flöden en startsida visar.
+const maxItems = 8
+
+// ToDashboard gör om en Snapshot till en Dashboard.
+func ToDashboard(s Snapshot) Dashboard {
+	d := Dashboard{
+		Metrics: []Metric{
+			{"konton", s.Totals.Feeds},
+			{"senaste dygnet", s.Totals.PostedLastDay},
+			{"fel", s.Totals.Errors},
+		},
+		Items:  []Item{},
+		Status: "ok",
+	}
+	var failing, working []Feed
+	for _, f := range s.Feeds {
+		if f.Problem != "" {
+			failing = append(failing, f)
+		} else {
+			working = append(working, f)
+		}
+	}
+	// Flöden som felar först, så att de syns även när det finns fler än maxItems.
+	for _, f := range slices.Concat(failing, working) {
+		if len(d.Items) == maxItems {
+			break
+		}
+		item := Item{Name: f.Account, Label: f.Summary}
+		if strings.HasPrefix(f.URL, "https://") || strings.HasPrefix(f.URL, "http://") {
+			item.Href = f.URL
+		}
+		d.Items = append(d.Items, item)
+	}
+	switch len(failing) {
+	case 0:
+	case 1:
+		d.Status, d.Message = "warn", failing[0].Account+": "+failing[0].Problem
+	default:
+		names := make([]string, len(failing))
+		for i, f := range failing {
+			names[i] = f.Account
+		}
+		d.Status, d.Message = "warn", strconv.Itoa(len(failing))+" flöden felar: "+strings.Join(names, ", ")
+	}
+	return d
+}
+
+// Handler svarar på GET /status och GET / med hela Snapshot, på GET /api/dashboard med en
+// Dashboard, och med 404 på allt annat.
 func Handler(snapshot func() Snapshot) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet || r.RequestURI != "/status" && r.RequestURI != "/" {
+		if r.Method != http.MethodGet {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+		var body any
+		switch r.RequestURI {
+		case "/status", "/":
+			body = snapshot()
+		case "/api/dashboard":
+			body = ToDashboard(snapshot())
+		default:
 			w.WriteHeader(http.StatusNotFound)
 			return
 		}
 		var buf bytes.Buffer
 		enc := json.NewEncoder(&buf)
 		enc.SetEscapeHTML(false)
-		if err := enc.Encode(snapshot()); err != nil {
+		if err := enc.Encode(body); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}

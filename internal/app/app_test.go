@@ -22,6 +22,7 @@ import (
 	"time"
 
 	mastorss "github.com/maxbengtzen/masto-rss"
+	"github.com/maxbengtzen/masto-rss/internal/status"
 	"github.com/maxbengtzen/masto-rss/internal/testutil"
 )
 
@@ -275,7 +276,8 @@ func TestRunsGolden(t *testing.T) {
 	case <-time.After(20 * time.Second):
 		t.Fatalf("delta blev aldrig klar:\n%s", stdout.String())
 	}
-	res, err := http.Get("http://" + <-addr + "/status")
+	base := "http://" + <-addr
+	res, err := http.Get(base + "/status")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -285,6 +287,17 @@ func TestRunsGolden(t *testing.T) {
 		t.Errorf("Content-Type %q", ct)
 	}
 	statusRaw = regexp.MustCompile(`"lastPost":"[^"]+"`).ReplaceAllString(r.clean(string(b)), `"lastPost":"TID"`)
+	// Startsidans sammanfattning bygger på samma läge: två flöden felar.
+	var dashboard status.Dashboard
+	if res, err := http.Get(base + "/api/dashboard"); err != nil {
+		t.Error(err)
+	} else {
+		json.NewDecoder(res.Body).Decode(&dashboard)
+		res.Body.Close()
+	}
+	if dashboard.Status != "warn" || dashboard.Message != "2 flöden felar: @alfa, gamma" || len(dashboard.Items) != 4 {
+		t.Errorf("dashboard: %+v", dashboard)
+	}
 	signals <- syscall.SIGTERM
 	got["live"] = runResult{Status: <-done, Out: r.clean(stdout.String())}
 
