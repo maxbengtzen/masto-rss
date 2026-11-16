@@ -24,7 +24,7 @@ TypeScript).
 | Beslut om vad som postas | `internal/poll`: nya poster, skydden mot flod och dubbletter, utkorgen |
 | Inläggens text | `internal/format`: mallen, längd enligt Mastodons regler (grafemkluster), inga omnämnanden |
 | Postning | `internal/deliver` (utkorgen, omförsök) och `internal/mastodon` (API-klienten) |
-| Aviseringar och status | `internal/notify` (Signal via signal-cli-rest-api), `internal/status` (`/status`, till exempel för Homepage) |
+| Aviseringar och status | `internal/notify` (Signal via signal-cli-rest-api), `internal/status` (`/status`, till exempel för Homepage, och `/api/dashboard` för en startsida) |
 | JavaScript-semantik | `internal/js` (`Date.parse`, `trim()` m.m.) och `internal/weburl` (`new URL()`, `URLSearchParams`), så att datum, länkar och nycklar blir desamma som i TypeScript-versionen |
 | Övrigt | `internal/logx` (loggrader i `TZ`), `internal/netx` (fel i loggen), `version.go` (version och User-Agent ur `VERSION`) |
 | Tester | `*_test.go` bredvid koden (HTTP är låtsad: inget nätverk), påhittade flöden i `testdata/fixtures/`, TypeScript-versionens svar i `testdata/golden/`; riktiga flöden bara lokalt i `testdata/local/` (versionshanteras inte) |

@@ -78,7 +78,7 @@ Med `SIGNAL_API_URL` och `SIGNAL_NUMBER` skickas ett Signal-meddelande till numr
 - mer än hälften av ett flöde ser nytt ut på en gång utan att vara nyare än det som setts
 - instansen byter Mastodon-version eller API-version, eller svarar med ett `Deprecation`-huvud
 
-## Statussida och Homepage
+## Statussida, Homepage och startsidor
 
 `GET /status` på `STATUS_PORT` ger JSON med varje flödes konto, följare, senaste inlägg och fel. En
 samlad ruta i [Homepage](https://gethomepage.dev):
@@ -95,6 +95,20 @@ labels:
   homepage.widgets[0].mappings.label: summary
   homepage.widgets[0].mappings.target: "{url}"
 ```
+
+`GET /api/dashboard` på samma port ger en kort sammanfattning för en startsida:
+
+```json
+{
+  "metrics": [{"k": "konton", "v": 5}, {"k": "senaste dygnet", "v": 12}, {"k": "fel", "v": 1}],
+  "items": [{"name": "@nyheter", "label": "fel: flödet svarar inte (3 i rad)", "href": "https://…"}],
+  "status": "warn",
+  "message": "@nyheter: flödet svarar inte (3 i rad)"
+}
+```
+
+`items` har en rad per flöde (högst åtta, de som felar först) med länk till kontot. `status` är `ok`,
+eller `warn` med `message` när något flöde felar, på samma sätt som `fel` i `/status`.
 
 ## Köra i Docker
 
