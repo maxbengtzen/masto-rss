@@ -7,6 +7,8 @@ All changes noticeable to whoever runs the service. The format follows
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-11-26
+
 ### Changed
 - All text is now in English: log lines, Signal notifications, error messages, the summaries in
   `/status` and `/api/dashboard`, the documentation and the code. Settings, templates and the
