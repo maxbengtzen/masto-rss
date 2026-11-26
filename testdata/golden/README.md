@@ -1,53 +1,61 @@
-# Golden-filer
+# Golden files
 
-Svaren TypeScript-versionen (v1.0.3, Node 26 med ICU för Unicode 17) gav, inspelade med
-`scripts/golden.ts` inför omskrivningen till Go (skriptet togs bort med TypeScript-koden och finns i
-historiken). Testerna kräver att Go-versionen ger samma:
+The outputs the TypeScript version (v1.0.3, Node 26 with ICU for Unicode 17) produced, recorded
+with `scripts/golden.ts` before the rewrite in Go (the script was removed along with the TypeScript
+code and is in the history). The tests require the Go version to produce the same:
 
-| Fil | Vad | Test |
+| File | What | Test |
 |---|---|---|
-| `feeds.json` | Tolkade flöden (feedsmith och normaliseringen i `feed.ts`) för allt i `../fixtures/` | `internal/feed` |
-| `format.json` | Inläggens text, längd och neutraliserade omnämnanden för många mallar, gränser och texter | `internal/format` |
-| `config.json` | `parseDuration` och konfigurationen eller felen för många miljöer, i samma ordning | `internal/config` |
-| `text.json` | `normalizeLink`, `new URL(länk, bas)`, entiteter, HTML till text, teckenkodning, `Date.parse`, tid sedan, inläggs-id | flera |
-| `schema.json` | Databasens schema och `user_version` | `internal/store` |
-| `runs.json` | Hela programmet mot en låtsad server: loggen, `/status`, inläggen och aviseringarna | `internal/app` |
+| `feeds.json` | Parsed feeds (feedsmith and the normalization in `feed.ts`) for everything in `../fixtures/` | `internal/feed` |
+| `format.json` | Post text, length and defused mentions for many templates, limits and texts | `internal/format` |
+| `config.json` | `parseDuration` and the configuration or errors for many environments, in the same order | `internal/config` |
+| `text.json` | `normalizeLink`, `new URL(link, base)`, entities, HTML to text, character encodings, `Date.parse`, time ago, post ids | several |
+| `schema.json` | The database schema and `user_version` | `internal/store` |
+| `runs.json` | The whole program against a fake server: the log, `/status`, the posts and the notifications | `internal/app` |
 
-Alla flöden i `../fixtures/` är påhittade. `rss-wordpress-exempel.xml` och `rss-cms-exempel.xml` har
-samma uppbyggnad som WordPress och ett vanligt nyhets-CMS (CDATA, `content:encoded`, `dc:creator`,
-spårningsparametrar, långa texter), och resten är skrivna för kantfallen.
-`../unicode/GraphemeBreakTest.txt` är Unicodes egna testfall för grafemkluster (17.0.0), som
-`internal/format` också kör.
+All feeds in `../fixtures/` are invented, and partly written in Swedish on purpose so that non-ASCII
+text is exercised. `rss-wordpress-example.xml` and `rss-cms-example.xml` have the same structure as
+WordPress and a common news CMS (CDATA, `content:encoded`, `dc:creator`, tracking parameters, long
+texts), and the rest are written for edge cases. `../unicode/GraphemeBreakTest.txt` is Unicode's own
+test cases for grapheme clusters (17.0.0), which `internal/format` also runs.
 
-Riktiga flöden versionshanteras inte, eftersom texterna tillhör andra. Den som vill kan spara egna i
-`../local/fixtures/` och spela in `../local/golden/feeds.json` och `format.json` från
-TypeScript-versionen (se `scripts/golden.ts` i historiken, med `FIXTURES` och `GOLDEN` satta).
-Testerna `TestParseGoldenLocal` och `TestFormatGoldenLocal` jämför då mot dem, och hoppas annars över.
+Real feeds are not version controlled, since the texts belong to others. You can save your own in
+`../local/fixtures/` and record `../local/golden/feeds.json` and `format.json` from the TypeScript
+version (see `scripts/golden.ts` in the history, with `FIXTURES` and `GOLDEN` set). The tests
+`TestParseGoldenLocal` and `TestFormatGoldenLocal` then compare against them, and are skipped
+otherwise.
 
-Filerna är kontraktet med den som kör tjänsten: ändra dem inte för att ett test går fel. Ändras ett
-svar med avsikt uppdateras filen för hand i samma commit, och skillnaden skrivs in nedan.
+The files are the contract with whoever runs the service: don't change them because a test fails.
+If an output changes on purpose, the file is updated by hand in the same commit, and the difference
+is described below.
 
-## Avsiktliga skillnader
+## Intentional differences
 
-- **Användningstexterna** säger `masto-rss import …` och `masto-rss post …` i stället för
-  `node src/main.ts …`. Testet byter texten i golden-filen innan det jämför.
-- **En ensam surrogat** från en numerisk entitet (`&#xD800;`) blir U+FFFD. JavaScript behöll den i
-  strängen, men den blev U+FFFD ändå när texten skrevs som UTF-8, så inget inlägg blir annorlunda.
-- **Nyckeln för `post`** innehåller instansens adress och därmed den låtsade serverns port; testet
-  räknar fram den i stället för att läsa den ur `runs.json`.
+- **All messages are in English.** The TypeScript version wrote configuration errors, usage texts,
+  log lines, notifications and status summaries in Swedish. `config.json` and `runs.json` were
+  updated by hand with the English texts; nothing else in them changed. Some invented input values
+  in `config.json` were translated along with them (for example `kanske` → `maybe`), and fixtures
+  with Swedish file names were renamed, which changes the keys in `feeds.json`. `post` takes `all`
+  as well as the old `alla`.
+- **The usage texts** say `masto-rss import …` and `masto-rss post …` instead of
+  `node src/main.ts …`. The test replaces the text in the golden file before comparing.
+- **A lone surrogate** from a numeric entity (`&#xD800;`) becomes U+FFFD. JavaScript kept it in the
+  string, but it became U+FFFD anyway when the text was written as UTF-8, so no post differs.
+- **The key for `post`** contains the instance's URL and therefore the fake server's port; the test
+  computes it instead of reading it from `runs.json`.
 
-Skillnader som golden-filerna inte täcker, eftersom de gäller fel och sällsynta indata:
+Differences the golden files don't cover, since they concern errors and rare input:
 
-- Orsaken inom parentes i loggen för nätverksfel (`TypeError: fetch failed (…)`), för trasig XML
-  (`MalformedError: Invalid feed format (…)`) och när statussidans port är upptagen är Go:s egen
-  text, inte Node:s.
-- XML tolkas med `encoding/xml` i stället för fast-xml-parser. Fälten som läses (titel, länk,
-  beskrivning och så vidare) läses som rå text på samma sätt, men XML som är trasig utanför dem kan
-  ge fel i den ena och inte i den andra.
-- Teckenkodningar: UTF-8, UTF-16, windows-1252 (som också är vad ISO-8859-1, latin1 och ascii betyder)
-  och ISO-8859-15. Andra avkodas som UTF-8, som en okänd teckenkodning gjorde förut.
-- Domännamn med andra tecken än ASCII görs om till Punycode utan Unicode-normalisering.
-- Antalet poster "som saknar både id och länk" (bara i debugloggen) kan skilja för poster som bara
-  innehåller okända element.
-- Aviseringar som är på väg när programmet avslutas (`ONCE=1`) skickas klart innan det avslutas.
-- Ett intervall över 24,8 dygn fungerar; i Node blev det en timer på 1 ms.
+- The reason in parentheses in the log for network errors (`TypeError: fetch failed (…)`), for
+  broken XML (`MalformedError: Invalid feed format (…)`) and when the status page's port is taken is
+  Go's own text, not Node's.
+- XML is parsed with `encoding/xml` instead of fast-xml-parser. The fields that are read (title,
+  link, description and so on) are read as raw text the same way, but XML that is broken outside
+  them can fail in one and not the other.
+- Character encodings: UTF-8, UTF-16, windows-1252 (which is also what ISO-8859-1, latin1 and ascii
+  mean) and ISO-8859-15. Others are decoded as UTF-8, as an unknown encoding was before.
+- Domain names with non-ASCII characters are converted to Punycode without Unicode normalization.
+- The number of items "missing both id and link" (only in the debug log) can differ for items that
+  only contain unknown elements.
+- Notifications on their way when the program exits (`ONCE=1`) are sent before it exits.
+- An interval above 24.8 days works; in Node it became a 1 ms timer.

@@ -49,12 +49,12 @@ func TestDecideFirstRun(t *testing.T) {
 	opts := Options{MaxAgeMs: 48 * HOUR, MaxPostsPerPoll: 5}
 	d := Decide(items, []bool{false, false, false}, true, opts, NOW, nil)
 	if d.Reason != "first-run" || len(d.Post) != 0 || len(d.Skipped) != 3 {
-		t.Errorf("fick %+v", d)
+		t.Errorf("got %+v", d)
 	}
 	opts.Backfill = 2
 	d = Decide(items, []bool{false, false, false}, true, opts, NOW, nil)
 	if !reflect.DeepEqual(titles(d.Post), []string{"Post 2", "Post 3"}) || !reflect.DeepEqual(titles(d.Skipped), []string{"Post 1"}) {
-		t.Errorf("fick %v %v", titles(d.Post), titles(d.Skipped))
+		t.Errorf("got %v %v", titles(d.Post), titles(d.Skipped))
 	}
 }
 
@@ -65,11 +65,11 @@ func TestDecideOldestFirstWithCap(t *testing.T) {
 	}
 	seen := make([]bool, len(items))
 	for i := range seen {
-		seen[i] = i >= 3 // 8, 7 och 6 är nya
+		seen[i] = i >= 3 // 8, 7 and 6 are new
 	}
 	d := Decide(items, seen, false, Options{MaxAgeMs: 48 * HOUR, MaxPostsPerPoll: 2}, NOW, nil)
 	if d.Reason != "" || !reflect.DeepEqual(titles(d.Post), []string{"Post 6", "Post 7"}) || !reflect.DeepEqual(titles(d.Deferred), []string{"Post 8"}) || len(d.Skipped) != 0 {
-		t.Errorf("fick %+v", d)
+		t.Errorf("got %+v", d)
 	}
 }
 
@@ -78,10 +78,10 @@ func TestDecideTooOldAndUndated(t *testing.T) {
 	none := []bool{false, false, false, false}
 	d := Decide(items, none, false, Options{MaxAgeMs: 48 * HOUR, MaxPostsPerPoll: 5}, NOW, nil)
 	if !reflect.DeepEqual(titles(d.Skipped), []string{"Post 2"}) || !reflect.DeepEqual(titles(d.Post), []string{"Post 1", "Post 3", "Post 4"}) {
-		t.Errorf("fick %v %v", titles(d.Skipped), titles(d.Post))
+		t.Errorf("got %v %v", titles(d.Skipped), titles(d.Post))
 	}
 	if off := Decide(items, none, false, Options{MaxPostsPerPoll: 5}, NOW, nil); len(off.Skipped) != 0 {
-		t.Error("MAX_AGE=0 ska inte hoppa över något")
+		t.Error("MAX_AGE=0 should not skip anything")
 	}
 }
 
@@ -92,15 +92,15 @@ func TestDecideAnomaly(t *testing.T) {
 	}
 	seen := make([]bool, 10)
 	for i := range seen {
-		seen[i] = i < 4 // sex av tio nya
+		seen[i] = i < 4 // six of ten new
 	}
 	d := Decide(items, seen, false, Options{MaxPostsPerPoll: 5}, NOW, nil)
 	if d.Reason != "anomaly" || len(d.Skipped) != 6 || len(d.Post) != 0 {
-		t.Errorf("fick %+v", d)
+		t.Errorf("got %+v", d)
 	}
-	// Ett litet flöde med mest nytt är normalt.
+	// A small feed with mostly new items is normal.
 	if d := Decide(items[:4], []bool{false, false, false, true}, false, Options{MaxPostsPerPoll: 5}, NOW, nil); d.Reason != "" {
-		t.Error("litet flöde")
+		t.Error("small feed")
 	}
 }
 
@@ -114,20 +114,20 @@ func TestDecideNewerThanSeenIsNotAnomaly(t *testing.T) {
 	none := make([]bool, 10)
 	d := Decide(items, none, false, opts, NOW, ptr(NOW-10*HOUR))
 	if d.Reason != "" || !reflect.DeepEqual(titles(d.Post), []string{"Post 9", "Post 8", "Post 7", "Post 6", "Post 5"}) || len(d.Deferred) != 5 {
-		t.Errorf("fick %+v", d)
+		t.Errorf("got %+v", d)
 	}
 	if Decide(items, none, false, opts, NOW, ptr(NOW)).Reason != "anomaly" {
-		t.Error("inte nyare: avvikelse")
+		t.Error("not newer: anomaly")
 	}
 	if Decide(undated, none, false, opts, NOW, ptr(NOW-10*HOUR)).Reason != "anomaly" {
-		t.Error("utan datum: avvikelse")
+		t.Error("undated: anomaly")
 	}
 	if Decide(items, none, false, opts, NOW, nil).Reason != "anomaly" {
-		t.Error("okänt datum: avvikelse")
+		t.Error("unknown date: anomaly")
 	}
 }
 
-// --- pollFeed mot en låtsad server -------------------------------------------------------
+// --- pollFeed against a fake server ------------------------------------------------------
 
 type testItem struct {
 	guid, link, title string
@@ -157,7 +157,7 @@ func rssXML(items []testItem) string {
 		b.WriteString(`<guid isPermaLink="false">` + i.guid + "</guid>")
 		b.WriteString("<pubDate>" + time.UnixMilli(i.date).UTC().Format(http.TimeFormat) + "</pubDate></item>\n")
 	}
-	return `<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel><title>Testflöde</title><link>https://example.com/</link><language>sv-SE</language>` + b.String() + "</channel></rss>"
+	return `<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel><title>Test feed</title><link>https://example.com/</link><language>sv-SE</language>` + b.String() + "</channel></rss>"
 }
 
 type feedServer struct {
@@ -232,21 +232,21 @@ func TestPollFirstRunThenOnlyNew(t *testing.T) {
 	s.serve(numbered(1, 5, Date(2026, 10, 26, 12)), `"v1"`)
 	r := pollAt(t, f, st, NOW, false)
 	if r.Decision.Reason != "first-run" || r.Items != 5 || r.Language != "sv" {
-		t.Errorf("fick %+v", r)
+		t.Errorf("got %+v", r)
 	}
 	s.serve(numbered(1, 7, Date(2026, 10, 26, 12)), `"v2"`)
 	r = pollAt(t, f, st, NOW+HOUR, false)
 	if s.first().Header.Get("If-None-Match") != `"v1"` || !reflect.DeepEqual(titles(r.Decision.Post), []string{"Post 6", "Post 7"}) {
-		t.Errorf("fick %v", titles(r.Decision.Post))
+		t.Errorf("got %v", titles(r.Decision.Post))
 	}
 	s.serve(numbered(1, 7, Date(2026, 10, 26, 12)), "")
 	r = pollAt(t, f, st, NOW+2*HOUR, false)
 	if len(r.Decision.Post) != 0 || feedState(t, st).ETag != "" {
-		t.Errorf("fick %+v", r.Decision)
+		t.Errorf("got %+v", r.Decision)
 	}
 }
 
-// Date är Date.UTC i JavaScript, med månader från 1.
+// Date is Date.UTC in JavaScript, with months from 1.
 func Date(y, m, d, h int) int64 {
 	return time.Date(y, time.Month(m), d, h, 0, 0, 0, time.UTC).UnixMilli()
 }
@@ -256,28 +256,28 @@ func TestPollWholePageNewVersusChangedKeys(t *testing.T) {
 	s.serve(numbered(1, 10, Date(2026, 10, 26, 12)), "")
 	pollAt(t, f, st, NOW, false)
 	if *feedState(t, st).NewestPublished != Date(2026, 10, 26, 12) {
-		t.Error("senaste datum")
+		t.Error("latest date")
 	}
 	s.serve(numbered(11, 20, NOW+10*HOUR), "")
 	r := pollAt(t, f, st, NOW+11*HOUR, false)
 	if r.Decision.Reason != "" || !reflect.DeepEqual(titles(r.Decision.Post), []string{"Post 11", "Post 12", "Post 13", "Post 14", "Post 15"}) ||
 		!reflect.DeepEqual(titles(r.Decision.Deferred), []string{"Post 16", "Post 17", "Post 18", "Post 19", "Post 20"}) {
-		t.Errorf("fick %+v", r.Decision)
+		t.Errorf("got %+v", r.Decision)
 	}
 	s.serve(numbered(11, 20, NOW+10*HOUR), "")
 	r = pollAt(t, f, st, NOW+12*HOUR, false)
 	if r.Decision.Reason != "" || !reflect.DeepEqual(titles(r.Decision.Post), []string{"Post 16", "Post 17", "Post 18", "Post 19", "Post 20"}) || *feedState(t, st).NewestPublished != NOW+10*HOUR {
-		t.Errorf("fick %+v", r.Decision)
+		t.Errorf("got %+v", r.Decision)
 	}
 	changed := numbered(11, 20, NOW+10*HOUR)
 	for i := range changed {
 		changed[i].guid += "0"
-		changed[i].link += "&amp;ny=1"
+		changed[i].link += "&amp;new=1"
 	}
 	s.serve(changed, "")
 	r = pollAt(t, f, st, NOW+13*HOUR, false)
 	if r.Decision.Reason != "anomaly" || len(r.Queued) != 0 {
-		t.Errorf("fick %+v", r.Decision)
+		t.Errorf("got %+v", r.Decision)
 	}
 }
 
@@ -290,7 +290,7 @@ func TestPollDeferredDoesNotMoveDate(t *testing.T) {
 		s.serve(numbered(11, 20, NOW+10*HOUR), "")
 		r := pollAt(t, f, st, NOW+int64(11+round)*HOUR, false)
 		if r.Decision.Reason != "" || !reflect.DeepEqual(titles(r.Decision.Post), []string{want}) {
-			t.Errorf("varv %d: fick %+v", round, r.Decision)
+			t.Errorf("poll %d: got %+v", round, r.Decision)
 		}
 	}
 }
@@ -300,14 +300,14 @@ func TestPollDateBelongsToURLAndFutureCountsAsNow(t *testing.T) {
 	s.serve(append(numbered(10, 10, NOW+24*HOUR), numbered(1, 9, Date(2026, 10, 26, 12))...), "")
 	pollAt(t, f, st, NOW, false)
 	if *feedState(t, st).NewestPublished != NOW {
-		t.Error("ett datum i framtiden räknas som nu")
+		t.Error("a date in the future counts as now")
 	}
 	moved := f
-	moved.URL = s.URL + "/ny-feed/"
+	moved.URL = s.URL + "/new-feed/"
 	s.serve(numbered(11, 20, NOW+10*HOUR), "")
 	r := pollAt(t, moved, st, NOW+11*HOUR, false)
 	if r.Decision.Reason != "anomaly" || *feedState(t, st).NewestPublished != NOW+10*HOUR {
-		t.Errorf("fick %+v", r.Decision)
+		t.Errorf("got %+v", r.Decision)
 	}
 }
 
@@ -319,7 +319,7 @@ func TestPoll304KeepsState(t *testing.T) {
 	r := pollAt(t, f, st, NOW+HOUR, false)
 	state := feedState(t, st)
 	if !r.Unchanged || state.ETag != `"v1"` || *state.CheckedAt != NOW+HOUR || *state.PrimedAt != NOW {
-		t.Errorf("fick %+v %+v", r, state)
+		t.Errorf("got %+v %+v", r, state)
 	}
 }
 
@@ -328,10 +328,10 @@ func TestPollDryRunSavesNothing(t *testing.T) {
 	s.serve(numbered(1, 3, Date(2026, 10, 26, 12)), `"v1"`)
 	r := pollAt(t, f, st, NOW, true)
 	if r.Decision.Reason != "first-run" || feedState(t, st) != nil {
-		t.Error("torrläget sparade")
+		t.Error("dry run saved")
 	}
 	if ok, _ := st.IsSeen("news", []string{"g:https://example.com/?p=1"}); ok {
-		t.Error("nyckel sparad")
+		t.Error("key saved")
 	}
 }
 
@@ -348,11 +348,11 @@ func TestPollImportedLinksCountAsSeen(t *testing.T) {
 	}, "")
 	r := pollAt(t, f, st, NOW, false)
 	if r.Decision.Reason != "" || !reflect.DeepEqual(titles(r.Decision.Post), []string{"Post 3"}) {
-		t.Errorf("fick %+v", r.Decision)
+		t.Errorf("got %+v", r.Decision)
 	}
-	// GUID-nyckeln sparas nu också, så att en ändrad länk senare inte ger en dubblett.
+	// The GUID key is now saved too, so a changed link later does not cause a duplicate.
 	if ok, _ := st.IsSeen("news", []string{"g:https://example.com/?p=2"}); !ok {
-		t.Error("GUID inte sparat")
+		t.Error("GUID not saved")
 	}
 }
 
@@ -364,12 +364,12 @@ func TestPollDeferredNextRoundWithoutETag(t *testing.T) {
 	s.serve(numbered(1, 13, Date(2026, 10, 26, 12)+3*HOUR), `"v2"`)
 	r := pollAt(t, f, st, NOW, false)
 	if !reflect.DeepEqual(titles(r.Decision.Post), []string{"Post 11"}) || !reflect.DeepEqual(titles(r.Decision.Deferred), []string{"Post 12", "Post 13"}) || feedState(t, st).ETag != "" {
-		t.Errorf("fick %+v", r.Decision)
+		t.Errorf("got %+v", r.Decision)
 	}
 	s.serve(numbered(1, 13, Date(2026, 10, 26, 12)+3*HOUR), `"v2"`)
 	r = pollAt(t, f, st, NOW+HOUR, false)
 	if s.first().Header.Get("If-None-Match") != "" || !reflect.DeepEqual(titles(r.Decision.Post), []string{"Post 12"}) {
-		t.Errorf("fick %+v", r.Decision)
+		t.Errorf("got %+v", r.Decision)
 	}
 }
 
@@ -379,37 +379,37 @@ func TestPollFailuresCountedAndReset(t *testing.T) {
 	pollAt(t, f, st, NOW, false)
 	s.set(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(502)
-		fmt.Fprint(w, "fel")
+		fmt.Fprint(w, "error")
 	})
 	for _, want := range []int{1, 2} {
 		_, err := Poll(context.Background(), f, st, PollOptions{Limits: LIMITS, Now: NOW})
 		var pe *Error
 		if !errors.As(err, &pe) || pe.Failures != want || err.Error() != "HTTP 502 Bad Gateway" {
-			t.Errorf("fick %v", err)
+			t.Errorf("got %v", err)
 		}
 	}
 	if feedState(t, st).Failures != 2 {
-		t.Error("fel i rad")
+		t.Error("failures in a row")
 	}
 	s.serve(numbered(1, 2, Date(2026, 10, 26, 12)), "")
 	r := pollAt(t, f, st, NOW, false)
 	if feedState(t, st).Failures != 0 || r.PreviousFailures != 2 {
-		t.Errorf("nollställdes inte: %d", r.PreviousFailures)
+		t.Errorf("not reset: %d", r.PreviousFailures)
 	}
 }
 
 func TestPollErrorOnNewFeedDoesNotPrime(t *testing.T) {
 	s, f, st := setup(t)
-	s.set(func(w http.ResponseWriter, r *http.Request) { fmt.Fprint(w, "<html>nej</html>") })
+	s.set(func(w http.ResponseWriter, r *http.Request) { fmt.Fprint(w, "<html>no</html>") })
 	if _, err := Poll(context.Background(), f, st, PollOptions{Limits: LIMITS, Now: NOW}); err == nil {
-		t.Fatal("väntade fel")
+		t.Fatal("expected an error")
 	}
 	if feedState(t, st).PrimedAt != nil {
-		t.Error("blev inläst")
+		t.Error("got primed")
 	}
 	s.serve(numbered(1, 3, Date(2026, 10, 26, 12)), "")
 	if r := pollAt(t, f, st, NOW, false); r.Decision.Reason != "first-run" {
-		t.Error("ska vara nytt flöde")
+		t.Error("should be a new feed")
 	}
 }
 
@@ -419,10 +419,10 @@ func TestPollNewURLNoOldETag(t *testing.T) {
 	pollAt(t, f, st, NOW, false)
 	s.serve(numbered(1, 2, Date(2026, 10, 26, 12)), "")
 	moved := f
-	moved.URL = s.URL + "/ny-feed/"
+	moved.URL = s.URL + "/new-feed/"
 	pollAt(t, moved, st, NOW, false)
 	if s.first().Header.Get("If-None-Match") != "" {
-		t.Error("skickade gamla ETag")
+		t.Error("sent old ETag")
 	}
 }
 
@@ -433,14 +433,14 @@ func TestPollKeysForgottenAfter30Days(t *testing.T) {
 	s.serve(numbered(3, 3, Date(2026, 10, 26, 12)), "")
 	pollAt(t, f, st, NOW+ForgetAfterMs-HOUR, false)
 	if ok, _ := st.IsSeen("news", []string{"g:https://example.com/?p=1"}); !ok {
-		t.Error("glömdes för tidigt")
+		t.Error("forgotten too early")
 	}
 	pollAt(t, f, st, NOW+ForgetAfterMs+HOUR, false)
 	if ok, _ := st.IsSeen("news", []string{"g:https://example.com/?p=1"}); ok {
-		t.Error("glömdes inte")
+		t.Error("not forgotten")
 	}
 	if ok, _ := st.IsSeen("news", []string{"g:https://example.com/?p=3"}); !ok {
-		t.Error("det som finns kvar glömdes")
+		t.Error("what is still there was forgotten")
 	}
 }
 
@@ -451,7 +451,7 @@ func TestPollSamePostTwice(t *testing.T) {
 	twice := numbered(2, 2, Date(2026, 10, 26, 12))
 	s.serve(append(append(twice, twice...), numbered(1, 1, Date(2026, 10, 26, 12))...), "")
 	if r := pollAt(t, f, st, NOW, false); !reflect.DeepEqual(titles(r.Decision.Post), []string{"Post 2"}) {
-		t.Errorf("fick %v", titles(r.Decision.Post))
+		t.Errorf("got %v", titles(r.Decision.Post))
 	}
 }
 
@@ -462,17 +462,17 @@ func TestPollQueuesFinishedText(t *testing.T) {
 	s.serve(numbered(1, 3, Date(2026, 10, 26, 12)), "")
 	dry := pollAt(t, f, st, NOW, true)
 	if len(dry.Queued) != 1 || dry.Queued[0].Status != "Post 3\n\nhttps://example.com/post-3/?utm_source=rss" {
-		t.Errorf("fick %+v", dry.Queued)
+		t.Errorf("got %+v", dry.Queued)
 	}
 	if due, _ := st.DuePosts("news", NOW); len(due) != 0 {
-		t.Error("torrläget lade i utkorgen")
+		t.Error("dry run added to the outbox")
 	}
 	s.serve(numbered(1, 3, Date(2026, 10, 26, 12)), "")
 	live := pollAt(t, f, st, NOW, false)
 	due, _ := st.DuePosts("news", NOW)
 	if len(live.Queued) != 1 || len(due) != 1 || due[0].ID != PostID("news", "g:https://example.com/?p=3") || due[0].Language != "sv" ||
 		due[0].Status != "Post 3\n\nhttps://example.com/post-3/?utm_source=rss" {
-		t.Errorf("fick %+v", due)
+		t.Errorf("got %+v", due)
 	}
 }
 
@@ -483,7 +483,7 @@ func TestPostIDGolden(t *testing.T) {
 	testutil.Golden(t, "text.json", &golden)
 	for _, c := range golden.PostID {
 		if got := PostID(c.Feed, c.Key); got != c.ID {
-			t.Errorf("PostID(%q, %q) = %s, väntade %s", c.Feed, c.Key, got, c.ID)
+			t.Errorf("PostID(%q, %q) = %s, want %s", c.Feed, c.Key, got, c.ID)
 		}
 	}
 }

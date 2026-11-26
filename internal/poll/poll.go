@@ -1,15 +1,15 @@
-// Package poll kör ett varv för ett flöde: hämta, tolka och avgör vad som är nytt och vad som ska
-// postas.
+// Package poll runs one poll of a feed: fetch, parse and decide what is new and what should be
+// posted.
 //
-// Skydden mot flod och dubbletter:
-//   - En post räknas som sedd om någon av dess nycklar (GUID eller normaliserad länk) har setts.
-//   - Nytt flöde: allt som finns markeras som sett, och bara de `backfill` senaste postas.
-//   - Ser mer än hälften av ett flöde med minst tio poster nytt ut på en gång, utan att vara nyare
-//     än det senaste som setts i flödet, är något fel (till exempel nya länkar och GUID för allt):
-//     allt markeras som sett och inget postas. Många nya poster med senare datum, som när en sajt
-//     publicerar en hel morgons artiklar på en gång, är inget fel.
-//   - Poster äldre än `maxAgeMs` postas inte.
-//   - Högst `maxPostsPerPoll` per varv, äldst först. Resten väntar till nästa varv.
+// The guards against floods and duplicates:
+//   - An item counts as seen if any of its keys (GUID or normalized link) has been seen.
+//   - New feed: everything present is marked as seen, and only the latest `backfill` are posted.
+//   - If more than half of a feed with at least ten items looks new at once, without being newer
+//     than the latest seen in the feed, something is wrong (for example new links and GUIDs for
+//     everything): everything is marked as seen and nothing is posted. Many new items with later
+//     dates, as when a site publishes a whole morning's articles at once, is not a problem.
+//   - Items older than `maxAgeMs` are not posted.
+//   - At most `maxPostsPerPoll` per poll, oldest first. The rest wait for the next poll.
 package poll
 
 import (
@@ -27,42 +27,41 @@ import (
 )
 
 const (
-	// ForgetAfterMs: nycklar som inte funnits i flödet så här länge glöms bort.
+	// ForgetAfterMs: keys that have not been in the feed for this long are forgotten.
 	ForgetAfterMs = 30 * 24 * 3600 * 1000
-	// KeepPostsMs: skickade och misslyckade inlägg sparas så här länge i utkorgen.
+	// KeepPostsMs: sent and failed posts are kept in the outbox for this long.
 	KeepPostsMs     = 90 * 24 * 3600 * 1000
 	AnomalyMinItems = 10
 )
 
-// PostID är inläggets id, som också är dess Idempotency-Key: samma flöde och post ger alltid samma
-// id, så att ett omförsök aldrig blir ett nytt inlägg och samma post inte kan hamna i utkorgen två
-// gånger.
+// PostID is the post's id, which is also its Idempotency-Key: the same feed and item always give the
+// same id, so a retry never becomes a new post and the same item cannot end up in the outbox twice.
 func PostID(feedName, key string) string {
 	sum := sha256.Sum256([]byte("masto-rss\n" + feedName + "\n" + key))
 	return hex.EncodeToString(sum[:])[:32]
 }
 
-// Decision är vad som görs med flödets nya poster.
+// Decision is what is done with the feed's new items.
 type Decision struct {
-	// Post är det som ska postas, äldst först.
+	// Post is what should be posted, oldest first.
 	Post []*feed.Item
-	// Skipped är nya poster som markeras som sedda utan att postas.
+	// Skipped are new items that are marked as seen without being posted.
 	Skipped []*feed.Item
-	// Deferred är nya poster som väntar till nästa varv.
+	// Deferred are new items that wait for the next poll.
 	Deferred []*feed.Item
-	// Reason är varför allt nytt hoppades över, om det gjordes: "first-run" eller "anomaly".
+	// Reason is why everything new was skipped, if it was: "first-run" or "anomaly".
 	Reason string
 }
 
-// Options är det ur flödets inställningar som avgör.
+// Options are the feed settings that the decision depends on.
 type Options struct {
 	MaxAgeMs        int64
 	MaxPostsPerPoll int
 	Backfill        int
 }
 
-// oldestFirst är postningsordningen: daterade poster äldst först, sedan odaterade i omvänd
-// flödesordning.
+// oldestFirst is the posting order: dated items oldest first, then undated ones in reverse feed
+// order.
 func oldestFirst(items []*feed.Item) []*feed.Item {
 	var dated, undated []*feed.Item
 	for _, i := range items {
@@ -79,8 +78,8 @@ func oldestFirst(items []*feed.Item) []*feed.Item {
 	return append(dated, undated...)
 }
 
-// Decide avgör vad som ska postas. seen[i] gäller items[i]. newestSeen är senaste
-// publiceringsdatumet som setts i flödet förut, om det är känt.
+// Decide decides what should be posted. seen[i] applies to items[i]. newestSeen is the latest
+// publication date previously seen in the feed, if known.
 func Decide(items []*feed.Item, seen []bool, firstRun bool, opts Options, now int64, newestSeen *int64) Decision {
 	var fresh []*feed.Item
 	for i, item := range items {
@@ -93,7 +92,7 @@ func Decide(items []*feed.Item, seen []bool, firstRun bool, opts Options, now in
 		keep := min(opts.Backfill, len(ordered))
 		return Decision{Post: ordered[len(ordered)-keep:], Skipped: ordered[:len(ordered)-keep], Reason: "first-run"}
 	}
-	// Bara nya poster som inte är nyare än det som redan setts kan vara gamla poster med nya nycklar.
+	// Only new items that are not newer than what has already been seen can be old items with new keys.
 	suspect := 0
 	for _, i := range fresh {
 		if newestSeen == nil || i.Published == nil || *i.Published <= *newestSeen {
@@ -121,7 +120,7 @@ func Decide(items []*feed.Item, seen []bool, firstRun bool, opts Options, now in
 	return Decision{Post: ordered[:n], Skipped: old, Deferred: ordered[n:]}
 }
 
-// unique gör att samma post två gånger i ett flöde räknas en gång.
+// unique makes the same item appearing twice in a feed count once.
 func unique(items []*feed.Item) []*feed.Item {
 	keys := map[string]bool{}
 	var out []*feed.Item
@@ -144,33 +143,33 @@ func unique(items []*feed.Item) []*feed.Item {
 	return out
 }
 
-// Queued är ett inlägg som lades i utkorgen (i torrläge: som skulle ha lagts där).
+// Queued is a post that was added to the outbox (in dry run: that would have been added).
 type Queued struct {
 	Title string
 	Link  string
-	// Status är inläggets text, som den kommer att postas.
+	// Status is the post's text, as it will be posted.
 	Status string
 }
 
-// Result är ett varv. Unchanged betyder 304; då är bara Redirect och PreviousFailures satta.
+// Result is one poll. Unchanged means 304; then only Redirect and PreviousFailures are set.
 type Result struct {
 	Unchanged bool
 	Redirect  *feed.Redirect
-	// PreviousFailures är misslyckade varv i rad före det här.
+	// PreviousFailures is the number of failed polls in a row before this one.
 	PreviousFailures int
 	Queued           []Queued
 	Title            string
 	Language         string
-	// Items är posterna i flödet som går att känna igen.
+	// Items is the number of items in the feed that can be recognized.
 	Items int
-	// Unrecognized är poster utan både id och länk, som inte går att känna igen.
+	// Unrecognized is the number of items with neither id nor link, which cannot be recognized.
 	Unrecognized int
 	Decision     Decision
 }
 
-// Error är ett misslyckat varv.
+// Error is a failed poll.
 type Error struct {
-	// Failures är misslyckade varv i rad, inklusive det här.
+	// Failures is the number of failed polls in a row, including this one.
 	Failures int
 	Err      error
 }
@@ -178,17 +177,17 @@ type Error struct {
 func (e *Error) Error() string { return e.Err.Error() }
 func (e *Error) Unwrap() error { return e.Err }
 
-// PollOptions är inställningarna för ett varv.
+// PollOptions are the settings for one poll.
 type PollOptions struct {
-	// DryRun: spara ingenting.
+	// DryRun: save nothing.
 	DryRun bool
-	// Limits är instansens gränser för inläggens längd.
+	// Limits are the instance's limits on post length.
 	Limits format.Limits
 	Now    int64
 	HTTP   *http.Client
 }
 
-// Poll kör ett varv för flödet.
+// Poll runs one poll of the feed.
 func Poll(ctx context.Context, f config.Feed, st *store.Store, opts PollOptions) (*Result, error) {
 	state, err := st.GetFeed(f.Name)
 	if err != nil {
@@ -199,7 +198,7 @@ func Poll(ctx context.Context, f config.Feed, st *store.Store, opts PollOptions)
 	if client == nil {
 		client = http.DefaultClient
 	}
-	// ETag, Last-Modified och senaste datum gäller bara adressen de kom från.
+	// ETag, Last-Modified and the latest date only apply to the URL they came from.
 	sameURL := state != nil && state.URL == f.URL
 	var validators feed.Validators
 	var newestSeen *int64
@@ -255,7 +254,7 @@ func Poll(ctx context.Context, f config.Feed, st *store.Store, opts PollOptions)
 		decision := Decide(items, seen, state == nil || state.PrimedAt == nil,
 			Options{MaxAgeMs: f.MaxAgeMs, MaxPostsPerPoll: f.MaxPostsPerPoll, Backfill: f.Backfill}, now, newestSeen)
 
-		// Det som ska postas läggs i utkorgen i samma transaktion som det markeras som sett.
+		// What should be posted is added to the outbox in the same transaction as it is marked as seen.
 		language := f.Language
 		if language == "" {
 			language = parsed.Language
@@ -293,8 +292,8 @@ func Poll(ctx context.Context, f config.Feed, st *store.Store, opts PollOptions)
 			return err
 		}
 
-		// Väntande poster räknas inte förrän de tagits. Ett datum i framtiden räknas som nu, så att
-		// det inte får spärren att se allt nytt som gammalt.
+		// Deferred items do not count until they have been taken. A date in the future counts as now,
+		// so it does not make the anomaly guard see everything new as old.
 		newest := newestSeen
 		for _, item := range items {
 			if deferred[item] || item.Published == nil {
@@ -313,7 +312,7 @@ func Poll(ctx context.Context, f config.Feed, st *store.Store, opts PollOptions)
 		if next.PrimedAt == nil {
 			next.PrimedAt = &now
 		}
-		// Väntar poster får nästa varv inte svara 304, då skulle de bli kvar tills flödet ändras.
+		// If items are deferred, the next poll must not get a 304, or they would stay until the feed changes.
 		if len(deferred) == 0 {
 			next.ETag, next.LastModified = fetched.ETag, fetched.LastModified
 		}

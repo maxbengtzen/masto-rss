@@ -1,6 +1,6 @@
-// Package notify skickar aviseringar via signal-cli-rest-api, till numret självt. Av om
-// SIGNAL_API_URL eller SIGNAL_NUMBER saknas. En avisering får aldrig fälla något, och i torrläge
-// skickas inget.
+// Package notify sends notifications via signal-cli-rest-api, to the number itself. Off if
+// SIGNAL_API_URL or SIGNAL_NUMBER is missing. A notification must never bring anything down, and in
+// dry run nothing is sent.
 package notify
 
 import (
@@ -18,7 +18,7 @@ import (
 	"github.com/maxbengtzen/masto-rss/internal/netx"
 )
 
-// Notifier skickar aviseringar i bakgrunden.
+// Notifier sends notifications in the background.
 type Notifier struct {
 	URL    string
 	Number string
@@ -29,26 +29,26 @@ type Notifier struct {
 	wg sync.WaitGroup
 }
 
-// Send skickar meddelandet utan att vänta på svaret.
+// Send sends the message without waiting for the response.
 func (n *Notifier) Send(message string) {
 	text := "masto-rss: " + message
 	if n.URL == "" || n.Number == "" {
 		return
 	}
 	if n.DryRun {
-		n.Log.Printf("[torrläge] skulle avisera: %s", text)
+		n.Log.Printf("[dry run] would notify: %s", text)
 		return
 	}
 	n.wg.Add(1)
 	go func() {
 		defer n.wg.Done()
 		if err := n.send(text); err != nil {
-			n.Log.Printf("Kunde inte skicka Signal-avisering: %s", netx.Describe(err))
+			n.Log.Printf("Could not send Signal notification: %s", netx.Describe(err))
 		}
 	}()
 }
 
-// Wait väntar tills alla aviseringar skickats (eller gett upp).
+// Wait waits until all notifications have been sent (or given up).
 func (n *Notifier) Wait() { n.wg.Wait() }
 
 func (n *Notifier) send(text string) error {

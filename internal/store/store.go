@@ -1,18 +1,18 @@
-// Package store är databasen: SQLite (modernc.org/sqlite, utan cgo), en fil i DATA_DIR.
+// Package store is the database: SQLite (modernc.org/sqlite, without cgo), one file in DATA_DIR.
 //
-// `feed` har ett tillstånd per flöde (ETag, senaste hämtning, fel i rad, senaste
-// publiceringsdatum). `seen` har varje nyckel (GUID eller normaliserad länk) som setts i ett
-// flöde, med när den senast fanns kvar i flödet, så att gamla nycklar kan rensas utan att något
-// som fortfarande finns i flödet glöms bort.
+// `feed` holds one state per feed (ETag, last fetch, consecutive failures, newest publication
+// date). `seen` holds every key (GUID or normalized link) seen in a feed, with when it was last
+// still present in the feed, so old keys can be pruned without forgetting anything that is still
+// in the feed.
 //
-// `post` är utkorgen: ett inlägg sparas som "pending" i samma transaktion som posten markeras som
-// sedd, och blir "posted" eller "failed" när Mastodon svarat. Id:t skickas som Idempotency-Key.
-// `instance` minns varje instans version, så att en uppgradering märks. `notice` håller reda på
-// aviseringar som bara ska skickas en gång.
+// `post` is the outbox: a post is saved as "pending" in the same transaction that marks the item
+// as seen, and becomes "posted" or "failed" once Mastodon has answered. The id is sent as the
+// Idempotency-Key. `instance` remembers each instance's version, so an upgrade is noticed.
+// `notice` keeps track of notifications that should only be sent once.
 //
-// Schemat versioneras med PRAGMA user_version och är detsamma som i TypeScript-versionen, så att
-// en befintlig databas öppnas som den är. Allt som hör till ett varv skrivs i en transaktion; i
-// torrläge rullas den tillbaka.
+// The schema is versioned with PRAGMA user_version and is the same as in the TypeScript version,
+// so an existing database opens as is. Everything belonging to one run is written in one
+// transaction; in dry-run mode it is rolled back.
 package store
 
 import (
@@ -72,15 +72,15 @@ var migrations = []string{
 	`alter table feed add column newest_published integer;`,
 }
 
-// Post är ett inlägg i utkorgen.
+// Post is a post in the outbox.
 type Post struct {
 	ID            string
 	Feed          string
 	Title         string
-	Link          string // tom = ingen
+	Link          string // empty = none
 	Status        string
-	Language      string // tom = inget
-	State         string // pending, posted eller failed
+	Language      string // empty = none
+	State         string // pending, posted or failed
 	Attempts      int
 	NextAttemptAt int64
 	CreatedAt     int64
@@ -89,39 +89,41 @@ type Post struct {
 	Error         string
 }
 
-// FeedState är ett flödes tillstånd.
+// FeedState is a feed's state.
 type FeedState struct {
 	Name         string
 	URL          string
 	ETag         string
 	LastModified string
-	// PrimedAt är när flödet lästes in första gången eller importerades. nil = nytt flöde.
+	// PrimedAt is when the feed was first read or imported. nil = new feed.
 	PrimedAt  *int64
 	CheckedAt *int64
 	OkAt      *int64
-	// Failures är misslyckade hämtningar i rad.
+	// Failures is the number of consecutive failed fetches.
 	Failures int
-	// NewestPublished är det senaste publiceringsdatumet bland flödets poster hittills (ms, aldrig
-	// senare än hämtningen).
+	// NewestPublished is the newest publication date among the feed's items so far (ms, never
+	// later than the fetch).
 	NewestPublished *int64
 }
 
-// Store är databasen. Alla metoder går att anropa från flera goroutiner: de tar en i taget, och
-// en transaktion håller låset tills den är klar, som när TypeScript-versionen körde allt i en tråd.
+// Store is the database. All methods may be called from multiple goroutines: they run one at a
+// time, and a transaction holds the lock until it is done, as when the TypeScript version ran
+// everything on one thread.
 type Store struct {
 	mu     *sync.Mutex
 	db     *sql.DB
 	conn   *sql.Conn
-	locked bool // sant inuti en transaktion, där låset redan är taget
+	locked bool // true inside a transaction, where the lock is already held
 }
 
-// Open öppnar (och skapar eller uppgraderar) databasen.
+// Open opens (and creates or upgrades) the database.
 func Open(path string) (*Store, error) {
 	db, err := sql.Open("sqlite", path)
 	if err != nil {
 		return nil, err
 	}
-	// En enda anslutning: ":memory:" är en databas per anslutning, och allt ska ske i ordning.
+	// A single connection: ":memory:" is one database per connection, and everything must happen in
+	// order.
 	db.SetMaxOpenConns(1)
 	conn, err := db.Conn(context.Background())
 	if err != nil {
@@ -162,7 +164,7 @@ func (s *Store) migrate() error {
 		return err
 	}
 	if version > len(migrations) {
-		return fmt.Errorf("Databasen har schemaversion %d, men den här versionen av masto-rss känner bara till %d", version, len(migrations))
+		return fmt.Errorf("The database has schema version %d, but this version of masto-rss only knows up to %d", version, len(migrations))
 	}
 	for v := version; v < len(migrations); v++ {
 		err := s.Transaction(false, func(tx *Store) error {
@@ -179,8 +181,8 @@ func (s *Store) migrate() error {
 	return nil
 }
 
-// Transaction kör fn i en transaktion. Med rollback sparas ingenting (torrläge). fn får en Store
-// som delar transaktionen.
+// Transaction runs fn in a transaction. With rollback, nothing is saved (dry run). fn gets a
+// Store that shares the transaction.
 func (s *Store) Transaction(rollback bool, fn func(tx *Store) error) error {
 	defer s.lock()()
 	if _, err := s.exec("begin immediate"); err != nil {
@@ -198,7 +200,7 @@ func (s *Store) Transaction(rollback bool, fn func(tx *Store) error) error {
 	return err
 }
 
-// UserVersion är schemaversionen.
+// UserVersion is the schema version.
 func (s *Store) UserVersion() (int, error) {
 	defer s.lock()()
 	var v int
@@ -206,7 +208,7 @@ func (s *Store) UserVersion() (int, error) {
 	return v, err
 }
 
-// JournalMode är databasens journalläge (wal).
+// JournalMode is the database's journal mode (wal).
 func (s *Store) JournalMode() (string, error) {
 	defer s.lock()()
 	var mode string
@@ -235,7 +237,7 @@ func ptrInt(v sql.NullInt64) *int64 {
 	return &v.Int64
 }
 
-// GetFeed ger flödets tillstånd, eller nil om flödet är okänt.
+// GetFeed returns the feed's state, or nil if the feed is unknown.
 func (s *Store) GetFeed(name string) (*FeedState, error) {
 	defer s.lock()()
 	var st FeedState
@@ -254,7 +256,7 @@ func (s *Store) GetFeed(name string) (*FeedState, error) {
 	return &st, nil
 }
 
-// SaveFeed sparar flödets tillstånd.
+// SaveFeed saves the feed's state.
 func (s *Store) SaveFeed(st FeedState) error {
 	defer s.lock()()
 	_, err := s.exec(`insert into feed (name, url, etag, last_modified, primed_at, checked_at, ok_at, failures, newest_published)
@@ -268,7 +270,7 @@ func (s *Store) SaveFeed(st FeedState) error {
 	return err
 }
 
-// IsSeen är sant om någon av nycklarna har setts i flödet.
+// IsSeen reports whether any of the keys has been seen in the feed.
 func (s *Store) IsSeen(feed string, keys []string) (bool, error) {
 	defer s.lock()()
 	for _, key := range keys {
@@ -284,7 +286,7 @@ func (s *Store) IsSeen(feed string, keys []string) (bool, error) {
 	return false, nil
 }
 
-// MarkSeen sparar nycklarna som sedda nu. Finns de redan flyttas bara "senast sedd" fram.
+// MarkSeen saves the keys as seen now. Keys that already exist only have "last seen" moved forward.
 func (s *Store) MarkSeen(feed string, keys []string, now int64) error {
 	defer s.lock()()
 	for _, key := range keys {
@@ -304,15 +306,15 @@ func changes(res sql.Result, err error) (int, error) {
 	return int(n), err
 }
 
-// Prune tar bort nycklar som inte funnits i flödet sedan before. Returnerar antalet.
+// Prune removes keys that have not been in the feed since before. It returns the count.
 func (s *Store) Prune(feed string, before int64) (int, error) {
 	defer s.lock()()
 	return changes(s.exec("delete from seen where feed = ? and last_seen < ?", feed, before))
 }
 
-// ImportKeys importerar nycklar (till exempel länkar från den gamla botens tillståndsfil) och
-// markerar flödet som inläst, så att första hämtningen inte behandlas som ett nytt flöde.
-// Returnerar antalet nycklar som inte fanns sedan tidigare.
+// ImportKeys imports keys (for example links from the old bot's state file) and marks the feed as
+// primed, so the first fetch isn't treated as a new feed. It returns the number of keys that
+// didn't already exist.
 func (s *Store) ImportKeys(feed, url string, keys []string, now int64) (int, error) {
 	state, err := s.GetFeed(feed)
 	if err != nil {
@@ -340,13 +342,13 @@ func (s *Store) ImportKeys(feed, url string, keys []string, now int64) (int, err
 	return added, nil
 }
 
-// Orphan är ett flöde i databasen som inte finns i konfigurationen.
+// Orphan is a feed in the database that isn't in the configuration.
 type Orphan struct {
 	Name     string
 	LastUsed int64
 }
 
-// Orphans ger flöden i databasen som inte finns i konfigurationen, med när de senast hämtades.
+// Orphans returns feeds in the database that aren't in the configuration, with when they were last fetched.
 func (s *Store) Orphans(configured []string) ([]Orphan, error) {
 	defer s.lock()()
 	if configured == nil {
@@ -370,7 +372,7 @@ func (s *Store) Orphans(configured []string) ([]Orphan, error) {
 	return out, rows.Err()
 }
 
-// Forget glömmer ett flöde helt: tillståndet och alla nycklar.
+// Forget forgets a feed entirely: its state and all its keys.
 func (s *Store) Forget(feed string) error {
 	defer s.lock()()
 	if _, err := s.exec("delete from seen where feed = ?", feed); err != nil {
@@ -380,7 +382,7 @@ func (s *Store) Forget(feed string) error {
 	return err
 }
 
-// Enqueue lägger ett inlägg i utkorgen. Ett id som redan finns lämnas orört. Sant om det lades till.
+// Enqueue adds a post to the outbox. An id that already exists is left untouched. It reports whether the post was added.
 func (s *Store) Enqueue(p Post, now int64) (bool, error) {
 	defer s.lock()()
 	n, err := changes(s.exec(`insert into post (id, feed, title, link, status, language, next_attempt_at, created_at)
@@ -403,7 +405,7 @@ func scanPost(scan func(...any) error) (*Post, error) {
 	return &p, nil
 }
 
-// DuePosts ger väntande inlägg för flödet som får skickas nu, äldst först.
+// DuePosts returns the feed's pending posts that may be sent now, oldest first.
 func (s *Store) DuePosts(feed string, now int64) ([]*Post, error) {
 	defer s.lock()()
 	rows, err := s.conn.QueryContext(context.Background(),
@@ -423,7 +425,7 @@ func (s *Store) DuePosts(feed string, now int64) ([]*Post, error) {
 	return out, rows.Err()
 }
 
-// GetPost ger ett inlägg, eller nil.
+// GetPost returns a post, or nil.
 func (s *Store) GetPost(id string) (*Post, error) {
 	defer s.lock()()
 	p, err := scanPost(s.queryRow("select "+postColumns+" from post where id = ?", id).Scan)
@@ -433,28 +435,28 @@ func (s *Store) GetPost(id string) (*Post, error) {
 	return p, err
 }
 
-// MarkPosted markerar ett inlägg som postat.
+// MarkPosted marks a post as posted.
 func (s *Store) MarkPosted(id, statusURL string, now int64) error {
 	defer s.lock()()
 	_, err := s.exec("update post set state = 'posted', posted_at = ?, status_url = ?, error = null, attempts = attempts + 1 where id = ?", now, statusURL, id)
 	return err
 }
 
-// MarkRetry låter ett inlägg vänta till nextAttemptAt.
+// MarkRetry makes a post wait until nextAttemptAt.
 func (s *Store) MarkRetry(id string, nextAttemptAt int64, errText string) error {
 	defer s.lock()()
 	_, err := s.exec("update post set attempts = attempts + 1, next_attempt_at = ?, error = ? where id = ?", nextAttemptAt, errText, id)
 	return err
 }
 
-// MarkFailed markerar ett inlägg som misslyckat för gott.
+// MarkFailed marks a post as permanently failed.
 func (s *Store) MarkFailed(id, errText string) error {
 	defer s.lock()()
 	_, err := s.exec("update post set state = 'failed', attempts = attempts + 1, error = ? where id = ?", errText, id)
 	return err
 }
 
-// LastPosted är senaste lyckade inlägget för flödet (ms), eller nil.
+// LastPosted is the time of the feed's latest successful post (ms), or nil.
 func (s *Store) LastPosted(feed string) (*int64, error) {
 	defer s.lock()()
 	var at sql.NullInt64
@@ -462,7 +464,7 @@ func (s *Store) LastPosted(feed string) (*int64, error) {
 	return ptrInt(at), err
 }
 
-// PostedSince är antalet lyckade inlägg sedan since (ms), för alla flöden.
+// PostedSince is the number of successful posts since since (ms), across all feeds.
 func (s *Store) PostedSince(since int64) (int, error) {
 	defer s.lock()()
 	var n int
@@ -470,19 +472,19 @@ func (s *Store) PostedSince(since int64) (int, error) {
 	return n, err
 }
 
-// PrunePosts tar bort skickade och misslyckade inlägg som är äldre än before.
+// PrunePosts removes posted and failed posts older than before.
 func (s *Store) PrunePosts(before int64) (int, error) {
 	defer s.lock()()
 	return changes(s.exec("delete from post where state != 'pending' and created_at < ?", before))
 }
 
-// Instance är vad som senast lästes om en instans.
+// Instance is what was last read about an instance.
 type Instance struct {
 	Version    string
 	APIVersion int
 }
 
-// GetInstance ger det sparade om instansen, eller nil.
+// GetInstance returns what is saved about the instance, or nil.
 func (s *Store) GetInstance(url string) (*Instance, error) {
 	defer s.lock()()
 	var in Instance
@@ -493,7 +495,7 @@ func (s *Store) GetInstance(url string) (*Instance, error) {
 	return &in, err
 }
 
-// SaveInstance sparar instansens version.
+// SaveInstance saves the instance's version.
 func (s *Store) SaveInstance(url, version string, apiVersion int, now int64) error {
 	defer s.lock()()
 	_, err := s.exec(`insert into instance (url, version, api_version, checked_at) values (?, ?, ?, ?)
@@ -502,14 +504,14 @@ func (s *Store) SaveInstance(url, version string, apiVersion int, now int64) err
 	return err
 }
 
-// FirstNotice är sant första gången för en nyckel; den sparar att aviseringen skickats.
+// FirstNotice reports true the first time for a key; it records that the notification was sent.
 func (s *Store) FirstNotice(key string, now int64) (bool, error) {
 	defer s.lock()()
 	n, err := changes(s.exec("insert into notice (key, sent_at) values (?, ?) on conflict do nothing", key, now))
 	return n > 0, err
 }
 
-// Close stänger databasen.
+// Close closes the database.
 func (s *Store) Close() error {
 	if s.conn != nil {
 		s.conn.Close()

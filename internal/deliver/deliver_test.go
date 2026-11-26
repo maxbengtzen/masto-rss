@@ -43,9 +43,9 @@ func newMastodon(t *testing.T, reply func(n int, w http.ResponseWriter)) *fakeMa
 			return
 		}
 		m.mu.Unlock()
-		// Kontots senaste inlägg: ett som länkar till a.
+		// The account's latest posts: one that links to a.
 		json.NewEncoder(w).Encode([]any{map[string]any{"url": "https://mastodon.example/@news/1",
-			"content": `<p>A <a href="https://example.com/a/?utm_source=rss&amp;utm_medium=feed">länk</a></p>`, "card": nil}})
+			"content": `<p>A <a href="https://example.com/a/?utm_source=rss&amp;utm_medium=feed">link</a></p>`, "card": nil}})
 	}))
 	t.Cleanup(m.Close)
 	return m
@@ -91,34 +91,34 @@ func TestOldestFirstWithKeyLanguageAndQuotes(t *testing.T) {
 		json.NewEncoder(w).Encode(map[string]any{"id": n, "url": "https://mastodon.example/@news/" + string(rune('0'+n))})
 	})
 	f, st := setup(t, m)
-	queue(st, "a", "Första", NOW-2000)
-	queue(st, "b", "Andra", NOW-1000)
+	queue(st, "a", "First", NOW-2000)
+	queue(st, "b", "Second", NOW-1000)
 	res := run(t, f, st, Account{Quotes: true}, opts)
-	if len(res.Posted) != 2 || res.Posted[0].Post.Title != "Första" || res.Posted[0].URL != "https://mastodon.example/@news/1" || res.Posted[1].URL != "https://mastodon.example/@news/2" {
-		t.Errorf("fick %+v", res.Posted)
+	if len(res.Posted) != 2 || res.Posted[0].Post.Title != "First" || res.Posted[0].URL != "https://mastodon.example/@news/1" || res.Posted[1].URL != "https://mastodon.example/@news/2" {
+		t.Errorf("got %+v", res.Posted)
 	}
 	if !reflect.DeepEqual(m.keys, []string{"a", "b"}) {
-		t.Errorf("nycklar %v", m.keys)
+		t.Errorf("keys %v", m.keys)
 	}
-	want := map[string]any{"status": "Första\n\nhttps://example.com/a/", "visibility": "public", "language": "sv", "quote_approval_policy": "followers"}
+	want := map[string]any{"status": "First\n\nhttps://example.com/a/", "visibility": "public", "language": "sv", "quote_approval_policy": "followers"}
 	if !reflect.DeepEqual(m.bodies[0], want) {
 		t.Errorf("body %v", m.bodies[0])
 	}
 	if p, _ := st.GetPost("a"); p.State != "posted" {
-		t.Error("a inte postad")
+		t.Error("a not posted")
 	}
 	if due, _ := st.DuePosts("news", NOW); len(due) != 0 {
-		t.Error("kvar i utkorgen")
+		t.Error("still in the outbox")
 	}
 }
 
 func TestNoQuotePolicyWhenUnsupported(t *testing.T) {
 	m := newMastodon(t, jsonReply(200, map[string]any{"id": "1", "url": "u"}))
 	f, st := setup(t, m)
-	queue(st, "a", "Första", NOW)
+	queue(st, "a", "First", NOW)
 	run(t, f, st, Account{Quotes: false}, opts)
 	if _, ok := m.bodies[0]["quote_approval_policy"]; ok {
-		t.Error("citatinställningen skickades")
+		t.Error("quote policy was sent")
 	}
 }
 
@@ -131,37 +131,37 @@ func TestRejectedFailsButNextIsSent(t *testing.T) {
 		}
 	})
 	f, st := setup(t, m)
-	queue(st, "a", "För långt", NOW-2000)
-	queue(st, "b", "Okej", NOW-1000)
+	queue(st, "a", "Too long", NOW-2000)
+	queue(st, "b", "Okay", NOW-1000)
 	res := run(t, f, st, Account{Quotes: true}, opts)
-	if len(res.Failed) != 1 || res.Failed[0].Post.Title != "För långt" || res.Failed[0].Error != "HTTP 422: Validation failed" {
-		t.Errorf("fick %+v", res.Failed)
+	if len(res.Failed) != 1 || res.Failed[0].Post.Title != "Too long" || res.Failed[0].Error != "HTTP 422: Validation failed" {
+		t.Errorf("got %+v", res.Failed)
 	}
-	if len(res.Posted) != 1 || res.Posted[0].Post.Title != "Okej" {
-		t.Errorf("fick %+v", res.Posted)
+	if len(res.Posted) != 1 || res.Posted[0].Post.Title != "Okay" {
+		t.Errorf("got %+v", res.Posted)
 	}
 	if p, _ := st.GetPost("a"); p.State != "failed" {
-		t.Error("a inte misslyckad")
+		t.Error("a not failed")
 	}
 }
 
 func TestTransientAnd429Retry(t *testing.T) {
 	m := newMastodon(t, func(_ int, w http.ResponseWriter) {
 		w.WriteHeader(503)
-		w.Write([]byte("upptagen"))
+		w.Write([]byte("busy"))
 	})
 	f, st := setup(t, m)
-	queue(st, "a", "Första", NOW-2000)
-	queue(st, "b", "Andra", NOW-1000)
+	queue(st, "a", "First", NOW-2000)
+	queue(st, "b", "Second", NOW-1000)
 	res := run(t, f, st, Account{Quotes: true}, opts)
 	if res.Retry == nil || res.Retry.NextAttemptAt != NOW+60_000 || len(m.bodies) != 1 {
-		t.Fatalf("fick %+v", res.Retry)
+		t.Fatalf("got %+v", res.Retry)
 	}
 	if p, _ := st.GetPost("a"); p.Attempts != 1 {
-		t.Error("försök")
+		t.Error("attempts")
 	}
 	if due, _ := st.DuePosts("news", NOW); len(due) != 1 || due[0].ID != "b" {
-		t.Errorf("väntande %+v", due)
+		t.Errorf("pending %+v", due)
 	}
 
 	reset := "2026-10-26T12:30:00Z"
@@ -173,55 +173,55 @@ func TestTransientAnd429Retry(t *testing.T) {
 	res = run(t, f, st, Account{Quotes: true}, later)
 	want, _ := time.Parse(time.RFC3339, reset)
 	if res.Retry == nil || res.Retry.Post.ID != "a" || res.Retry.NextAttemptAt != want.UnixMilli() {
-		t.Errorf("fick %+v", res.Retry)
+		t.Errorf("got %+v", res.Retry)
 	}
 }
 
 func TestDeniedTokenStopsAccount(t *testing.T) {
 	m := newMastodon(t, jsonReply(401, map[string]any{"error": "The access token was revoked"}))
 	f, st := setup(t, m)
-	queue(st, "a", "Första", NOW)
+	queue(st, "a", "First", NOW)
 	res := run(t, f, st, Account{Quotes: true}, opts)
 	if res.AuthError == nil || res.AuthError.Status != 401 {
-		t.Errorf("fick %+v", res)
+		t.Errorf("got %+v", res)
 	}
 	if p, _ := st.GetPost("a"); p.State != "pending" {
-		t.Error("ska vänta kvar")
+		t.Error("should stay pending")
 	}
 }
 
 func TestAfterAnHourAccountIsCheckedFirst(t *testing.T) {
 	m := newMastodon(t, jsonReply(200, map[string]any{"id": "7", "url": "https://mastodon.example/@news/7"}))
 	f, st := setup(t, m)
-	queue(st, "a", "Kom fram ändå", NOW-IdempotencyWindowMs-1000)
-	queue(st, "b", "Kom aldrig fram", NOW-IdempotencyWindowMs-500)
+	queue(st, "a", "Got through anyway", NOW-IdempotencyWindowMs-1000)
+	queue(st, "b", "Never got through", NOW-IdempotencyWindowMs-500)
 	st.MarkRetry("a", NOW, "timeout")
 	st.MarkRetry("b", NOW, "timeout")
 	res := run(t, f, st, Account{ID: "42", Quotes: true}, opts)
 	if len(res.Posted) != 2 || res.Posted[0].Post.ID != "a" || !res.Posted[0].AlreadyThere || res.Posted[1].AlreadyThere {
-		t.Errorf("fick %+v", res.Posted)
+		t.Errorf("got %+v", res.Posted)
 	}
 	if len(m.bodies) != 1 {
-		t.Errorf("%d inlägg", len(m.bodies))
+		t.Errorf("%d posts", len(m.bodies))
 	}
 	found := false
 	for _, p := range m.paths {
 		found = found || strings.HasPrefix(p, "/api/v1/accounts/42/statuses")
 	}
 	if !found {
-		t.Errorf("kontrollerade inte kontot: %v", m.paths)
+		t.Errorf("did not check the account: %v", m.paths)
 	}
 }
 
 func TestExpiredNotSent(t *testing.T) {
 	m := newMastodon(t, jsonReply(200, map[string]any{"id": "1", "url": "u"}))
 	f, st := setup(t, m)
-	queue(st, "a", "Gammalt", NOW-f.MaxAgeMs-1000)
+	queue(st, "a", "Old", NOW-f.MaxAgeMs-1000)
 	res := run(t, f, st, Account{Quotes: true}, opts)
 	if len(res.Expired) != 1 || len(m.bodies) != 0 {
-		t.Errorf("fick %+v", res)
+		t.Errorf("got %+v", res)
 	}
 	if p, _ := st.GetPost("a"); p.State != "failed" {
-		t.Error("ska vara misslyckad")
+		t.Error("should be failed")
 	}
 }

@@ -12,10 +12,10 @@ import (
 	"github.com/maxbengtzen/masto-rss/internal/weburl"
 )
 
-// --- Som feedsmith läser ett fält -----------------------------------------------------------
+// --- How feedsmith reads a field ------------------------------------------------------------
 
-// parseString är feedsmiths parseString: kommentarer bort, CDATA som det står, HTML-entiteter
-// utanför CDATA avkodade (bara om det finns ett & med ett ; efter), och blanktecken runt om bort.
+// parseString is feedsmith's parseString: comments removed, CDATA as is, HTML entities outside
+// CDATA decoded (only if there is an & followed by a ;), and surrounding whitespace trimmed.
 func parseString(s string) string {
 	if s == "" {
 		return ""
@@ -46,7 +46,7 @@ func stripComments(s string) string {
 		b.WriteString(s[last:i])
 		end := strings.Index(s[i+4:], "-->")
 		if end < 0 {
-			return s // en kommentar som aldrig slutar: allt lämnas som det står
+			return s // a comment that never ends: everything is left as is
 		}
 		last = i + 4 + end + 3
 		j := strings.Index(s[last:], "<!--")
@@ -84,7 +84,7 @@ func decodeWithCdata(s string) string {
 	return b.String()
 }
 
-// --- Text och länkar -----------------------------------------------------------------------
+// --- Text and links ------------------------------------------------------------------------
 
 var entities = map[string]string{
 	"amp": "&", "lt": "<", "gt": ">", "quot": `"`, "apos": "'", "nbsp": "\u00A0", "ensp": "\u2002", "emsp": "\u2003",
@@ -100,7 +100,7 @@ var entities = map[string]string{
 
 var entityRE = regexp.MustCompile(`&(#[xX][0-9a-fA-F]+|#\d+|[a-zA-Z][a-zA-Z0-9]*);`)
 
-// DecodeEntities gör HTML-entiteter till tecken. Okända namngivna entiteter lämnas som de är.
+// DecodeEntities turns HTML entities into characters. Unknown named entities are left as they are.
 func DecodeEntities(text string) string {
 	if !strings.Contains(text, "&") {
 		return text
@@ -121,7 +121,7 @@ func DecodeEntities(text string) string {
 		}
 		if code > 0 && code <= 0x10FFFF {
 			if code >= 0xD800 && code <= 0xDFFF {
-				// Surrogater sätts ihop efteråt, som när JavaScript skriver dem i följd.
+				// Surrogates are combined afterwards, as when JavaScript writes them in sequence.
 				return string(rune(surrogateMark + code - 0xD800))
 			}
 			return string(rune(code))
@@ -146,17 +146,17 @@ func DecodeEntities(text string) string {
 			i++
 			continue
 		}
-		b.WriteRune(utf8.RuneError) // en ensam surrogat går inte att skriva i UTF-8
+		b.WriteRune(utf8.RuneError) // a lone surrogate cannot be written in UTF-8
 	}
 	return b.String()
 }
 
-// surrogateMark är var i ett privat plan surrogaterna hålls tills de satts ihop.
+// surrogateMark is where in a private-use plane the surrogates are kept until they are combined.
 const surrogateMark = 0x10F000
 
 func isSurrogateMark(r rune) bool { return r >= surrogateMark && r < surrogateMark+0x800 }
 
-// parseIntJS är parseInt för en sträng med bara siffror: för stora tal blir stora, inte fel.
+// parseIntJS is parseInt for a string of digits only: too large numbers become large, not errors.
 func parseIntJS(digits string, base int) float64 {
 	v, err := strconv.ParseUint(digits, base, 64)
 	if err != nil {
@@ -165,13 +165,13 @@ func parseIntJS(digits string, base int) float64 {
 	return float64(v)
 }
 
-// blockTag är taggar som skiljer stycken åt och därför blir ett blanksteg.
+// blockTag matches tags that separate blocks and therefore become a space.
 var blockTag = regexp.MustCompile(ci(`</?(?:p|div|br|hr|li|ul|ol|h[1-6]|blockquote|pre|table|tr|td|th|section|article|figure|figcaption|header|footer)\b[^>]*>`))
 var commentRE = regexp.MustCompile(`<!--[\s\S]*?-->`)
 var tagRE = regexp.MustCompile(`<[^>]*>`)
 
-// ci gör bokstäverna i ett mönster skiftlägesokänsliga bara för ASCII, som /i i JavaScript (Go:s
-// (?i) räknar också till exempel ſ som s).
+// ci makes the letters in a pattern case-insensitive for ASCII only, like /i in JavaScript (Go's
+// (?i) also counts, for example, ſ as s).
 func ci(pattern string) string {
 	var b strings.Builder
 	escaped := false
@@ -190,7 +190,7 @@ func ci(pattern string) string {
 	return b.String()
 }
 
-// HTMLToText gör HTML till en rad text: taggar bort, entiteter avkodade, blanktecken hopslagna.
+// HTMLToText turns HTML into a line of text: tags removed, entities decoded, whitespace collapsed.
 func HTMLToText(s string) string {
 	s = removeScripts(s)
 	s = commentRE.ReplaceAllString(s, " ")
@@ -199,8 +199,8 @@ func HTMLToText(s string) string {
 	return js.Trim(js.CollapseSpace(DecodeEntities(s)))
 }
 
-// removeScripts är s.replace(/<(script|style)\b[\s\S]*?<\/\1\s*>/gi, " ") (Go:s regexp saknar
-// bakåtreferenser).
+// removeScripts is s.replace(/<(script|style)\b[\s\S]*?<\/\1\s*>/gi, " ") (Go's regexp lacks
+// backreferences).
 func removeScripts(s string) string {
 	lower := asciiLower(s)
 	if !strings.Contains(lower, "<script") && !strings.Contains(lower, "<style") {
@@ -232,7 +232,7 @@ func removeScripts(s string) string {
 	return b.String()
 }
 
-// closingTag letar efter </tag följt av blanktecken och >, och ger positionen efter >.
+// closingTag looks for </tag followed by whitespace and >, and returns the position after >.
 func closingTag(lower string, from int, tag string) int {
 	for {
 		j := strings.Index(lower[from:], "</"+tag)
@@ -268,12 +268,12 @@ func isWordByte(c byte) bool {
 	return 'a' <= c && c <= 'z' || 'A' <= c && c <= 'Z' || '0' <= c && c <= '9' || c == '_'
 }
 
-// tracking är spårningsparametrar som inte ska påverka om två länkar räknas som samma.
+// tracking holds tracking parameters that must not affect whether two links count as the same.
 var tracking = regexp.MustCompile(ci(`^(?:utm_\w+|fbclid|gclid|dclid|gbraid|wbraid|msclkid|yclid|mc_cid|mc_eid|_hsenc|_hsmi|igshid)$`))
 
-// NormalizeLink gör länken till en nyckel: utan schema, `www.`, spårningsparametrar, fragment och
-// avslutande snedstreck, och med övriga parametrar i bokstavsordning. Två länkar som bara skiljer
-// sig så räknas som samma post.
+// NormalizeLink turns the link into a key: without scheme, `www.`, tracking parameters, fragment and
+// trailing slash, and with the remaining parameters in alphabetical order. Two links that differ
+// only in these ways count as the same item.
 func NormalizeLink(link string) string {
 	raw := js.Trim(link)
 	u, err := weburl.Parse(raw, nil)

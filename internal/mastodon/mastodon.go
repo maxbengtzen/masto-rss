@@ -1,9 +1,10 @@
-// Package mastodon är Mastodon-API:t: instansinfo, kontroll av token, postning och kontots
-// senaste inlägg.
+// Package mastodon is the Mastodon API: instance info, token checks, posting and the account's
+// latest posts.
 //
-// Alla anrop har timeout. Fel klassas: nätverk, 5xx och 429 är tillfälliga, 401/403 betyder att
-// token inte duger, och övriga 4xx att Mastodon nekar för gott. Ett Deprecation-huvud i ett svar
-// skickas vidare till OnDeprecation, så att vi märker när något vi använder håller på att fasas ut.
+// Every call has a timeout. Errors are classified: network errors, 5xx and 429 are transient,
+// 401/403 mean the token is not accepted, and other 4xx mean Mastodon rejects the request for good.
+// A Deprecation header in a response is passed on to OnDeprecation, so we notice when something we
+// use is being phased out.
 package mastodon
 
 import (
@@ -25,21 +26,21 @@ import (
 
 const timeout = 30 * time.Second
 
-// Error är ett fel från Mastodon.
+// Error is an error from Mastodon.
 type Error struct {
 	Status  int
 	Message string
-	// ResetAt är när rate limit-fönstret öppnar igen (ms), vid 429. 0 = okänt.
+	// ResetAt is when the rate limit window opens again (ms), on 429. 0 = unknown.
 	ResetAt int64
 }
 
 func (e *Error) Error() string { return e.Message }
 
-// Name är felets namn i loggen.
+// Name is the error's name in the log.
 func (e *Error) Name() string { return "MastodonError" }
 
-// Kind är "auth" (token nekas), "rejected" (Mastodon säger nej för gott) eller "transient" (prova
-// igen senare).
+// Kind is "auth" (token not accepted), "rejected" (Mastodon says no for good) or "transient" (try
+// again later).
 func (e *Error) Kind() string {
 	switch {
 	case e.Status == 401 || e.Status == 403:
@@ -50,57 +51,57 @@ func (e *Error) Kind() string {
 	return "transient"
 }
 
-// Instance är det som behövs om instansen.
+// Instance is what we need to know about the instance.
 type Instance struct {
 	Version string
-	// APIVersion är api_versions.mastodon; 0 om instansen inte anger det (äldre Mastodon eller
-	// annan server).
+	// APIVersion is api_versions.mastodon; 0 if the instance does not report it (older Mastodon or
+	// another server).
 	APIVersion       int
 	MaxCharacters    int
 	CharactersPerURL int
 }
 
-// App är appen bakom en token.
+// App is the app behind a token.
 type App struct {
 	Name   string
 	Scopes []string
 }
 
-// Account är kontot bakom en token.
+// Account is the account behind a token.
 type Account struct {
 	ID        string
 	Acct      string
 	URL       string
 	Followers int
 	Posts     int
-	// LastStatusAt är datumet (YYYY-MM-DD) för kontots senaste inlägg, om det finns.
+	// LastStatusAt is the date (YYYY-MM-DD) of the account's latest post, if any.
 	LastStatusAt string
 	Bot          bool
 }
 
-// StatusParams är det som skickas med ett inlägg.
+// StatusParams is what is sent with a post.
 type StatusParams struct {
 	Status     string `json:"status"`
 	Visibility string `json:"visibility"`
 	Language   string `json:"language,omitempty"`
-	// QuotePolicy skickas bara till instanser med API-version 7 eller senare.
+	// QuotePolicy is only sent to instances with API version 7 or later.
 	QuotePolicy string `json:"quote_approval_policy,omitempty"`
 }
 
-// Posted är ett postat inlägg.
+// Posted is a published post.
 type Posted struct {
 	ID  string
 	URL string
 }
 
-// Recent är ett av kontots senaste inlägg.
+// Recent is one of the account's latest posts.
 type Recent struct {
 	URL     string
 	Content string
 	Card    string
 }
 
-// Client anropar Mastodon.
+// Client calls Mastodon.
 type Client struct {
 	HTTP *http.Client
 
@@ -108,7 +109,7 @@ type Client struct {
 	onDeprecation func(endpoint, value string)
 }
 
-// SetDeprecationHandler anges vad som händer när ett svar har ett Deprecation-huvud.
+// SetDeprecationHandler sets what happens when a response has a Deprecation header.
 func (c *Client) SetDeprecationHandler(fn func(endpoint, value string)) {
 	c.mu.Lock()
 	c.onDeprecation = fn
@@ -117,7 +118,7 @@ func (c *Client) SetDeprecationHandler(fn func(endpoint, value string)) {
 
 var idSegment = regexp.MustCompile(`^\d+$`)
 
-// endpoint är metoden och sökvägen utan fråga, med siffror som :id.
+// endpoint is the method and the path without the query, with numeric segments as :id.
 func endpoint(method, path string) string {
 	path, _, _ = strings.Cut(path, "?")
 	segs := strings.Split(path, "/")
@@ -217,7 +218,7 @@ func (c *Client) call(ctx context.Context, base, path string, opts callOptions, 
 	return nil
 }
 
-// jsString är String(v) för ett värde ur JSON.
+// jsString is String(v) for a value from JSON.
 func jsString(v any) string {
 	switch v := v.(type) {
 	case string:
@@ -243,7 +244,7 @@ func jsString(v any) string {
 	return ""
 }
 
-// Instance läser instansens version och gränser. Kräver ingen token.
+// Instance reads the instance's version and limits. Needs no token.
 func (c *Client) Instance(ctx context.Context, base string) (*Instance, error) {
 	var j struct {
 		Version     *string `json:"version"`
@@ -260,7 +261,7 @@ func (c *Client) Instance(ctx context.Context, base string) (*Instance, error) {
 	if err := c.call(ctx, base, "/api/v2/instance", callOptions{}, &j); err != nil {
 		return nil, err
 	}
-	info := &Instance{Version: "okänd", MaxCharacters: 500, CharactersPerURL: 23}
+	info := &Instance{Version: "unknown", MaxCharacters: 500, CharactersPerURL: 23}
 	if j.Version != nil {
 		info.Version = *j.Version
 	}
@@ -278,7 +279,7 @@ func (c *Client) Instance(ctx context.Context, base string) (*Instance, error) {
 	return info, nil
 }
 
-// VerifyApp ger appen bakom token och dess scopes. Kräver ingen scope sedan Mastodon 4.3.
+// VerifyApp returns the app behind the token and its scopes. Needs no scope since Mastodon 4.3.
 func (c *Client) VerifyApp(ctx context.Context, base, token string) (*App, error) {
 	var j struct {
 		Name   string   `json:"name"`
@@ -293,7 +294,7 @@ func (c *Client) VerifyApp(ctx context.Context, base, token string) (*App, error
 	return &App{Name: j.Name, Scopes: j.Scopes}, nil
 }
 
-// CanPost är sant om scopes räcker för att posta: write eller write:statuses.
+// CanPost reports whether the scopes are enough to post: write or write:statuses.
 func CanPost(scopes []string) bool {
 	for _, s := range scopes {
 		if s == "write" || s == "write:statuses" {
@@ -303,7 +304,7 @@ func CanPost(scopes []string) bool {
 	return false
 }
 
-// VerifyAccount läser kontot bakom token.
+// VerifyAccount reads the account behind the token.
 func (c *Client) VerifyAccount(ctx context.Context, base, token string) (*Account, error) {
 	var j struct {
 		ID             any     `json:"id"`
@@ -333,7 +334,7 @@ func (c *Client) VerifyAccount(ctx context.Context, base, token string) (*Accoun
 	return a, nil
 }
 
-// Post postar ett inlägg med en Idempotency-Key.
+// Post publishes a post with an Idempotency-Key.
 func (c *Client) Post(ctx context.Context, base, token string, params StatusParams, idempotencyKey string) (*Posted, error) {
 	var j struct {
 		ID  any     `json:"id"`
@@ -353,7 +354,7 @@ func (c *Client) Post(ctx context.Context, base, token string, params StatusPara
 	return p, nil
 }
 
-// RecentStatuses ger kontots senaste egna inlägg, utan svar och boostar.
+// RecentStatuses returns the account's latest own posts, without replies and boosts.
 func (c *Client) RecentStatuses(ctx context.Context, base, token, accountID string) ([]Recent, error) {
 	var list []struct {
 		URL     *string `json:"url"`

@@ -1637,158 +1637,158 @@
   "ago": [
     {
       "delta": -5000,
-      "text": "nyss"
+      "text": "just now"
     },
     {
       "delta": 20000,
-      "text": "nyss"
+      "text": "just now"
     },
     {
       "delta": 59999,
-      "text": "nyss"
+      "text": "just now"
     },
     {
       "delta": 60000,
-      "text": "1 min sedan"
+      "text": "1 min ago"
     },
     {
       "delta": 720000,
-      "text": "12 min sedan"
+      "text": "12 min ago"
     },
     {
       "delta": 3599999,
-      "text": "59 min sedan"
+      "text": "59 min ago"
     },
     {
       "delta": 10800000,
-      "text": "3 h sedan"
+      "text": "3 h ago"
     },
     {
       "delta": 86399999,
-      "text": "23 h sedan"
+      "text": "23 h ago"
     },
     {
       "delta": 93600000,
-      "text": "1 dag sedan"
+      "text": "1 day ago"
     },
     {
       "delta": 172800000,
-      "text": "2 dagar sedan"
+      "text": "2 days ago"
     },
     {
       "delta": 288000000,
-      "text": "3 dagar sedan"
+      "text": "3 days ago"
     },
     {
       "delta": 34560000000,
-      "text": "400 dagar sedan"
+      "text": "400 days ago"
     }
   ],
   "daysAgo": [
     {
       "now": 1793016000000,
       "date": "2026-10-26",
-      "text": "idag"
+      "text": "today"
     },
     {
       "now": 1793016000000,
       "date": "2026-10-25",
-      "text": "igår"
+      "text": "yesterday"
     },
     {
       "now": 1793016000000,
       "date": "2026-05-12",
-      "text": "167 dagar sedan"
+      "text": "167 days ago"
     },
     {
       "now": 1793016000000,
       "date": "2026-10-27",
-      "text": "idag"
+      "text": "today"
     },
     {
       "now": 1793016000000,
       "date": "2026-10-26T23:30:00Z",
-      "text": "idag"
+      "text": "today"
     },
     {
       "now": 1793016000000,
       "date": "2025-10-26",
-      "text": "365 dagar sedan"
+      "text": "365 days ago"
     },
     {
       "now": 1793016000000,
       "date": "trasigt",
-      "text": "NaN dagar sedan"
+      "text": "NaN days ago"
     },
     {
       "now": 1793053800000,
       "date": "2026-10-26",
-      "text": "idag"
+      "text": "today"
     },
     {
       "now": 1793053800000,
       "date": "2026-10-25",
-      "text": "igår"
+      "text": "yesterday"
     },
     {
       "now": 1793053800000,
       "date": "2026-05-12",
-      "text": "167 dagar sedan"
+      "text": "167 days ago"
     },
     {
       "now": 1793053800000,
       "date": "2026-10-27",
-      "text": "idag"
+      "text": "today"
     },
     {
       "now": 1793053800000,
       "date": "2026-10-26T23:30:00Z",
-      "text": "idag"
+      "text": "today"
     },
     {
       "now": 1793053800000,
       "date": "2025-10-26",
-      "text": "365 dagar sedan"
+      "text": "365 days ago"
     },
     {
       "now": 1793053800000,
       "date": "trasigt",
-      "text": "NaN dagar sedan"
+      "text": "NaN days ago"
     },
     {
       "now": 1774744200000,
       "date": "2026-10-26",
-      "text": "idag"
+      "text": "today"
     },
     {
       "now": 1774744200000,
       "date": "2026-10-25",
-      "text": "idag"
+      "text": "today"
     },
     {
       "now": 1774744200000,
       "date": "2026-05-12",
-      "text": "idag"
+      "text": "today"
     },
     {
       "now": 1774744200000,
       "date": "2026-10-27",
-      "text": "idag"
+      "text": "today"
     },
     {
       "now": 1774744200000,
       "date": "2026-10-26T23:30:00Z",
-      "text": "idag"
+      "text": "today"
     },
     {
       "now": 1774744200000,
       "date": "2025-10-26",
-      "text": "154 dagar sedan"
+      "text": "154 days ago"
     },
     {
       "now": 1774744200000,
       "date": "trasigt",
-      "text": "NaN dagar sedan"
+      "text": "NaN days ago"
     }
   ],
   "postId": [

@@ -1,9 +1,9 @@
-// Package config läser konfigurationen ur miljövariabler.
+// Package config reads the configuration from environment variables.
 //
-// Varje flöde har ett namn, och dess inställningar heter FEED_<NAMN>_<FÄLT>. Ett globalt värde
-// (samma fält utan prefix, till exempel INTERVAL) gäller alla flöden som inte har ett eget.
-// Kontrollen är strikt: en okänd FEED_*-variabel eller ett ogiltigt värde stoppar starten, och
-// alla fel rapporteras på en gång.
+// Each feed has a name, and its settings are called FEED_<NAME>_<FIELD>. A global value (the same
+// field without a prefix, for example INTERVAL) applies to every feed that has no value of its own.
+// Validation is strict: an unknown FEED_* variable or an invalid value stops startup, and all
+// errors are reported at once.
 package config
 
 import (
@@ -23,54 +23,54 @@ var (
 	TemplateFields = []string{"title", "link", "summary", "author", "feed"}
 )
 
-// Feed är ett flödes inställningar.
+// Feed holds a feed's settings.
 type Feed struct {
-	// Name är namnet med gemener, till exempel "feber". Flödets identitet i databasen.
+	// Name is the name in lowercase, for example "news". The feed's identity in the database.
 	Name string `json:"name"`
-	// Prefix är prefixet i miljövariablerna, till exempel "FEED_FEBER_".
+	// Prefix is the prefix in the environment variables, for example "FEED_NEWS_".
 	Prefix string `json:"prefix"`
 	URL    string `json:"url"`
 	Token  string `json:"token"`
-	// MastodonURL är instansens adress utan avslutande snedstreck.
+	// MastodonURL is the instance's URL without a trailing slash.
 	MastodonURL string `json:"mastodonUrl"`
 	IntervalMs  int64  `json:"intervalMs"`
 	Visibility  string `json:"visibility"`
-	// Language är en ISO 639-kod. Tom: flödets eget språk används.
+	// Language is an ISO 639 code. Empty: the feed's own language is used.
 	Language string `json:"language,omitempty"`
 	Template string `json:"template"`
-	// QuotePolicy är tom när kontots standard gäller.
+	// QuotePolicy is empty when the account's default applies.
 	QuotePolicy string `json:"quotePolicy,omitempty"`
-	// MaxAgeMs 0 = ingen åldersgräns.
+	// MaxAgeMs 0 = no age limit.
 	MaxAgeMs        int64 `json:"maxAgeMs"`
 	MaxPostsPerPoll int   `json:"maxPostsPerPoll"`
 	Backfill        int   `json:"backfill"`
 }
 
-// Config är hela konfigurationen.
+// Config is the whole configuration.
 type Config struct {
-	// Feeds är flödena som ska köras, sorterade efter namn.
+	// Feeds are the feeds to run, sorted by name.
 	Feeds []Feed `json:"feeds"`
-	// Paused är namnen på flöden med ENABLED=false. Deras historik behålls.
+	// Paused holds the names of feeds with ENABLED=false. Their history is kept.
 	Paused  []string `json:"paused"`
 	DataDir string   `json:"dataDir"`
 	DryRun  bool     `json:"dryRun"`
 	Once    bool     `json:"once"`
 	Debug   bool     `json:"debug"`
-	// SignalURL och SignalNumber är signal-cli-rest-api för aviseringar; tomma = av.
+	// SignalURL and SignalNumber are signal-cli-rest-api for notifications; empty = off.
 	SignalURL    string `json:"signalUrl"`
 	SignalNumber string `json:"signalNumber"`
-	// FailNotifyAfter: avisera när ett flöde misslyckats så här många gånger i rad.
+	// FailNotifyAfter: send a notification when a feed has failed this many times in a row.
 	FailNotifyAfter int `json:"failNotifyAfter"`
-	// StatusPort är porten för statussidan (/status); 0 = av.
+	// StatusPort is the port for the status page (/status); 0 = off.
 	StatusPort int `json:"statusPort"`
 }
 
-// Error är alla fel i konfigurationen.
+// Error holds all errors in the configuration.
 type Error struct{ Problems []string }
 
 func (e *Error) Error() string {
 	var b strings.Builder
-	b.WriteString("Fel i konfigurationen:")
+	b.WriteString("Configuration errors:")
 	for _, p := range e.Problems {
 		b.WriteString("\n  - ")
 		b.WriteString(p)
@@ -78,14 +78,15 @@ func (e *Error) Error() string {
 	return b.String()
 }
 
-// shared är fält som kan sättas både globalt och per flöde.
+// shared are fields that can be set both globally and per feed.
 var shared = []string{"MASTODON_URL", "INTERVAL", "VISIBILITY", "TEMPLATE", "QUOTE_POLICY", "MAX_AGE", "MAX_POSTS_PER_POLL", "BACKFILL"}
 
-// own är fält som bara finns per flöde. LANGUAGE hör hit eftersom en global LANGUAGE redan är en
-// vanlig systemvariabel (gettext), till exempel "en_US:en".
+// own are fields that exist only per feed. LANGUAGE belongs here because a global LANGUAGE is
+// already a common system variable (gettext), for example "en_US:en".
 var own = []string{"URL", "TOKEN", "ENABLED", "LANGUAGE"}
 
-// Namnet matchas så kort som möjligt, så att FEED_X_MASTODON_URL blir flödet X och fältet MASTODON_URL.
+// The name is matched as short as possible, so that FEED_X_MASTODON_URL becomes feed X and field
+// MASTODON_URL.
 var feedKey = regexp.MustCompile(`^FEED_([A-Z0-9][A-Z0-9_]*?)_(` + strings.Join(append(append([]string{}, own...), shared...), "|") + `)$`)
 
 const minIntervalMs = 60_000
@@ -99,7 +100,7 @@ var (
 	fieldRE    = regexp.MustCompile(`\{(\w+)\}`)
 )
 
-// number är Number(digits) i JavaScript, utan att svämma över.
+// number is Number(digits) in JavaScript, without overflowing.
 func number(digits string) float64 {
 	f, _ := strconv.ParseFloat(digits, 64)
 	return f
@@ -112,8 +113,8 @@ func toMs(f float64) int64 {
 	return int64(f)
 }
 
-// ParseDuration tolkar "900" (sekunder), "15m", "1h30m" eller "2d" till millisekunder. ok är
-// false om texten inte går att tolka.
+// ParseDuration parses "900" (seconds), "15m", "1h30m" or "2d" into milliseconds. ok is false if
+// the text cannot be parsed.
 func ParseDuration(text string) (ms int64, ok bool) {
 	t := strings.ToLower(js.Trim(text))
 	if digitsRE.MatchString(t) {
@@ -137,7 +138,7 @@ func httpURL(value string) *weburl.URL {
 	return u
 }
 
-// orderedSet är en mängd som minns ordningen, som Set i JavaScript.
+// orderedSet is a set that remembers insertion order, like Set in JavaScript.
 type orderedSet struct {
 	seen  map[string]bool
 	items []string
@@ -162,8 +163,8 @@ func contains(list []string, v string) bool {
 	return false
 }
 
-// Load läser konfigurationen. environ är miljön i den ordning processen fick den ("NAMN=värde",
-// som os.Environ), eftersom felen rapporteras i den ordningen.
+// Load reads the configuration. environ is the environment in the order the process received it
+// ("NAME=value", like os.Environ), since errors are reported in that order.
 func Load(environ []string) (*Config, error) {
 	env := map[string]string{}
 	var problems orderedSet
@@ -175,7 +176,7 @@ func Load(environ []string) (*Config, error) {
 			continue
 		}
 		if _, dup := env[key]; dup {
-			continue // som process.env: första förekomsten gäller
+			continue // like process.env: the first occurrence wins
 		}
 		env[key] = raw
 		if !strings.HasPrefix(key, "FEED_") {
@@ -183,7 +184,7 @@ func Load(environ []string) (*Config, error) {
 		}
 		m := feedKey.FindStringSubmatch(key)
 		if m == nil {
-			problems.add("Okänd inställning " + key + " (stavfel?)")
+			problems.add("Unknown setting " + key + " (typo?)")
 			continue
 		}
 		if byName[m[1]] == nil {
@@ -206,7 +207,7 @@ func Load(environ []string) (*Config, error) {
 		name := strings.ToLower(envName)
 		enabled := fields["ENABLED"]
 		if enabled != "" && !boolRE.MatchString(enabled) {
-			problems.add(prefix + `ENABLED måste vara true eller false, inte "` + enabled + `"`)
+			problems.add(prefix + `ENABLED must be true or false, not "` + enabled + `"`)
 		}
 		if enabled != "" && !flag(enabled) {
 			cfg.Paused = append(cfg.Paused, name)
@@ -218,7 +219,7 @@ func Load(environ []string) (*Config, error) {
 			failed = true
 			problems.add(msg)
 		}
-		// pick ger flödets eget värde, annars det globala, och variabeln som gav värdet.
+		// pick returns the feed's own value, otherwise the global one, and the variable that supplied it.
 		pick := func(field string) (value string, set bool, source string) {
 			if v := fields[field]; v != "" {
 				return v, true, prefix + field
@@ -233,13 +234,13 @@ func Load(environ []string) (*Config, error) {
 
 		url := fields["URL"]
 		if url == "" {
-			fail(prefix + "URL saknas")
+			fail(prefix + "URL is missing")
 		} else if httpURL(url) == nil {
-			fail(prefix + `URL är ingen http(s)-adress: "` + url + `"`)
+			fail(prefix + `URL is not an http(s) URL: "` + url + `"`)
 		}
 		token := fields["TOKEN"]
 		if token == "" {
-			fail(prefix + "TOKEN saknas")
+			fail(prefix + "TOKEN is missing")
 		}
 
 		instance, instanceSet, instanceSource := pick("MASTODON_URL")
@@ -248,9 +249,9 @@ func Load(environ []string) (*Config, error) {
 			instanceURL = httpURL(instance)
 		}
 		if !instanceSet {
-			fail("MASTODON_URL saknas (globalt eller som " + prefix + "MASTODON_URL)")
+			fail("MASTODON_URL is missing (globally or as " + prefix + "MASTODON_URL)")
 		} else if instanceURL == nil || instanceURL.Pathname() != "/" || instanceURL.Search() != "" {
-			fail(instanceSource + " ska vara instansens adress, till exempel https://mastodon.nu")
+			fail(instanceSource + " must be the instance's URL, for example https://mastodon.nu")
 		}
 
 		duration := func(field, fallback string, min int64) int64 {
@@ -260,9 +261,9 @@ func Load(environ []string) (*Config, error) {
 			}
 			ms, ok := ParseDuration(value)
 			if !ok {
-				fail(source + ` är ingen tid: "` + value + `" (till exempel 900, 15m eller 1h30m)`)
+				fail(source + ` is not a duration: "` + value + `" (for example 900, 15m or 1h30m)`)
 			} else if ms < min {
-				fail(source + " är för kort: minst " + strconv.FormatInt(min/1000, 10) + " s")
+				fail(source + " is too short: at least " + strconv.FormatInt(min/1000, 10) + " s")
 			}
 			return ms
 		}
@@ -272,7 +273,7 @@ func Load(environ []string) (*Config, error) {
 				value = fallback
 			}
 			if !digitsRE.MatchString(value) || number(value) < min {
-				fail(source + " måste vara ett heltal, minst " + js.FormatNumber(min) + `: "` + value + `"`)
+				fail(source + " must be an integer, at least " + js.FormatNumber(min) + `: "` + value + `"`)
 			}
 			n := number(value)
 			if n > math.MaxInt32 {
@@ -287,7 +288,7 @@ func Load(environ []string) (*Config, error) {
 			}
 			lower := strings.ToLower(value)
 			if !contains(allowed, lower) {
-				fail(source + " måste vara " + strings.Join(allowed, ", ") + `: "` + value + `"`)
+				fail(source + " must be " + strings.Join(allowed, ", ") + `: "` + value + `"`)
 			}
 			return lower
 		}
@@ -304,7 +305,7 @@ func Load(environ []string) (*Config, error) {
 		if lang != "" {
 			langMatch = languageRE.FindStringSubmatch(lang)
 			if langMatch == nil {
-				fail(prefix + `LANGUAGE ska vara en språkkod som sv eller en: "` + lang + `"`)
+				fail(prefix + `LANGUAGE must be a language code such as sv or en: "` + lang + `"`)
 			}
 		}
 
@@ -312,7 +313,7 @@ func Load(environ []string) (*Config, error) {
 		if !tplSet {
 			tpl = "{title}\n\n{link}"
 		}
-		// Ett \n i värdet blir en radbrytning, så att mallen går att skriva på en rad i .env.
+		// A \n in the value becomes a line break, so that the template can be written on one line in .env.
 		template := strings.ReplaceAll(tpl, `\n`, "\n")
 		for _, m := range fieldRE.FindAllStringSubmatch(template, -1) {
 			if !contains(TemplateFields, m[1]) {
@@ -320,7 +321,7 @@ func Load(environ []string) (*Config, error) {
 				for i, f := range TemplateFields {
 					valid[i] = "{" + f + "}"
 				}
-				fail(tplSource + " har okänt fält {" + m[1] + "}; giltiga är " + strings.Join(valid, ", "))
+				fail(tplSource + " has unknown field {" + m[1] + "}; valid fields are " + strings.Join(valid, ", "))
 			}
 		}
 
@@ -351,14 +352,14 @@ func Load(environ []string) (*Config, error) {
 	for _, feed := range cfg.Feeds {
 		target := feed.URL + "\n" + feed.MastodonURL + "\n" + feed.Token
 		if other, ok := targets[target]; ok {
-			problems.add(other + " och " + feed.Prefix + " postar samma flöde till samma konto")
+			problems.add(other + " and " + feed.Prefix + " post the same feed to the same account")
 		} else {
 			targets[target] = feed.Prefix
 		}
 	}
 
 	if len(cfg.Feeds) == 0 && len(cfg.Paused) == 0 && len(problems.items) == 0 {
-		problems.add("Inga flöden: ange minst FEED_<NAMN>_URL och FEED_<NAMN>_TOKEN")
+		problems.add("No feeds: set at least FEED_<NAME>_URL and FEED_<NAME>_TOKEN")
 	}
 
 	numberEnv := func(name, fallback string, min, max float64) int {
@@ -369,7 +370,7 @@ func Load(environ []string) (*Config, error) {
 		}
 		n := number(value)
 		if !digitsRE.MatchString(value) || n < min || n > max {
-			problems.add(name + " måste vara ett heltal mellan " + js.FormatNumber(min) + " och " + js.FormatNumber(max) + `: "` + value + `"`)
+			problems.add(name + " must be an integer between " + js.FormatNumber(min) + " and " + js.FormatNumber(max) + `: "` + value + `"`)
 		}
 		if n > math.MaxInt32 {
 			return math.MaxInt32
@@ -383,10 +384,10 @@ func Load(environ []string) (*Config, error) {
 	signalNumber, _ := lookup("SIGNAL_NUMBER")
 	cfg.SignalNumber = js.Trim(signalNumber)
 	if cfg.SignalURL != "" && httpURL(cfg.SignalURL) == nil {
-		problems.add(`SIGNAL_API_URL är ingen http(s)-adress: "` + cfg.SignalURL + `"`)
+		problems.add(`SIGNAL_API_URL is not an http(s) URL: "` + cfg.SignalURL + `"`)
 	}
 	if (cfg.SignalURL != "") != (cfg.SignalNumber != "") {
-		problems.add("SIGNAL_API_URL och SIGNAL_NUMBER behövs båda för Signal-aviseringar")
+		problems.add("SIGNAL_API_URL and SIGNAL_NUMBER are both required for Signal notifications")
 	}
 	if len(problems.items) > 0 {
 		return nil, &Error{Problems: problems.items}

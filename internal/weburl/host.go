@@ -7,8 +7,8 @@ import (
 	"unicode/utf8"
 )
 
-// parseHost tolkar värden: IPv6 inom hakparenteser, en ogenomskinlig värd för scheman som inte är
-// speciella, och annars ett domännamn (med IDN som Punycode) eller en IPv4-adress.
+// parseHost parses the host: IPv6 in square brackets, an opaque host for schemes that aren't
+// special, and otherwise a domain name (with IDN as Punycode) or an IPv4 address.
 func parseHost(input string, notSpecial bool) (string, error) {
 	if strings.HasPrefix(input, "[") {
 		if !strings.HasSuffix(input, "]") {
@@ -56,15 +56,15 @@ func isForbiddenHost(r rune) bool {
 	return false
 }
 
-// domainToASCII gör domänen till gemener och varje etikett med andra tecken än ASCII till Punycode
-// (xn--). Det är en förenkling av UTS #46: normalisering (NFC) och de ovanligare
-// teckenmappningarna görs inte, eftersom Go:s standardbibliotek saknar tabellerna för dem.
+// domainToASCII lowercases the domain and turns every label with non-ASCII characters into Punycode
+// (xn--). It is a simplification of UTS #46: normalization (NFC) and the less common character
+// mappings are not done, since Go's standard library lacks the tables for them.
 func domainToASCII(domain string) (string, bool) {
 	domain = strings.Map(func(r rune) rune {
 		switch r {
-		case 0x3002, 0xFF0E, 0xFF61: // punkter i andra skriftsystem
+		case 0x3002, 0xFF0E, 0xFF61: // full stops in other scripts
 			return '.'
-		case 0xAD, 0x200B, 0x2060, 0xFEFF: // tecken som UTS #46 tar bort
+		case 0xAD, 0x200B, 0x2060, 0xFEFF: // characters that UTS #46 removes
 			return -1
 		}
 		return unicode.ToLower(r)
@@ -96,7 +96,7 @@ func isASCII(s string) bool {
 	return true
 }
 
-// punycode kodar en etikett enligt RFC 3492.
+// punycode encodes a label according to RFC 3492.
 func punycode(s string) (string, bool) {
 	const (
 		base, tmin, tmax, skew, damp = 36, 1, 26, 38, 700
@@ -206,7 +206,7 @@ func parseIPv4Number(s string) (uint64, bool) {
 	}
 	v, err := strconv.ParseUint(s, base, 64)
 	if err != nil {
-		// För stora tal räknas som för stora, inte som fel.
+		// Numbers that are too large count as too large, not as errors.
 		if ne, ok := err.(*strconv.NumError); ok && ne.Err == strconv.ErrRange {
 			return 1 << 40, true
 		}
@@ -360,7 +360,7 @@ func parseIPv6(s string) ([8]uint16, bool) {
 }
 
 func serializeIPv6(addr [8]uint16) string {
-	// Den längsta följden av minst två nollor skrivs som ::.
+	// The longest run of at least two zeros is written as ::.
 	best, bestLen := -1, 1
 	for i := 0; i < 8; {
 		if addr[i] != 0 {

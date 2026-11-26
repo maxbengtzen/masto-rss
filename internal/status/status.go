@@ -1,6 +1,7 @@
-// Package status är statussidan för en samlad Homepage-ruta: GET /status ger JSON med varje flödes
-// konto, följare, senaste inlägg och eventuella fel. GET /api/dashboard ger samma sak i kort form
-// för en startsida (se Dashboard). Båda är tänkta för ett internt nätverk och visar inga tokens.
+// Package status is the status page for a combined Homepage widget: GET /status returns JSON with
+// each feed's account, followers, latest post and any errors. GET /api/dashboard returns the same in
+// short form for a start page (see Dashboard). Both are meant for an internal network and show no
+// tokens.
 package status
 
 import (
@@ -15,53 +16,53 @@ import (
 	"github.com/maxbengtzen/masto-rss/internal/js"
 )
 
-// Feed är ett flödes rad.
+// Feed is one feed's row.
 type Feed struct {
 	Name string `json:"name"`
-	// Account är till exempel "@feber".
+	// Account is for example "@news".
 	Account string `json:"account"`
-	// URL är kontots profilsida.
+	// URL is the account's profile page.
 	URL       string `json:"url,omitempty"`
 	Followers *int   `json:"followers,omitempty"`
 	Posts     *int   `json:"posts,omitempty"`
-	// LastPost är senaste inlägget (ISO 8601), om det är känt.
+	// LastPost is the latest post (ISO 8601), if known.
 	LastPost string `json:"lastPost,omitempty"`
 	OK       bool   `json:"ok"`
-	// Summary är en rad för Homepage, till exempel "195 följare · 12 min sedan".
+	// Summary is a line for Homepage, for example "195 followers · 12 min ago".
 	Summary string `json:"summary"`
-	// Problem är felet utan prefix, "" när flödet fungerar. Det syns i /status bara via Summary.
+	// Problem is the error without prefix, "" when the feed works. It shows in /status only via Summary.
 	Problem string `json:"-"`
 }
 
-// Totals är summorna. PostedLastDay är inlägg de senaste 24 timmarna.
+// Totals are the totals. PostedLastDay is posts in the last 24 hours.
 type Totals struct {
 	Feeds         int `json:"feeds"`
 	PostedLastDay int `json:"postedLastDay"`
 	Errors        int `json:"errors"`
 }
 
-// Snapshot är hela svaret.
+// Snapshot is the whole response.
 type Snapshot struct {
 	Version string `json:"version"`
 	Totals  Totals `json:"totals"`
 	Feeds   []Feed `json:"feeds"`
 }
 
-// Metric är ett värde i Dashboard: en kort etikett och ett tal.
+// Metric is a value in Dashboard: a short label and a number.
 type Metric struct {
 	K string `json:"k"`
 	V int    `json:"v"`
 }
 
-// Item är en rad i Dashboard.
+// Item is a row in Dashboard.
 type Item struct {
 	Name  string `json:"name"`
 	Label string `json:"label"`
 	Href  string `json:"href,omitempty"`
 }
 
-// Dashboard är en kort sammanfattning för en startsida: högst fyra värden, en rad per flöde och
-// status "ok" eller "warn" (med Message) när något flöde felar.
+// Dashboard is a short summary for a start page: at most four values, one row per feed and
+// status "ok" or "warn" (with Message) when any feed is failing.
 type Dashboard struct {
 	Metrics []Metric `json:"metrics"`
 	Items   []Item   `json:"items"`
@@ -69,16 +70,16 @@ type Dashboard struct {
 	Message string   `json:"message,omitempty"`
 }
 
-// maxItems är hur många flöden en startsida visar.
+// maxItems is how many feeds a start page shows.
 const maxItems = 8
 
-// ToDashboard gör om en Snapshot till en Dashboard.
+// ToDashboard turns a Snapshot into a Dashboard.
 func ToDashboard(s Snapshot) Dashboard {
 	d := Dashboard{
 		Metrics: []Metric{
-			{"konton", s.Totals.Feeds},
-			{"senaste dygnet", s.Totals.PostedLastDay},
-			{"fel", s.Totals.Errors},
+			{"accounts", s.Totals.Feeds},
+			{"last 24 h", s.Totals.PostedLastDay},
+			{"errors", s.Totals.Errors},
 		},
 		Items:  []Item{},
 		Status: "ok",
@@ -91,7 +92,7 @@ func ToDashboard(s Snapshot) Dashboard {
 			working = append(working, f)
 		}
 	}
-	// Flöden som felar först, så att de syns även när det finns fler än maxItems.
+	// Failing feeds first, so they show even when there are more than maxItems.
 	for _, f := range slices.Concat(failing, working) {
 		if len(d.Items) == maxItems {
 			break
@@ -111,13 +112,13 @@ func ToDashboard(s Snapshot) Dashboard {
 		for i, f := range failing {
 			names[i] = f.Account
 		}
-		d.Status, d.Message = "warn", strconv.Itoa(len(failing))+" flöden felar: "+strings.Join(names, ", ")
+		d.Status, d.Message = "warn", strconv.Itoa(len(failing))+" feeds failing: "+strings.Join(names, ", ")
 	}
 	return d
 }
 
-// Handler svarar på GET /status och GET / med hela Snapshot, på GET /api/dashboard med en
-// Dashboard, och med 404 på allt annat.
+// Handler answers GET /status and GET / with the whole Snapshot, GET /api/dashboard with a
+// Dashboard, and everything else with 404.
 func Handler(snapshot func() Snapshot) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
@@ -148,24 +149,36 @@ func Handler(snapshot func() Snapshot) http.Handler {
 	})
 }
 
-// Ago är hur länge sedan, på svenska: "nyss", "12 min sedan", "3 h sedan", "2 dagar sedan".
+// Ago is how long ago, in words: "just now", "12 min ago", "3 h ago", "1 day ago", "2 days ago".
 func Ago(then, now int64) string {
 	minutes := floorDiv(now-then, 60_000)
 	if minutes < 1 {
-		return "nyss"
+		return "just now"
 	}
 	if minutes < 60 {
-		return strconv.FormatInt(minutes, 10) + " min sedan"
+		return strconv.FormatInt(minutes, 10) + " min ago"
 	}
 	hours := minutes / 60
 	if hours < 24 {
-		return strconv.FormatInt(hours, 10) + " h sedan"
+		return strconv.FormatInt(hours, 10) + " h ago"
 	}
-	days := hours / 24
+	return daysAgo(hours / 24)
+}
+
+// daysAgo is "1 day ago" or "N days ago".
+func daysAgo(days int64) string {
 	if days == 1 {
-		return "1 dag sedan"
+		return "1 day ago"
 	}
-	return strconv.FormatInt(days, 10) + " dagar sedan"
+	return strconv.FormatInt(days, 10) + " days ago"
+}
+
+// Followers is the follower count with its noun: "1 follower", "12,345 followers".
+func Followers(n int) string {
+	if n == 1 {
+		return "1 follower"
+	}
+	return FormatNumber(n) + " followers"
 }
 
 func floorDiv(a, b int64) int64 {
@@ -176,26 +189,26 @@ func floorDiv(a, b int64) int64 {
 	return q
 }
 
-// DaysAgo är samma sak för ett datum utan klockslag (YYYY-MM-DD), räknat i tidszonen loc.
+// DaysAgo is the same for a date without a time of day (YYYY-MM-DD), counted in the time zone loc.
 func DaysAgo(date string, now int64, loc *time.Location) string {
 	today := time.UnixMilli(now).In(loc).Format("2006-01-02")
 	t, ok1 := js.ParseDate(today)
 	d, ok2 := js.ParseDate(date)
 	if !ok1 || !ok2 {
-		// NaN i JavaScript: Math.round(NaN) <= 0 är falskt, och texten blir "NaN dagar sedan".
-		return "NaN dagar sedan"
+		// NaN in JavaScript: Math.round(NaN) <= 0 is false, and the text becomes "NaN days ago".
+		return "NaN days ago"
 	}
 	days := jsRound(float64(t-d) / 86_400_000)
 	if days <= 0 {
-		return "idag"
+		return "today"
 	}
 	if days == 1 {
-		return "igår"
+		return "yesterday"
 	}
-	return strconv.FormatInt(days, 10) + " dagar sedan"
+	return daysAgo(days)
 }
 
-// jsRound är Math.round: halva avrundas uppåt, även för negativa tal.
+// jsRound is Math.round: halves round up, also for negative numbers.
 func jsRound(f float64) int64 {
 	i := int64(f)
 	frac := f - float64(i)
@@ -208,8 +221,8 @@ func jsRound(f float64) int64 {
 	return i
 }
 
-// FormatNumber skriver ett heltal som Intl.NumberFormat("sv-SE"): tusental skiljs med ett hårt
-// blanksteg, till exempel "12 345".
+// FormatNumber writes an integer like Intl.NumberFormat("en-US"): thousands are separated by a
+// comma, for example "12,345".
 func FormatNumber(n int) string {
 	s := strconv.Itoa(n)
 	neg := strings.HasPrefix(s, "-")
@@ -217,12 +230,12 @@ func FormatNumber(n int) string {
 	var b strings.Builder
 	for i, c := range s {
 		if i > 0 && (len(s)-i)%3 == 0 {
-			b.WriteString("\u00A0")
+			b.WriteByte(',')
 		}
 		b.WriteRune(c)
 	}
 	if neg {
-		return "\u2212" + b.String()
+		return "-" + b.String()
 	}
 	return b.String()
 }

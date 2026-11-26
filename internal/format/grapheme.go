@@ -5,11 +5,11 @@ import (
 	"unicode/utf8"
 )
 
-// Grafemkluster enligt UAX #29 (det man ser som ett tecken), som Intl.Segmenter i
-// TypeScript-versionen. Tabellerna i tables.go kommer ur samma Unicode-version som Node:s ICU.
+// Grapheme clusters per UAX #29 (what you see as one character), like Intl.Segmenter in the
+// TypeScript version. The tables in tables.go come from the same Unicode version as Node's ICU.
 
-// Egenskaper per tecken: Grapheme_Cluster_Break i de fyra lägsta bitarna, Extended_Pictographic
-// och Indic_Conjunct_Break i de övriga.
+// Properties per character: Grapheme_Cluster_Break in the four lowest bits, Extended_Pictographic
+// and Indic_Conjunct_Break in the others.
 const (
 	gcbOther byte = iota
 	gcbCR
@@ -42,7 +42,7 @@ type propRange struct {
 
 func props(r rune) byte {
 	if r < 0x80 {
-		// ASCII: bara styrtecken, CR och LF har egenskaper.
+		// ASCII: only control characters, CR and LF have properties.
 		switch {
 		case r == '\r':
 			return gcbCR
@@ -60,7 +60,7 @@ func props(r rune) byte {
 	return 0
 }
 
-// nextBoundary ger längden i bytes av första grafemklustret i s.
+// nextBoundary returns the length in bytes of the first grapheme cluster in s.
 func nextBoundary(s string) int {
 	r, size := utf8.DecodeRuneInString(s)
 	if size == 0 {
@@ -68,7 +68,7 @@ func nextBoundary(s string) int {
 	}
 	prev := props(r)
 	prevGCB := prev & 0x0F
-	// Tillstånd för GB11 (emoji med ZWJ), GB12/13 (flaggor) och GB9c (indiska konjunkter).
+	// State for GB11 (emoji with ZWJ), GB12/13 (flags) and GB9c (Indic conjuncts).
 	emoji := prev&propExtPict != 0
 	emojiZWJ := false
 	ri := 0
@@ -87,7 +87,7 @@ func nextBoundary(s string) int {
 		if isBoundary(prevGCB, gcb, p, emojiZWJ, ri, conjunct && linker) {
 			return i
 		}
-		// Uppdatera tillståndet efter tecknet.
+		// Update the state after the character.
 		switch {
 		case p&propExtPict != 0:
 			emoji, emojiZWJ = true, false
@@ -147,7 +147,7 @@ func isBoundary(prev, next, nextProps byte, emojiZWJ bool, ri int, conjunctLinke
 	return true // GB999
 }
 
-// graphemes delar texten i grafemkluster.
+// graphemes splits the text into grapheme clusters.
 func graphemes(s string) []string {
 	var out []string
 	for len(s) > 0 {
@@ -158,7 +158,7 @@ func graphemes(s string) []string {
 	return out
 }
 
-// graphemeCount räknar grafemkluster utan att spara dem.
+// graphemeCount counts grapheme clusters without storing them.
 func graphemeCount(s string) int {
 	n := 0
 	for len(s) > 0 {

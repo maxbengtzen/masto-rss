@@ -1,87 +1,88 @@
-# Instruktioner för kodassistenter
+# Instructions for coding assistants
 
-Den här filen är skriven för dig som är en LLM eller kodassistent och hjälper till med det här
-repot: att koda, testa, versionshantera, skriva release notes och publicera. Läs den helt innan du
-ändrar något. Commits, kodkommentarer och CHANGELOG skrivs på svenska (commit-rubriker enligt
-Conventional Commits, se nedan).
+This file is written for you, an LLM or coding assistant helping with this repository: coding,
+testing, versioning, writing release notes and publishing. Read all of it before changing
+anything. Commits, code comments, CHANGELOG and all runtime text (logs, notifications, status
+output) are written in English (commit subjects follow Conventional Commits, see below).
 
-Finns filen `AGENTS.local.md` i utcheckningen, läs den också. Den beskriver ägarens egen drift och
-versionshanteras inte.
+If the file `AGENTS.local.md` exists in the checkout, read it too. It describes the owner's own
+deployment and is not version controlled.
 
-## Vad det är och var allt finns
+## What it is and where things are
 
-`masto-rss` läser RSS-, Atom-, RDF- och JSON-flöden och postar nya poster till Mastodon. Alla flöden
-och konton körs i en och samma container. Det är en liten Go-tjänst (från v1.1.0; tidigare
-TypeScript).
+`masto-rss` reads RSS, Atom, RDF and JSON feeds and posts new items to Mastodon. All feeds and
+accounts run in one container. It is a small Go service (since v1.1.0; previously TypeScript).
 
-| Vad | Var |
+| What | Where |
 |---|---|
-| Startpunkt | `cmd/masto-rss/main.go`: programmet och `healthcheck` |
-| Huvudloop | `internal/app`: kontroller vid start, schemaläggning, `import`, `post`, statussidans innehåll, nedstängning |
-| Konfiguration | `internal/config`: miljövariabler, `FEED_<NAMN>_<FÄLT>` per flöde |
-| Hämtning och tolkning | `internal/feed`: hämtning, teckenkodning, RSS/Atom/RDF (`encoding/xml`) och JSON Feed, länkar som nycklar |
-| Databas | `internal/store`: SQLite (`modernc.org/sqlite`) i `/data/masto-rss.db` |
-| Beslut om vad som postas | `internal/poll`: nya poster, skydden mot flod och dubbletter, utkorgen |
-| Inläggens text | `internal/format`: mallen, längd enligt Mastodons regler (grafemkluster), inga omnämnanden |
-| Postning | `internal/deliver` (utkorgen, omförsök) och `internal/mastodon` (API-klienten) |
-| Aviseringar och status | `internal/notify` (Signal via signal-cli-rest-api), `internal/status` (`/status`, till exempel för Homepage, och `/api/dashboard` för en startsida) |
-| JavaScript-semantik | `internal/js` (`Date.parse`, `trim()` m.m.) och `internal/weburl` (`new URL()`, `URLSearchParams`), så att datum, länkar och nycklar blir desamma som i TypeScript-versionen |
-| Övrigt | `internal/logx` (loggrader i `TZ`), `internal/netx` (fel i loggen), `version.go` (version och User-Agent ur `VERSION`) |
-| Tester | `*_test.go` bredvid koden (HTTP är låtsad: inget nätverk), påhittade flöden i `testdata/fixtures/`, TypeScript-versionens svar i `testdata/golden/`; riktiga flöden bara lokalt i `testdata/local/` (versionshanteras inte) |
-| Image | `ghcr.io/maxbengtzen/masto-rss`, byggs av GitHub Actions på taggar `vX.Y.Z` |
+| Entry point | `cmd/masto-rss/main.go`: the program and `healthcheck` |
+| Main loop | `internal/app`: startup checks, scheduling, `import`, `post`, status page content, shutdown |
+| Configuration | `internal/config`: environment variables, `FEED_<NAME>_<FIELD>` per feed |
+| Fetching and parsing | `internal/feed`: fetching, character encodings, RSS/Atom/RDF (`encoding/xml`) and JSON Feed, links as keys |
+| Database | `internal/store`: SQLite (`modernc.org/sqlite`) in `/data/masto-rss.db` |
+| Deciding what to post | `internal/poll`: new items, flood and duplicate safeguards, the outbox |
+| Post text | `internal/format`: the template, length by Mastodon's rules (grapheme clusters), no mentions |
+| Posting | `internal/deliver` (the outbox, retries) and `internal/mastodon` (the API client) |
+| Notifications and status | `internal/notify` (Signal via signal-cli-rest-api), `internal/status` (`/status`, for example for Homepage, and `/api/dashboard` for a dashboard) |
+| JavaScript semantics | `internal/js` (`Date.parse`, `trim()` etc.) and `internal/weburl` (`new URL()`, `URLSearchParams`), so dates, links and keys stay the same as in the TypeScript version |
+| Other | `internal/logx` (log lines in `TZ`), `internal/netx` (errors in the log), `version.go` (version and User-Agent from `VERSION`) |
+| Tests | `*_test.go` next to the code (HTTP is faked: no network), invented feeds in `testdata/fixtures/`, the TypeScript version's outputs in `testdata/golden/`; real feeds only locally in `testdata/local/` (not version controlled) |
+| Image | `ghcr.io/maxbengtzen/masto-rss`, built by GitHub Actions on `vX.Y.Z` tags |
 | Version | `VERSION` |
-| Release-skript | `scripts/release.sh` (släpper en version) och `scripts/changelog.sh` (anropas av `release.sh` och av GitHub Actions) |
+| Release scripts | `scripts/release.sh` (cuts a release) and `scripts/changelog.sh` (called by `release.sh` and by GitHub Actions) |
 | CI | `.github/workflows/publish.yml` |
 
-## Regler
+## Rules
 
-- **Inga riktiga flöden i repot.** Artikeltexter tillhör andra och visar vilka flöden som körs.
-  Fixtures och golden-filer bygger på påhittad text; riktiga flöden får bara ligga i den
-  gitignorerade `testdata/local/`.
-- **Inga driftuppgifter i repot.** Sökvägar, värdnamn, nätverk och annat om en viss server hör hemma
-  i `AGENTS.local.md` eller i driftens egen compose-fil, aldrig i repot eller i en commit.
-- **Provposta aldrig på riktiga konton utan att ägaren sagt till.** Kör med `DRY_RUN=1`.
-- **Fråga ägaren innan något som syns utanför repot:** push av en versionstagg (det publicerar en
-  image och en GitHub Release) och driftsättning. Att committa och pusha vanliga commits till
-  `main` är okej när ägaren bett om ändringen.
-- **Återanvänd aldrig ett versionsnummer.** Flytta eller radera aldrig en publicerad tagg.
-  Blev något fel i en release: rätta och släpp nästa patch-version.
-- **Hemligheter:** inga tokens eller telefonnummer i kod, tester, commits, loggar eller CHANGELOG.
-  Testerna använder påhittade värden. Skriv aldrig ut en token, inte ens delvis.
-- **Håll den beroendesnål.** Det enda beroendet utöver Go:s standardbibliotek är
-  `modernc.org/sqlite`. Lägg inte till fler utan att fråga. Bygget sker med `CGO_ENABLED=0`, så
-  inget får kräva cgo.
-- **Golden-filerna är kontraktet.** `testdata/golden/` är TypeScript-versionens svar. Ändra dem inte
-  för att ett test går fel; ändras ett beteende med avsikt, uppdatera filen för hand och skriv in
-  skillnaden i `testdata/golden/README.md`.
-- **Containern kör skrivskyddat** (`read_only: true`) som 1000:1000 i en `scratch`-image. Koden
-  skriver bara till `/data` (databasen) och `/tmp` (hälsofilen).
-- **Mät minnet** när något kan påverka det (nytt beroende, ny cache, större ändringar i
-  tolkningen): `docker stats` och `RssAnon` i `/proc/<pid>/status` för containerns process, före
-  och efter.
+- **No real feeds in the repository.** Article texts belong to others and reveal which feeds are
+  run. Fixtures and golden files are built from invented text; real feeds may only live in the
+  git-ignored `testdata/local/`. The invented feed content is partly Swedish on purpose, to test
+  non-ASCII text.
+- **No deployment details in the repository.** Paths, host names, networks and anything else about
+  a particular server belong in `AGENTS.local.md` or in the deployment's own compose file, never in
+  the repository or a commit.
+- **Never test-post to real accounts unless the owner has said so.** Use `DRY_RUN=1`.
+- **Ask the owner before anything visible outside the repository:** pushing a version tag (which
+  publishes an image and a GitHub Release) and deploying. Committing and pushing ordinary commits
+  to `main` is fine when the owner asked for the change.
+- **Never reuse a version number.** Never move or delete a published tag. If a release went wrong:
+  fix it and release the next patch version.
+- **Secrets:** no tokens or phone numbers in code, tests, commits, logs or CHANGELOG. Tests use
+  invented values. Never print a token, not even partially.
+- **Keep dependencies minimal.** The only dependency beyond Go's standard library is
+  `modernc.org/sqlite`. Don't add more without asking. Builds use `CGO_ENABLED=0`, so nothing may
+  require cgo.
+- **The golden files are the contract.** `testdata/golden/` holds the TypeScript version's outputs.
+  Don't change them because a test fails; if a behavior changes on purpose, update the file by hand
+  and describe the difference in `testdata/golden/README.md`.
+- **The container runs read-only** (`read_only: true`) as 1000:1000 in a `scratch` image. The code
+  only writes to `/data` (the database) and `/tmp` (the health file).
+- **Measure memory** when something might affect it (new dependency, new cache, larger changes to
+  parsing): `docker stats` and `RssAnon` in `/proc/<pid>/status` for the container's process,
+  before and after.
 
-## Utveckla och testa
+## Developing and testing
 
-Har du inte Go lokalt, kör i Go-imagen:
+Without Go installed, run it in the Go image:
 
 ```sh
 docker run --rm -u "$(id -u):$(id -g)" -e HOME=/tmp -v "$PWD":/src -w /src golang:1.27-alpine \
   sh -c 'gofmt -l . && go vet ./... && go test ./...'
 ```
 
-Lägg till eller uppdatera tester för varje beteendeändring. CI kör samma Go-version som `go.mod`
-anger. Kapplöpningar mellan goroutiner hittas med `go test -race ./...` (kräver cgo, till exempel i
-`golang:1.27` med `CGO_ENABLED=1`).
+Add or update tests for every behavior change. CI runs the Go version that `go.mod` specifies.
+Data races between goroutines are found with `go test -race ./...` (requires cgo, for example in
+`golang:1.27` with `CGO_ENABLED=1`).
 
-Grafemtabellerna i `internal/format/tables.go` genereras ur Unicodes teckendatabas med
-`internal/format/gen_tables.go`; se kommentaren där. Byt Unicode-version bara tillsammans med
-`testdata/unicode/GraphemeBreakTest.txt`.
+The grapheme tables in `internal/format/tables.go` are generated from the Unicode Character
+Database by `internal/format/gen_tables.go`; see the comment there. Only change the Unicode version
+together with `testdata/unicode/GraphemeBreakTest.txt`.
 
-### Torrköra mot riktiga flöden
+### Dry run against real feeds
 
-Bygg imagen och kör ett varv i torrläge (`DRY_RUN=1`, `ONCE=1`). Ingenting postas, och allt som
-skrivs i databasen rullas tillbaka. Med en riktig token kontrolleras också kontot (bara läsning);
-skicka in den via miljön utan att skriva ut den.
+Build the image and run one round in dry-run mode (`DRY_RUN=1`, `ONCE=1`). Nothing is posted, and
+everything written to the database is rolled back. With a real token the account is checked too
+(read-only); pass it in through the environment without printing it.
 
 ```sh
 docker build -t masto-rss:dev .
@@ -93,92 +94,92 @@ docker run --rm --read-only --tmpfs /tmp -v "$PWD/data:/data" \
   masto-rss:dev
 ```
 
-Med tom databas ska varje flöde ge "nytt flöde", och `skulle posta:` visar inläggens text som de
-skulle se ut. `data/` är ignorerad av git. Radera den efteråt.
+With an empty database every feed should log "new feed", and `would post:` shows the posts' text as
+it would look. `data/` is ignored by git. Delete it afterwards.
 
 ## Commits
 
-Conventional Commits med rubriken på svenska: `feat: …`, `fix: …`, `docs: …`, `chore: …`,
-`test: …`, `refactor: …`. En brytande ändring får `!` (`feat!: …`) och en förklaring i
-brödtexten. Release-commits skapas av `scripts/release.sh` (`chore(release): vX.Y.Z`); skriv dem
-inte för hand.
+Conventional Commits with an English subject: `feat: …`, `fix: …`, `docs: …`, `chore: …`,
+`test: …`, `refactor: …`. A breaking change gets `!` (`feat!: …`) and an explanation in the body.
+Release commits are created by `scripts/release.sh` (`chore(release): vX.Y.Z`); don't write them by
+hand.
 
-## Versionering (semver)
+## Versioning (semver)
 
-Vad som räknas som vad. "Användaren" är den som kör containern, alltså compose-filen och kontona
-det postas till.
+What counts as what. "The user" is whoever runs the container, i.e. the compose file and the
+accounts posted to.
 
-| Typ | När | Exempel |
+| Type | When | Examples |
 |---|---|---|
-| **Major** (`2.0.0`) | Compose-filen måste ändras för att det ska fungera som förut | En miljövariabel byter namn eller tas bort; ett mallfält byter namn; databasen kräver ett manuellt steg; en ändring i imagen som kräver ändringar i compose |
-| **Minor** (`1.1.0`) | Ny funktion som är bakåtkompatibel | Ny valfri miljövariabel; bilder med alt-text; filter; ett nytt mallfält |
-| **Patch** (`1.0.1`) | Rättning eller underhåll utan synlig beteendeändring | Buggfix; uppdaterat beroende eller basimage; bättre loggtext |
+| **Major** (`2.0.0`) | The compose file must change for things to work as before | An environment variable is renamed or removed; a template field is renamed; the database needs a manual step; an image change that requires compose changes |
+| **Minor** (`1.1.0`) | New backwards-compatible feature | New optional environment variable; images with alt text; filters; a new template field |
+| **Patch** (`1.0.1`) | Fix or maintenance without visible behavior change | Bug fix; updated dependency or base image; better log text |
 
-Imagen taggas `X.Y.Z`, `X.Y` och `X`. Den som kör `:1` får minor och patch vid nästa
-`docker compose pull`; en major kräver att taggen i compose-filen ändras.
+The image is tagged `X.Y.Z`, `X.Y` and `X`. Anyone running `:1` gets minors and patches on the next
+`docker compose pull`; a major requires changing the tag in the compose file.
 
 ## Release notes (CHANGELOG.md)
 
-Release notes skrivs **löpande** i `CHANGELOG.md` under `## [Unreleased]`, i samma commit som
-ändringen. Vid release flyttar `scripts/release.sh` dem till en ny versionsrubrik, och GitHub
-Actions använder exakt det avsnittet som text i GitHub Release.
+Release notes are written **as you go** in `CHANGELOG.md` under `## [Unreleased]`, in the same
+commit as the change. On release, `scripts/release.sh` moves them under a new version heading, and
+GitHub Actions uses exactly that section as the GitHub Release text.
 
-- Skriv på svenska, för den som kör tjänsten: vad som är annorlunda och vad man behöver göra, inte
-  hur koden ändrades.
-- Använd rubrikerna `### Tillagt`, `### Ändrat`, `### Fixat`, `### Borttaget` och `### Säkerhet`,
-  i den ordningen, bara de som behövs.
-- Nämn nya eller ändrade miljövariabler med namn och standardvärde.
-- En major börjar med `### Måste göras vid uppgradering` med exakta steg (till exempel vilken rad i
-  compose-filen som ska ändras).
+- Write in English, for whoever runs the service: what is different and what they need to do, not
+  how the code changed.
+- Use the headings `### Added`, `### Changed`, `### Fixed`, `### Removed` and `### Security`, in
+  that order, only the ones needed.
+- Mention new or changed environment variables by name and default value.
+- A major starts with `### Required when upgrading` with exact steps (for example which line in the
+  compose file to change).
 
-`scripts/release.sh` stoppar om `Unreleased` är tomt.
+`scripts/release.sh` stops if `Unreleased` is empty.
 
-## Släppa en version
+## Cutting a release
 
-Förutsättningar: arbetskatalogen är ren, `main` är pushad, och CI på `main` är grön
+Prerequisites: the working tree is clean, `main` is pushed, and CI on `main` is green
 (`gh run list --limit 3`).
 
-1. **Kontrollera `CHANGELOG.md`.** Allt som ändrats sedan förra versionen ska stå under
-   `## [Unreleased]`. Jämför med `git log --oneline v$(cat VERSION)..HEAD`.
-2. **Välj version** enligt tabellen ovan och **fråga ägaren** innan du fortsätter, med
-   versionsnumret och release notes som underlag.
-3. **Skapa versionen:**
+1. **Check `CHANGELOG.md`.** Everything changed since the previous version should be under
+   `## [Unreleased]`. Compare with `git log --oneline v$(cat VERSION)..HEAD`.
+2. **Choose the version** from the table above and **ask the owner** before continuing, with the
+   version number and release notes as the basis.
+3. **Create the version:**
    ```sh
-   scripts/release.sh patch   # eller minor / major / ett exakt nummer som 1.2.0
+   scripts/release.sh patch   # or minor / major / an exact number like 1.2.0
    ```
-   Skriptet kontrollerar att arbetskatalogen är ren och att `Unreleased` inte är tomt, och kör
-   `go vet` och testerna (i Go-imagen om Go saknas). Sedan skriver det versionen i `VERSION`,
-   flyttar `Unreleased` till den nya versionen med dagens datum, committar
-   (`chore(release): vX.Y.Z`) och skapar en annoterad tagg `vX.Y.Z`. Avbryts det: rätta orsaken och
-   kör igen.
-4. **Publicera:**
+   The script checks that the working tree is clean and that `Unreleased` isn't empty, and runs
+   `go vet` and the tests (in the Go image if Go is missing). It then writes the version to
+   `VERSION`, moves `Unreleased` to the new version with today's date, commits
+   (`chore(release): vX.Y.Z`) and creates an annotated tag `vX.Y.Z`. If it aborts: fix the cause
+   and run it again.
+4. **Publish:**
    ```sh
    git push --follow-tags
    ```
-5. **Följ bygget:**
+5. **Follow the build:**
    ```sh
    gh run watch "$(gh run list --branch "v$(cat VERSION)" --limit 1 --json databaseId --jq '.[0].databaseId')" --exit-status
    ```
-   Jobbet `publish` kontrollerar att taggen matchar `VERSION`, bygger och pushar imagen med
-   taggarna `X.Y.Z`, `X.Y` och `X`, och skapar en GitHub Release med avsnittet ur `CHANGELOG.md`.
-6. **Kontrollera releasen:** `gh release view vX.Y.Z`.
-7. **Driftsätt** enligt `AGENTS.local.md`, om den finns, och fråga ägaren först.
+   The `publish` job checks that the tag matches `VERSION`, builds and pushes the image with the
+   tags `X.Y.Z`, `X.Y` and `X`, and creates a GitHub Release with the section from `CHANGELOG.md`.
+6. **Check the release:** `gh release view vX.Y.Z`.
+7. **Deploy** as described in `AGENTS.local.md`, if it exists, and ask the owner first.
 
-### Om något går fel
+### If something goes wrong
 
-- **CI misslyckas på taggen:** ingenting har publicerats om det föll före bygget, men taggen
-  finns kvar. Rätta på `main`, lägg en rad om rättningen i `Unreleased` och släpp nästa
-  patch-version. Radera inte taggen.
-- **Den nya versionen fungerar inte i drift:** lås compose-filen tillfälligt till förra
-  versionen, till exempel `ghcr.io/maxbengtzen/masto-rss:1.0.3`, och släpp en rättning. Byt sedan
-  tillbaka till `:1`. Databasen är densamma i alla 1.x, så det går att backa utan att röra den.
-- **`scripts/release.sh` säger att Unreleased är tomt:** skriv release notes först (se ovan) och
-  committa.
+- **CI fails on the tag:** nothing has been published if it failed before the build, but the tag
+  remains. Fix it on `main`, add a line about the fix under `Unreleased` and release the next patch
+  version. Don't delete the tag.
+- **The new version doesn't work in production:** temporarily pin the compose file to the previous
+  version, for example `ghcr.io/maxbengtzen/masto-rss:1.0.3`, and release a fix. Then switch back
+  to `:1`. The database is the same in all 1.x, so you can roll back without touching it.
+- **`scripts/release.sh` says Unreleased is empty:** write the release notes first (see above) and
+  commit.
 
-## Underhåll
+## Maintenance
 
-- **Beroenden:** Dependabot bevakar `go.mod` (varje vecka) och GitHub Actions (varje månad). Ett
-  uppdaterat beroende släpps som en patch-version.
-- **Go:** `Dockerfile` bygger med `golang:1.27-alpine` och kör i `scratch`. En ny Go-version byts i
-  `go.mod` och `Dockerfile` samtidigt och släpps som en patch-version. CI läser Go-versionen från
-  `go.mod`.
+- **Dependencies:** Dependabot watches `go.mod` (weekly) and GitHub Actions (monthly). An updated
+  dependency is released as a patch version.
+- **Go:** the `Dockerfile` builds with `golang:1.27-alpine` and runs in `scratch`. A new Go version
+  is changed in `go.mod` and the `Dockerfile` together and released as a patch version. CI reads
+  the Go version from `go.mod`.

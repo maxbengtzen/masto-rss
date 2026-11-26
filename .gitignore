@@ -1,5 +1,5 @@
 data/
-# Lokala driftanteckningar, versionshanteras aldrig
+# Local deployment notes, never version controlled
 AGENTS.local.md
-# Sparade riktiga flöden och det som spelats in från dem; texterna tillhör andra
+# Saved real feeds and what was recorded from them; the texts belong to others
 testdata/local/

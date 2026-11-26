@@ -1,6 +1,6 @@
-// Command masto-rss läser RSS-, Atom-, RDF- och JSON-flöden och postar nya poster till Mastodon.
-// `masto-rss healthcheck` är Dockers hälsokontroll: den lyckas om huvudloopen skrivit sin
-// hälsofil de senaste tre minuterna.
+// Command masto-rss reads RSS, Atom, RDF and JSON feeds and posts new items to Mastodon.
+// `masto-rss healthcheck` is Docker's health check: it succeeds if the main loop has written its
+// health file within the last three minutes.
 package main
 
 import (
@@ -19,8 +19,8 @@ func main() {
 	os.Exit(app.Main(os.Args[1:], os.Environ(), os.Stdout, os.Stderr, app.Options{}))
 }
 
-// healthcheck gör samma sak som `find /tmp/masto-rss.alive -mmin -3` gjorde: filen ska finnas och
-// vara yngre än tre minuter, räknat i hela sekunder.
+// healthcheck does the same as `find /tmp/masto-rss.alive -mmin -3` did: the file must exist and
+// be younger than three minutes, counted in whole seconds.
 func healthcheck(path string, now time.Time) int {
 	info, err := os.Stat(path)
 	if err != nil {
@@ -28,7 +28,7 @@ func healthcheck(path string, now time.Time) int {
 		return 1
 	}
 	if age := now.Unix() - info.ModTime().Unix(); age >= 180 {
-		fmt.Fprintf(os.Stderr, "%s skrevs för %d s sedan; huvudloopen står still\n", path, age)
+		fmt.Fprintf(os.Stderr, "%s was written %d s ago; the main loop is stuck\n", path, age)
 		return 1
 	}
 	return 0

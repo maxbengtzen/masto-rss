@@ -1,13 +1,13 @@
-// Package app är programmet: läser konfigurationen, öppnar databasen, kontrollerar instanser och
-// tokens, och kör varje flöde på sin egen timer: hämta, lägg det nya i utkorgen, posta.
+// Package app is the program: it reads the configuration, opens the database, checks instances and
+// tokens, and runs each feed on its own timer: fetch, add what is new to the outbox, post.
 //
-//	masto-rss                                   kör tills SIGTERM (ONCE=1: ett varv och avsluta)
-//	masto-rss import <namn> <fil>               importerar den gamla botens processed_entries.txt
-//	masto-rss post [--language sv] <namn,…|alla> <text>
-//	                                            postar en fri text till flödenas konton
+//	masto-rss                                   runs until SIGTERM (ONCE=1: one round and exit)
+//	masto-rss import <name> <file>              imports the old bot's processed_entries.txt
+//	masto-rss post [--language en] <name,…|all> <text>
+//	                                            posts a free text to the feeds' accounts
 //
-// Flödena körs ett i taget, så att minnestoppen blir låg. Efter ett misslyckat varv växer
-// väntetiden (intervallet gånger 2, 4, 8 … upp till 6 h, eller längre om servern bett om det).
+// Feeds run one at a time, which keeps peak memory low. After a failed round the wait grows (the
+// interval times 2, 4, 8 … up to 6 h, or longer if the server asked for it).
 package app
 
 import (
@@ -46,7 +46,7 @@ import (
 	"github.com/maxbengtzen/masto-rss/internal/weburl"
 )
 
-// HeartbeatFile skrivs varje minut. Hälsokontrollen (masto-rss healthcheck) läser dess tid.
+// HeartbeatFile is written every minute. The health check (masto-rss healthcheck) reads its time.
 const HeartbeatFile = "/tmp/masto-rss.alive"
 
 const (
@@ -55,32 +55,32 @@ const (
 	accountRefresh    = time.Hour
 	instanceRefresh   = 24 * time.Hour
 	shutdownGrace     = 10 * time.Second
-	usageCommands     = "masto-rss [import <namn> <fil> | post <namn,…|alla> <text>]"
+	usageCommands     = "masto-rss [import <name> <file> | post <name,…|all> <text>]"
 )
 
 var defaultLimits = format.Limits{MaxCharacters: 500, CharactersPerURL: 23}
 
-// Options är det som går att byta ut i testerna. Nollvärdet är det vanliga.
+// Options holds what the tests can replace. The zero value is the normal setup.
 type Options struct {
 	HTTP          *http.Client
 	HeartbeatFile string
-	// StartDelay är väntan före flödets första varv; normalt i·3 s plus upp till 2 s.
+	// StartDelay is the wait before a feed's first round; normally i·3 s plus up to 2 s.
 	StartDelay func(i int) time.Duration
-	// Sleep är pausen mellan två inlägg till samma konto.
+	// Sleep is the pause between two posts to the same account.
 	Sleep func(time.Duration)
-	// Signals ersätter SIGTERM och SIGINT.
+	// Signals replaces SIGTERM and SIGINT.
 	Signals <-chan os.Signal
-	// Listening anropas med statussidans adress när den lyssnar.
+	// Listening is called with the status page's address once it is listening.
 	Listening func(addr string)
 }
 
-// account är en instans och en token. Flera flöden kan dela konto.
+// account is an instance and a token. Several feeds can share an account.
 type account struct {
 	instance string
 	token    string
 	feeds    []config.Feed
 	info     *mastodon.Account
-	// blocked är varför kontot inte kan posta, om det inte kan.
+	// blocked is why the account cannot post, if it cannot.
 	blocked string
 }
 
@@ -98,7 +98,7 @@ type app struct {
 	http   *http.Client
 	opts   Options
 
-	mu              sync.Mutex // skyddar kontona och instanserna
+	mu              sync.Mutex // guards the accounts and the instances
 	accounts        []*account
 	accountByKey    map[string]*account
 	instances       map[string]instance
@@ -130,7 +130,7 @@ func duration(ms int64) string {
 
 func nowMs() int64 { return time.Now().UnixMilli() }
 
-// Main kör programmet och ger slutkoden.
+// Main runs the program and returns the exit code.
 func Main(args, environ []string, stdout, stderr io.Writer, opts Options) int {
 	exit := func(msg string) int {
 		fmt.Fprintln(stderr, msg)
@@ -144,11 +144,11 @@ func Main(args, environ []string, stdout, stderr io.Writer, opts Options) int {
 
 	dbPath := filepath.Join(cfg.DataDir, "masto-rss.db")
 	if err := os.MkdirAll(cfg.DataDir, 0o755); err != nil {
-		return exit(fmt.Sprintf("Kan inte öppna databasen %s: %s", dbPath, netx.Describe(err)))
+		return exit(fmt.Sprintf("Cannot open the database %s: %s", dbPath, netx.Describe(err)))
 	}
 	st, err := store.Open(dbPath)
 	if err != nil {
-		return exit(fmt.Sprintf("Kan inte öppna databasen %s: %s", dbPath, netx.Describe(err)))
+		return exit(fmt.Sprintf("Cannot open the database %s: %s", dbPath, netx.Describe(err)))
 	}
 	defer st.Close()
 
@@ -187,7 +187,7 @@ func Main(args, environ []string, stdout, stderr io.Writer, opts Options) int {
 		return a.postCommand(args, stderr)
 	case "":
 	default:
-		return exit(fmt.Sprintf("Okänt kommando \"%s\". Användning: %s", command, usageCommands))
+		return exit(fmt.Sprintf("Unknown command \"%s\". Usage: %s", command, usageCommands))
 	}
 	return a.run()
 }
@@ -215,12 +215,12 @@ func (a *app) importCommand(args []string, stderr io.Writer) int {
 		}
 	}
 	if f == nil || file == "" {
-		fmt.Fprintf(stderr, "Användning: masto-rss import <namn> <fil>, där namn är ett av: %s\n", a.feedNames())
+		fmt.Fprintf(stderr, "Usage: masto-rss import <name> <file>, where name is one of: %s\n", a.feedNames())
 		return 1
 	}
 	b, err := os.ReadFile(file)
 	if err != nil {
-		fmt.Fprintf(stderr, "Kan inte läsa %s: %s\n", file, netx.Describe(err))
+		fmt.Fprintf(stderr, "Cannot read %s: %s\n", file, netx.Describe(err))
 		return 1
 	}
 	var lines []string
@@ -248,11 +248,11 @@ func (a *app) importCommand(args []string, stderr io.Writer) int {
 		fmt.Fprintf(stderr, "%s\n", netx.Describe(err))
 		return 1
 	}
-	verb := "importerade"
+	verb := "imported"
 	if a.cfg.DryRun {
-		verb = "skulle importera"
+		verb = "would import"
 	}
-	a.log.Printf("%s: %s %d länkar från %s (%d nya nycklar)", f.Name, verb, len(lines), file, added)
+	a.log.Printf("%s: %s %d links from %s (%d new keys)", f.Name, verb, len(lines), file, added)
 	return 0
 }
 
@@ -271,7 +271,7 @@ func (a *app) postCommand(args []string, stderr io.Writer) int {
 	}
 	text := js.Trim(strings.ReplaceAll(strings.Join(args, " "), `\n`, "\n"))
 	var wanted []string
-	if which == "alla" {
+	if which == "all" || which == "alla" { // "alla" is the old Swedish keyword
 		for _, f := range a.cfg.Feeds {
 			wanted = append(wanted, f.Name)
 		}
@@ -295,7 +295,7 @@ func (a *app) postCommand(args []string, stderr io.Writer) int {
 		valid = valid && known(n)
 	}
 	if !valid {
-		fmt.Fprintf(stderr, "Användning: masto-rss post [--language sv] <namn,…|alla> <text>, där namn är: %s\n", a.feedNames())
+		fmt.Fprintf(stderr, "Usage: masto-rss post [--language en] <name,…|all> <text>, where name is one of: %s\n", a.feedNames())
 		return 1
 	}
 	ok := true
@@ -312,10 +312,10 @@ func (a *app) postCommand(args []string, stderr io.Writer) int {
 			continue
 		}
 		if a.cfg.DryRun {
-			a.log.Printf("%s: skulle posta: %s", f.Name, oneLine(text))
+			a.log.Printf("%s: would post: %s", f.Name, oneLine(text))
 			continue
 		}
-		// Samma text till samma konto ger samma nyckel, så en upprepning inom en timme blir inget nytt inlägg.
+		// The same text to the same account gives the same key, so a repeat within an hour is not a new post.
 		sum := sha256.Sum256([]byte("masto-rss post\n" + accountKey(*f) + "\n" + text))
 		key := hex.EncodeToString(sum[:])[:32]
 		lang := language
@@ -325,10 +325,10 @@ func (a *app) postCommand(args []string, stderr io.Writer) int {
 		posted, err := a.client.Post(context.Background(), acc.instance, acc.token, mastodon.StatusParams{Status: text, Visibility: f.Visibility, Language: lang}, key)
 		if err != nil {
 			ok = false
-			a.log.Printf("%s: FEL: %s", f.Name, netx.Describe(err))
+			a.log.Printf("%s: ERROR: %s", f.Name, netx.Describe(err))
 			continue
 		}
-		a.log.Printf("%s: postat %s", f.Name, posted.URL)
+		a.log.Printf("%s: posted %s", f.Name, posted.URL)
 	}
 	if !ok {
 		return 1
@@ -340,18 +340,18 @@ func (a *app) run() int {
 	cfg := a.cfg
 	dry := ""
 	if cfg.DryRun {
-		dry = " i torrläge: inget postas och inget sparas"
+		dry = " in dry-run mode: nothing is posted and nothing is saved"
 	}
-	a.log.Printf("masto-rss %s startar%s", mastorss.Version(), dry)
+	a.log.Printf("masto-rss %s starting%s", mastorss.Version(), dry)
 	for _, f := range cfg.Feeds {
 		lang := f.Language
 		if lang == "" {
-			lang = "från flödet"
+			lang = "from the feed"
 		}
-		a.log.Printf("  %s: %s → %s, var %s, %s, språk %s", f.Name, f.URL, host(f.MastodonURL), duration(f.IntervalMs), f.Visibility, lang)
+		a.log.Printf("  %s: %s → %s, every %s, %s, language %s", f.Name, f.URL, host(f.MastodonURL), duration(f.IntervalMs), f.Visibility, lang)
 	}
 	if len(cfg.Paused) > 0 {
-		a.log.Printf("  pausade: %s", strings.Join(cfg.Paused, ", "))
+		a.log.Printf("  paused: %s", strings.Join(cfg.Paused, ", "))
 	}
 
 	configured := make([]string, 0, len(cfg.Feeds)+len(cfg.Paused))
@@ -366,14 +366,14 @@ func (a *app) run() int {
 	for _, o := range orphans {
 		if !cfg.DryRun && nowMs()-o.LastUsed > poll.ForgetAfterMs {
 			a.store.Transaction(false, func(tx *store.Store) error { return tx.Forget(o.Name) })
-			a.log.Printf("%s: fanns inte i konfigurationen på 30 dagar, historiken är borttagen", o.Name)
+			a.log.Printf("%s: not in the configuration for 30 days, its history has been removed", o.Name)
 		} else {
-			a.log.Printf("%s: finns i databasen men inte i konfigurationen; historiken tas bort efter 30 dagar", o.Name)
+			a.log.Printf("%s: in the database but not in the configuration; its history is removed after 30 days", o.Name)
 		}
 	}
 
 	a.client.SetDeprecationHandler(func(endpoint, value string) {
-		message := fmt.Sprintf("Mastodon säger att %s är på väg bort (Deprecation: %s). masto-rss behöver uppdateras.", endpoint, value)
+		message := fmt.Sprintf("Mastodon says that %s is being phased out (Deprecation: %s). masto-rss needs to be updated.", endpoint, value)
 		if cfg.DryRun {
 			a.log.Printf("%s", message)
 		} else if first, _ := a.store.FirstNotice("deprecation "+endpoint, nowMs()); first {
@@ -410,10 +410,10 @@ func (a *app) run() int {
 func (a *app) checkInstance(ctx context.Context, url string) {
 	info, err := a.client.Instance(ctx, url)
 	if err != nil {
-		a.log.Printf("%s: kunde inte läsa instansens uppgifter (%s); räknar med %d tecken", host(url), netx.Describe(err), defaultLimits.MaxCharacters)
+		a.log.Printf("%s: could not read the instance's details (%s); assuming %d characters", host(url), netx.Describe(err), defaultLimits.MaxCharacters)
 		return
 	}
-	// Utan api_versions (äldre Mastodon eller en annan server) räknas länkar i full längd, för säkerhets skull.
+	// Without api_versions (older Mastodon or another server) links count at full length, to be safe.
 	limits := format.Limits{MaxCharacters: info.MaxCharacters}
 	if info.APIVersion != 0 {
 		limits.CharactersPerURL = info.CharactersPerURL
@@ -432,9 +432,9 @@ func (a *app) checkInstance(ctx context.Context, url string) {
 	}
 	switch {
 	case before == nil:
-		a.log.Printf("%s: Mastodon %s, API-version %d, %d tecken per inlägg", host(url), info.Version, info.APIVersion, info.MaxCharacters)
+		a.log.Printf("%s: Mastodon %s, API version %d, %d characters per post", host(url), info.Version, info.APIVersion, info.MaxCharacters)
 	case before.APIVersion != info.APIVersion || minor(before.Version) != minor(info.Version):
-		message := fmt.Sprintf("%s har gått från Mastodon %s (API %d) till %s (API %d). Läs Mastodons CHANGELOG och se om masto-rss behöver ändras.",
+		message := fmt.Sprintf("%s has gone from Mastodon %s (API %d) to %s (API %d). Read Mastodon's CHANGELOG and check whether masto-rss needs changes.",
 			host(url), before.Version, before.APIVersion, info.Version, info.APIVersion)
 		a.log.Printf("%s", message)
 		a.notify.Send(message)
@@ -462,7 +462,7 @@ func (a *app) block(acc *account, reason string) {
 	}
 	acc.blocked = reason
 	a.mu.Unlock()
-	message := fmt.Sprintf("%s: %s. Inget postas för kontot förrän det är rättat och masto-rss startats om.", names(acc), reason)
+	message := fmt.Sprintf("%s: %s. Nothing is posted for the account until this is fixed and masto-rss is restarted.", names(acc), reason)
 	a.log.Printf("%s", message)
 	a.notify.Send(message)
 }
@@ -475,13 +475,13 @@ func (a *app) checkAccount(ctx context.Context, acc *account, first bool) {
 		case err == nil && !mastodon.CanPost(app.Scopes):
 			has := strings.Join(app.Scopes, ", ")
 			if has == "" {
-				has = "inga"
+				has = "none"
 			}
-			a.block(acc, "token saknar write:statuses (har "+has+")")
+			a.block(acc, "token lacks write:statuses (has "+has+")")
 		case errors.As(err, &me) && me.Kind() == "auth":
-			a.block(acc, "token nekas ("+me.Error()+")")
+			a.block(acc, "token rejected ("+me.Error()+")")
 		case err != nil:
-			a.log.Printf("%s: kunde inte kontrollera token (%s)", names(acc), netx.Describe(err))
+			a.log.Printf("%s: could not check the token (%s)", names(acc), netx.Describe(err))
 		}
 	}
 	a.mu.Lock()
@@ -492,9 +492,9 @@ func (a *app) checkAccount(ctx context.Context, acc *account, first bool) {
 	}
 	info, err := a.client.VerifyAccount(ctx, acc.instance, acc.token)
 	if err != nil {
-		// Kontot behövs bara för statussidan och kontrollen efter en timme, inte för att posta.
+		// The account is only needed for the status page and the hourly check, not for posting.
 		if first {
-			a.log.Printf("%s: kunde inte läsa kontot (%s)", names(acc), netx.Describe(err))
+			a.log.Printf("%s: could not read the account (%s)", names(acc), netx.Describe(err))
 		}
 		return
 	}
@@ -502,11 +502,11 @@ func (a *app) checkAccount(ctx context.Context, acc *account, first bool) {
 	acc.info = info
 	a.mu.Unlock()
 	if first {
-		bot := ". Kontot är inte märkt som bot (Inställningar → Profil)"
+		bot := ". The account is not marked as a bot (Preferences → Profile)"
 		if info.Bot {
 			bot = ""
 		}
-		a.log.Printf("%s: @%s@%s, %d följare%s", names(acc), info.Acct, host(acc.instance), info.Followers, bot)
+		a.log.Printf("%s: @%s@%s, %d followers%s", names(acc), info.Acct, host(acc.instance), info.Followers, bot)
 	}
 }
 
@@ -515,9 +515,9 @@ func (a *app) report(f config.Feed, r *poll.Result) {
 	if r.Redirect != nil && !a.redirectsLogged[name] {
 		a.redirectsLogged[name] = true
 		if r.Redirect.Permanent {
-			a.log.Printf("%s: adressen har flyttat permanent till %s; uppdatera %sURL", name, r.Redirect.To, f.Prefix)
+			a.log.Printf("%s: the address has moved permanently to %s; update %sURL", name, r.Redirect.To, f.Prefix)
 		} else {
-			a.log.Debugf("%s: omdirigeras tillfälligt till %s", name, r.Redirect.To)
+			a.log.Debugf("%s: temporarily redirected to %s", name, r.Redirect.To)
 		}
 	}
 	quiet := a.log.Debugf
@@ -525,41 +525,41 @@ func (a *app) report(f config.Feed, r *poll.Result) {
 		quiet = a.log.Printf
 	}
 	if r.Unchanged {
-		quiet("%s: oförändrat (304)", name)
+		quiet("%s: unchanged (304)", name)
 		return
 	}
 	d := r.Decision
 	if r.Unrecognized > 0 {
-		a.log.Debugf("%s: %d poster saknar både id och länk och hoppas över", name, r.Unrecognized)
+		a.log.Debugf("%s: %d items lack both id and link and are skipped", name, r.Unrecognized)
 	}
 	switch {
 	case d.Reason == "first-run":
-		rest := ", inget postas"
+		rest := ", nothing is posted"
 		if len(d.Post) > 0 {
-			rest = fmt.Sprintf(", %d läggs i utkorgen (BACKFILL)", len(d.Post))
+			rest = fmt.Sprintf(", %d added to the outbox (BACKFILL)", len(d.Post))
 		}
-		a.log.Printf("%s: nytt flöde, %d poster markerade som sedda%s", name, len(d.Skipped), rest)
+		a.log.Printf("%s: new feed, %d items marked as seen%s", name, len(d.Skipped), rest)
 	case d.Reason == "anomaly":
-		a.log.Printf("%s: VARNING: %d av %d poster ser nya ut på en gång. Allt markeras som sett och inget postas. Har sajten bytt adresser eller GUID?", name, len(d.Skipped), r.Items)
+		a.log.Printf("%s: WARNING: %d of %d items look new at once. Everything is marked as seen and nothing is posted. Has the site changed its addresses or GUIDs?", name, len(d.Skipped), r.Items)
 	case len(d.Skipped) > 0:
-		a.log.Printf("%s: hoppar över %d poster äldre än %s", name, len(d.Skipped), duration(f.MaxAgeMs))
+		a.log.Printf("%s: skipping %d items older than %s", name, len(d.Skipped), duration(f.MaxAgeMs))
 	}
 	for _, q := range r.Queued {
 		if a.cfg.DryRun {
-			a.log.Printf("%s: skulle posta: %s", name, oneLine(q.Status))
+			a.log.Printf("%s: would post: %s", name, oneLine(q.Status))
 		} else {
-			a.log.Debugf("%s: i utkorgen: %s", name, q.Title)
+			a.log.Debugf("%s: in the outbox: %s", name, q.Title)
 		}
 	}
 	if len(d.Deferred) > 0 {
-		a.log.Printf("%s: %d till väntar till nästa varv (högst %d per varv)", name, len(d.Deferred), f.MaxPostsPerPoll)
+		a.log.Printf("%s: %d more wait until the next round (at most %d per round)", name, len(d.Deferred), f.MaxPostsPerPoll)
 	}
 	if len(d.Post) == 0 && len(d.Skipped) == 0 && len(d.Deferred) == 0 {
-		quiet("%s: inget nytt (%d poster)", name, r.Items)
+		quiet("%s: nothing new (%d items)", name, r.Items)
 	}
 }
 
-// send skickar det som väntar i flödets utkorg.
+// send sends what is waiting in the feed's outbox.
 func (a *app) send(ctx context.Context, f config.Feed) error {
 	a.mu.Lock()
 	acc := a.accountByKey[accountKey(f)]
@@ -575,29 +575,29 @@ func (a *app) send(ctx context.Context, f config.Feed) error {
 	}
 	result, err := deliver.Deliver(ctx, a.client, f, a.store, deliver.Account{ID: accountID, Quotes: quotes}, deliver.Options{Sleep: a.opts.Sleep})
 	for _, p := range result.Posted {
-		verb := "postat"
+		verb := "posted"
 		if p.AlreadyThere {
-			verb = "fanns redan"
+			verb = "already there"
 		}
 		title := p.Post.Title
 		if title == "" {
-			title = "utan titel"
+			title = "untitled"
 		}
 		a.log.Printf("%s: %s %s (%s)", f.Name, verb, p.URL, title)
 	}
 	for _, p := range result.Expired {
-		a.log.Printf("%s: postas inte, väntade längre än %s: %s", f.Name, duration(f.MaxAgeMs), p.Title)
+		a.log.Printf("%s: not posted, waited longer than %s: %s", f.Name, duration(f.MaxAgeMs), p.Title)
 	}
 	for _, fl := range result.Failed {
-		a.log.Printf("%s: Mastodon nekade \"%s\": %s", f.Name, fl.Post.Title, fl.Error)
-		a.notify.Send(fmt.Sprintf("Mastodon nekade ett inlägg från %s (%s): %s", f.Name, fl.Error, fl.Post.Title))
+		a.log.Printf("%s: Mastodon rejected \"%s\": %s", f.Name, fl.Post.Title, fl.Error)
+		a.notify.Send(fmt.Sprintf("Mastodon rejected a post from %s (%s): %s", f.Name, fl.Error, fl.Post.Title))
 	}
 	if result.Retry != nil {
 		at := time.UnixMilli(result.Retry.NextAttemptAt).Format("15:04")
-		a.log.Printf("%s: kunde inte posta (%s); nytt försök tidigast %s", f.Name, result.Retry.Error, at)
+		a.log.Printf("%s: could not post (%s); next attempt at %s at the earliest", f.Name, result.Retry.Error, at)
 	}
 	if result.AuthError != nil {
-		a.block(acc, "token nekas ("+result.AuthError.Error()+")")
+		a.block(acc, "token rejected ("+result.AuthError.Error()+")")
 	}
 	return err
 }
@@ -607,7 +607,7 @@ type outcome struct {
 	nextMs int64
 }
 
-// runFeed kör ett varv och ger tiden till nästa.
+// runFeed runs one round and returns the time until the next.
 func (a *app) runFeed(ctx context.Context, f config.Feed) outcome {
 	a.mu.Lock()
 	limits := defaultLimits
@@ -621,10 +621,10 @@ func (a *app) runFeed(ctx context.Context, f config.Feed) outcome {
 	if err == nil {
 		a.report(f, result)
 		if result.PreviousFailures >= a.cfg.FailNotifyAfter {
-			a.notify.Send(f.Name + ": flödet fungerar igen")
+			a.notify.Send(f.Name + ": the feed works again")
 		}
 		if !result.Unchanged && result.Decision.Reason == "anomaly" {
-			a.notify.Send(fmt.Sprintf("%s: %d av %d poster såg nya ut på en gång. Allt markerades som sett och inget postades. Har sajten bytt adresser eller GUID?",
+			a.notify.Send(fmt.Sprintf("%s: %d of %d items looked new at once. Everything was marked as seen and nothing was posted. Has the site changed its addresses or GUIDs?",
 				f.Name, len(result.Decision.Skipped), result.Items))
 		}
 		out = outcome{ok: true, nextMs: int64(math.Round(float64(f.IntervalMs) * (0.9 + rand.Float64()*0.2)))}
@@ -640,15 +640,15 @@ func (a *app) runFeed(ctx context.Context, f config.Feed) outcome {
 			retryAfterMs = float64(h.RetryAfter) * 1000
 		}
 		next := math.Min(math.Max(float64(f.IntervalMs)*math.Pow(2, float64(failures-1)), retryAfterMs), maxBackoffMs)
-		a.log.Printf("%s: FEL (%d i rad): %s; nästa försök om %d min", f.Name, failures, netx.Describe(cause), max(1, int64(math.Round(next/60_000))))
+		a.log.Printf("%s: ERROR (%d in a row): %s; next attempt in %d min", f.Name, failures, netx.Describe(cause), max(1, int64(math.Round(next/60_000))))
 		if failures == a.cfg.FailNotifyAfter {
-			a.notify.Send(fmt.Sprintf("%s: flödet har inte gått att hämta %d gånger i rad (%s)", f.Name, failures, netx.Describe(cause)))
+			a.notify.Send(fmt.Sprintf("%s: the feed could not be fetched %d times in a row (%s)", f.Name, failures, netx.Describe(cause)))
 		}
 		out = outcome{ok: false, nextMs: int64(next)}
 	}
-	// Utkorgen töms även när hämtningen misslyckas: där kan finnas inlägg från tidigare varv.
+	// The outbox is emptied even when fetching fails: it can hold posts from earlier rounds.
 	if err := a.send(ctx, f); err != nil {
-		a.log.Printf("%s: fel vid postning: %s", f.Name, netx.Describe(err))
+		a.log.Printf("%s: error while posting: %s", f.Name, netx.Describe(err))
 	}
 	return out
 }
@@ -674,7 +674,7 @@ func (a *app) snapshot() status.Snapshot {
 		}
 		problem := blocked
 		if problem == "" && failures > 0 {
-			problem = fmt.Sprintf("flödet svarar inte (%d i rad)", failures)
+			problem = fmt.Sprintf("feed not responding (%d in a row)", failures)
 		}
 		last, _ := a.store.LastPosted(f.Name)
 		var lastText string
@@ -684,7 +684,7 @@ func (a *app) snapshot() status.Snapshot {
 		case info != nil && info.LastStatusAt != "":
 			lastText = status.DaysAgo(info.LastStatusAt, now, time.Local)
 		default:
-			lastText = "inga inlägg än"
+			lastText = "no posts yet"
 		}
 		fs := status.Feed{Name: f.Name, Account: f.Name, OK: problem == ""}
 		followers := ""
@@ -692,13 +692,13 @@ func (a *app) snapshot() status.Snapshot {
 			fs.Account = "@" + info.Acct
 			fs.URL = info.URL
 			fs.Followers, fs.Posts = &info.Followers, &info.Posts
-			followers = status.FormatNumber(info.Followers) + " följare · "
+			followers = status.Followers(info.Followers) + " · "
 		}
 		if last != nil {
 			fs.LastPost = time.UnixMilli(*last).UTC().Format("2006-01-02T15:04:05.000Z")
 		}
 		if problem != "" {
-			fs.Summary = "fel: " + problem
+			fs.Summary = "error: " + problem
 			fs.Problem = problem
 			errorsCount++
 		} else {
@@ -714,14 +714,14 @@ func (a *app) snapshot() status.Snapshot {
 	}
 }
 
-// serve kör flödena på sina timers tills SIGTERM eller SIGINT.
+// serve runs the feeds on their timers until SIGTERM or SIGINT.
 func (a *app) serve(ctx context.Context) int {
 	cfg := a.cfg
 	var server *http.Server
 	if cfg.StatusPort != 0 {
 		listener, err := net.Listen("tcp", ":"+strconv.Itoa(cfg.StatusPort))
 		if err != nil {
-			a.log.Printf("Statussidan kunde inte starta på port %d: %s", cfg.StatusPort, netx.Describe(err))
+			a.log.Printf("The status page could not start on port %d: %s", cfg.StatusPort, netx.Describe(err))
 		} else {
 			server = &http.Server{Handler: status.Handler(a.snapshot), ReadHeaderTimeout: 10 * time.Second}
 			go server.Serve(listener)
@@ -739,7 +739,7 @@ func (a *app) serve(ctx context.Context) int {
 	var background sync.WaitGroup
 	heartbeat := func() bool {
 		if err := os.WriteFile(heartbeatFile, nil, 0o644); err != nil {
-			a.log.Printf("Kan inte skriva %s, hälsokontrollen kommer att fallera: %s", heartbeatFile, netx.Describe(err))
+			a.log.Printf("Cannot write %s, the health check will fail: %s", heartbeatFile, netx.Describe(err))
 			return false
 		}
 		return true
@@ -763,7 +763,7 @@ func (a *app) serve(ctx context.Context) int {
 		}()
 	}
 
-	// Kontona läses om varje timme (för statussidan) och instanserna varje dygn.
+	// Accounts are re-read every hour (for the status page) and instances every day.
 	background.Add(1)
 	go func() {
 		defer background.Done()
@@ -790,7 +790,7 @@ func (a *app) serve(ctx context.Context) int {
 		}
 	}()
 
-	// Flödena körs ett i taget, i den ordning deras timers går.
+	// Feeds run one at a time, in the order their timers fire.
 	queue := make(chan config.Feed, len(cfg.Feeds))
 	var timersMu sync.Mutex
 	timers := map[string]*time.Timer{}
@@ -805,7 +805,7 @@ func (a *app) serve(ctx context.Context) int {
 	}
 	startDelay := a.opts.StartDelay
 	if startDelay == nil {
-		// Sprid de första hämtningarna några sekunder, så att de inte startar samtidigt.
+		// Spread the first fetches over a few seconds, so they don't all start at once.
 		startDelay = func(i int) time.Duration {
 			return time.Duration(float64(i)*3000+rand.Float64()*2000) * time.Millisecond
 		}
@@ -814,7 +814,7 @@ func (a *app) serve(ctx context.Context) int {
 		schedule(f, startDelay(i))
 	}
 	if len(cfg.Feeds) == 0 {
-		a.log.Printf("Alla flöden är pausade; väntar utan att göra något")
+		a.log.Printf("All feeds are paused; waiting without doing anything")
 	}
 
 	idle := make(chan struct{})
@@ -847,7 +847,7 @@ func (a *app) serve(ctx context.Context) int {
 	if sig == os.Interrupt {
 		name = "SIGINT"
 	}
-	a.log.Printf("%s: avslutar", name)
+	a.log.Printf("%s: shutting down", name)
 	timersMu.Lock()
 	stopping = true
 	for _, t := range timers {
@@ -858,7 +858,7 @@ func (a *app) serve(ctx context.Context) int {
 	if server != nil {
 		server.Close()
 	}
-	// Ett pågående varv får en stund på sig att bli klart.
+	// A round in progress gets a moment to finish.
 	select {
 	case <-idle:
 	case <-time.After(shutdownGrace):

@@ -1,7 +1,7 @@
-// Package weburl tolkar och skriver adresser enligt WHATWG URL Standard, som `new URL()` och
-// `URLSearchParams` i JavaScript. TypeScript-versionen använde dem för att göra relativa länkar
-// absoluta och för att normalisera länkar till nycklar, och nycklarna i databasen ska bli desamma.
-// Go:s net/url följer RFC 3986 och skiljer sig i detaljer (procentkodning, IDN, IPv4 med hex).
+// Package weburl parses and serializes URLs according to the WHATWG URL Standard, like `new URL()`
+// and `URLSearchParams` in JavaScript. The TypeScript version used them to make relative links
+// absolute and to normalize links into keys, and the keys in the database must stay the same.
+// Go's net/url follows RFC 3986 and differs in the details (percent-encoding, IDN, IPv4 in hex).
 package weburl
 
 import (
@@ -11,33 +11,33 @@ import (
 	"unicode/utf8"
 )
 
-// URL är en tolkad adress.
+// URL is a parsed URL.
 type URL struct {
 	Scheme   string
 	Username string
 	Password string
-	// Host är nil när adressen saknar värd (till exempel mailto:).
+	// Host is nil when the URL has no host (for example mailto:).
 	Host *string
-	// Port är -1 när ingen port anges eller när den är schemats standardport.
+	// Port is -1 when no port is given or when it is the scheme's default port.
 	Port int
-	// Path är segmenten, eller nil när adressen har en ogenomskinlig sökväg (Opaque).
+	// Path holds the segments, or nil when the URL has an opaque path (Opaque).
 	Path     []string
 	Opaque   *string
 	Query    *string
 	Fragment *string
 }
 
-// ErrInvalid är felet för en adress som inte går att tolka (TypeError: Invalid URL i JavaScript).
+// ErrInvalid is the error for a URL that cannot be parsed (TypeError: Invalid URL in JavaScript).
 var ErrInvalid = errors.New("Invalid URL")
 
 var specialPorts = map[string]int{"ftp": 21, "file": -1, "http": 80, "https": 443, "ws": 80, "wss": 443}
 
 func isSpecial(scheme string) bool { _, ok := specialPorts[scheme]; return ok }
 
-// IsSpecial är sant för http, https, ftp, file, ws och wss.
+// IsSpecial reports whether the scheme is http, https, ftp, file, ws or wss.
 func (u *URL) IsSpecial() bool { return isSpecial(u.Scheme) }
 
-// Href är adressen som text (url.href).
+// Href is the URL as text (url.href).
 func (u *URL) Href() string {
 	var b strings.Builder
 	b.WriteString(u.Scheme)
@@ -72,7 +72,7 @@ func (u *URL) Href() string {
 	return b.String()
 }
 
-// Pathname är url.pathname.
+// Pathname is url.pathname.
 func (u *URL) Pathname() string {
 	if u.Opaque != nil {
 		return *u.Opaque
@@ -85,7 +85,7 @@ func (u *URL) Pathname() string {
 	return b.String()
 }
 
-// HostPort är url.host: värden och porten om den inte är standardporten.
+// HostPort is url.host: the host, and the port if it isn't the default port.
 func (u *URL) HostPort() string {
 	if u.Host == nil {
 		return ""
@@ -96,7 +96,7 @@ func (u *URL) HostPort() string {
 	return *u.Host
 }
 
-// Search är url.search: "?" och frågan, eller tomt.
+// Search is url.search: "?" and the query, or empty.
 func (u *URL) Search() string {
 	if u.Query == nil || *u.Query == "" {
 		return ""
@@ -104,13 +104,13 @@ func (u *URL) Search() string {
 	return "?" + *u.Query
 }
 
-// Origin är url.origin för http(s).
+// Origin is url.origin for http(s).
 func (u *URL) Origin() string { return u.Scheme + "://" + u.HostPort() }
 
-// Parse är new URL(input) och new URL(input, base).
+// Parse is new URL(input) and new URL(input, base).
 func Parse(input string, base *URL) (*URL, error) {
-	// Inledande och avslutande styrtecken och blanksteg tas bort, och tabbar och radbrytningar
-	// var som helst.
+	// Leading and trailing control characters and spaces are removed, and tabs and newlines
+	// anywhere.
 	input = strings.TrimFunc(input, func(r rune) bool { return r <= 0x20 })
 	input = strings.Map(func(r rune) rune {
 		if r == '\t' || r == '\n' || r == '\r' {
@@ -125,7 +125,7 @@ func Parse(input string, base *URL) (*URL, error) {
 	return p.url, nil
 }
 
-// ParseRef är new URL(input, base) med base som text.
+// ParseRef is new URL(input, base) with base as text.
 func ParseRef(input, base string) (*URL, error) {
 	b, err := Parse(base, nil)
 	if err != nil {
@@ -538,7 +538,7 @@ func (p *parser) run() error {
 				u.Fragment = ptr("")
 				st = stFragment
 			} else if c == ' ' {
-				// Ett blanksteg före ? eller # (eller sist) kodas, annars står det kvar.
+				// A space before ? or # (or at the end) is encoded, otherwise it is left as is.
 				if n := p.at(i + 1); n == '?' || n == '#' || n == eof {
 					*u.Opaque += "%20"
 				} else {
@@ -594,7 +594,7 @@ func isDoubleDot(s string) bool {
 	return false
 }
 
-// Mängder av tecken som procentkodas, som i standarden.
+// Sets of characters that are percent-encoded, as in the standard.
 func inC0ControlSet(c byte) bool { return c < 0x20 || c > 0x7E }
 func inFragmentSet(c byte) bool {
 	return inC0ControlSet(c) || c == ' ' || c == '"' || c == '<' || c == '>' || c == '`'
@@ -634,7 +634,7 @@ func percentEncodeRune(r rune, in func(byte) bool) string {
 	return percentEncodeString(string(r), in)
 }
 
-// PercentDecode avkodar %XX till bytes; annat lämnas som det står.
+// PercentDecode decodes %XX into bytes; anything else is left as is.
 func PercentDecode(s string) []byte {
 	out := make([]byte, 0, len(s))
 	for i := 0; i < len(s); i++ {

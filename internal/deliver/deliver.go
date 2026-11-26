@@ -1,13 +1,13 @@
-// Package deliver tömmer utkorgen för ett flöde: skickar väntande inlägg äldst först, ett i taget.
+// Package deliver empties a feed's outbox: it sends pending posts oldest first, one at a time.
 //
-//   - Lyckat: inlägget markeras som postat, med sin adress.
-//   - Mastodon nekar för gott (till exempel 422): misslyckat, och nästa inlägg tas.
-//   - Token nekas (401/403): inget mer skickas för kontot, och inlägget väntar kvar.
-//   - Tillfälligt fel: inlägget väntar och provas igen, efter 1, 5, 15, 60 och sedan 360 minuter.
-//     Vid 429 väntar det tills Mastodons fönster öppnar igen.
-//   - Har ett inlägg väntat längre än Mastodon minns Idempotency-Key (en timme), kontrolleras
-//     kontots senaste inlägg först, så att ett inlägg som faktiskt kom fram inte postas två gånger.
-//   - Har det väntat längre än MAX_AGE (till exempel medan en token var trasig) skickas det inte alls.
+//   - Success: the post is marked as posted, with its URL.
+//   - Mastodon rejects it for good (for example 422): it fails, and the next post is taken.
+//   - Token not accepted (401/403): nothing more is sent for the account, and the post stays pending.
+//   - Transient error: the post waits and is retried after 1, 5, 15, 60 and then 360 minutes.
+//     On 429 it waits until Mastodon's window opens again.
+//   - If a post has waited longer than Mastodon remembers the Idempotency-Key (one hour), the
+//     account's latest posts are checked first, so a post that actually got through is not posted twice.
+//   - If it has waited longer than MAX_AGE (for example while a token was broken), it is not sent at all.
 package deliver
 
 import (
@@ -22,55 +22,55 @@ import (
 	"github.com/maxbengtzen/masto-rss/internal/store"
 )
 
-// IdempotencyWindowMs är hur länge Mastodon minns en Idempotency-Key.
+// IdempotencyWindowMs is how long Mastodon remembers an Idempotency-Key.
 const IdempotencyWindowMs = 3600_000
 
 var retryMinutes = []int64{1, 5, 15, 60, 360}
 
-// spacing är pausen mellan två inlägg till samma konto, så att de kommer i ordning och inte i en klump.
+// spacing is the pause between two posts to the same account, so they arrive in order and not in a burst.
 const spacing = 2 * time.Second
 
-// Account är det som behövs om kontot.
+// Account is what we need to know about the account.
 type Account struct {
-	// ID är kontots id. Behövs för kontrollen av ett inlägg som väntat längre än en timme.
+	// ID is the account id. Needed to check a post that has waited longer than an hour.
 	ID string
-	// Quotes är sant om instansen kan ta emot citatinställningen (API-version 7 eller senare).
+	// Quotes is true if the instance accepts the quote policy setting (API version 7 or later).
 	Quotes bool
 }
 
-// Posted är ett skickat inlägg.
+// Posted is a sent post.
 type Posted struct {
 	Post         *store.Post
 	URL          string
 	AlreadyThere bool
 }
 
-// Failed är ett inlägg som Mastodon nekade.
+// Failed is a post that Mastodon rejected.
 type Failed struct {
 	Post  *store.Post
 	Error string
 }
 
-// Retry är ett tillfälligt fel som stoppade utskicket.
+// Retry is a transient error that stopped delivery.
 type Retry struct {
 	Post          *store.Post
 	Error         string
 	NextAttemptAt int64
 }
 
-// Result är vad som hände.
+// Result is what happened.
 type Result struct {
 	Posted []Posted
 	Failed []Failed
-	// Expired är inlägg som väntat längre än MAX_AGE och därför aldrig skickades.
+	// Expired are posts that waited longer than MAX_AGE and were therefore never sent.
 	Expired []*store.Post
-	// Retry: ett tillfälligt fel stoppade utskicket; resten väntar till nästa försök.
+	// Retry: a transient error stopped delivery; the rest wait for the next attempt.
 	Retry *Retry
-	// AuthError: token nekas. Inget mer skickas för kontot.
+	// AuthError: the token is not accepted. Nothing more is sent for the account.
 	AuthError *mastodon.Error
 }
 
-// Options är klockan och pausen, utbytbara i testerna.
+// Options are the clock and the pause, replaceable in tests.
 type Options struct {
 	Now   func() int64
 	Sleep func(time.Duration)
@@ -78,12 +78,12 @@ type Options struct {
 
 var hrefRE = regexp.MustCompile(`href="([^"]+)"`)
 
-// findExisting ger adressen till ett av kontots senaste inlägg som länkar till samma sak, om något gör det.
+// findExisting returns the URL of one of the account's latest posts that links to the same thing, if any does.
 func findExisting(ctx context.Context, client *mastodon.Client, f config.Feed, accountID, link string) string {
 	wanted := feed.NormalizeLink(link)
 	statuses, err := client.RecentStatuses(ctx, f.MastodonURL, f.Token, accountID)
 	if err != nil {
-		return "" // går kontrollen inte att göra postas inlägget som vanligt
+		return "" // if the check cannot be made, the post is posted as usual
 	}
 	for _, s := range statuses {
 		urls := []string{s.Card}
@@ -99,7 +99,7 @@ func findExisting(ctx context.Context, client *mastodon.Client, f config.Feed, a
 	return ""
 }
 
-// Deliver skickar det som väntar i flödets utkorg.
+// Deliver sends what is waiting in the feed's outbox.
 func Deliver(ctx context.Context, client *mastodon.Client, f config.Feed, st *store.Store, account Account, opts Options) (*Result, error) {
 	now := opts.Now
 	if now == nil {
@@ -116,7 +116,7 @@ func Deliver(ctx context.Context, client *mastodon.Client, f config.Feed, st *st
 	}
 	for i, post := range due {
 		if f.MaxAgeMs > 0 && now()-post.CreatedAt > f.MaxAgeMs {
-			if err := st.MarkFailed(post.ID, "väntade längre än MAX_AGE"); err != nil {
+			if err := st.MarkFailed(post.ID, "waited longer than MAX_AGE"); err != nil {
 				return result, err
 			}
 			result.Expired = append(result.Expired, post)

@@ -1,87 +1,87 @@
 # masto-rss
 
-Läser RSS-, Atom-, RDF- och JSON-flöden och postar nya poster till Mastodon. Alla flöden och konton
-körs i en och samma container. Skriven i Go, utan andra beroenden än standardbiblioteket och
-SQLite ([modernc.org/sqlite](https://pkg.go.dev/modernc.org/sqlite), utan cgo) för vad som redan
-setts och postats. Imagen är på 13 MB, och tjänsten använder runt 13 MiB minne med fem flöden.
+Reads RSS, Atom, RDF and JSON feeds and posts new items to Mastodon. All feeds and accounts run in a
+single container. Written in Go, with no dependencies beyond the standard library and SQLite
+([modernc.org/sqlite](https://pkg.go.dev/modernc.org/sqlite), no cgo) for what has already been
+seen and posted. The image is 13 MB, and the service uses around 13 MiB of memory with five feeds.
 
-Fram till v1.0.3 var den skriven i TypeScript. Go-versionen gör samma sak, med samma inställningar,
-texter och databas.
+Up to v1.0.3 it was written in TypeScript. The Go version does the same thing, with the same
+settings and the same database.
 
-Inspirerad av [aserper/masto-rss](https://github.com/aserper/masto-rss), men skriven från grunden.
-Det som skiljer: flera flöden och konton i samma process, dubblettkontroll som tål ändrade
-länkar, skydd mot att ett flöde postas om i en klump, och en utkorg med `Idempotency-Key`, så att
-ett omförsök aldrig blir en dubblett.
+Inspired by [aserper/masto-rss](https://github.com/aserper/masto-rss), but written from scratch.
+What's different: several feeds and accounts in one process, duplicate detection that survives
+changed links, protection against a feed being reposted in one burst, and an outbox with
+`Idempotency-Key`, so a retry never becomes a duplicate.
 
-## Konfiguration
+## Configuration
 
-Varje flöde får ett namn, och dess inställningar heter `FEED_<NAMN>_<FÄLT>`. Globala värden gäller
-alla flöden; samma namn med prefixet `FEED_<NAMN>_` gäller bara det flödet.
+Each feed gets a name, and its settings are called `FEED_<NAME>_<FIELD>`. Global values apply to
+all feeds; the same name with the prefix `FEED_<NAME>_` applies to that feed only.
 
 ```yaml
 environment:
   TZ: Europe/Stockholm
-  MASTODON_URL: https://mastodon.nu
-  FEED_FEBER_URL: https://feber.se/rss/
-  FEED_FEBER_TOKEN: ${FEBER_TOKEN}
-  FEED_TJOCK_URL: https://tjock.se/rss/
-  FEED_TJOCK_TOKEN: ${TJOCK_TOKEN}
-  FEED_TJOCK_INTERVAL: 30m
+  MASTODON_URL: https://mastodon.example
+  FEED_NEWS_URL: https://news.example.com/rss/
+  FEED_NEWS_TOKEN: ${NEWS_TOKEN}
+  FEED_BLOG_URL: https://blog.example.com/feed/
+  FEED_BLOG_TOKEN: ${BLOG_TOKEN}
+  FEED_BLOG_INTERVAL: 30m
 ```
 
-| Variabel | Standard | |
+| Variable | Default | |
 |---|---|---|
-| `FEED_<NAMN>_URL` | – | Flödets adress (krävs) |
-| `FEED_<NAMN>_TOKEN` | – | Access-token för kontot (krävs), med `write:statuses` |
-| `FEED_<NAMN>_ENABLED` | `true` | `false` pausar flödet men behåller dess historik |
-| `FEED_<NAMN>_LANGUAGE` | från flödet | ISO 639, till exempel `sv`. Bara per flöde, eftersom `LANGUAGE` redan är en systemvariabel. Utan värde används flödets `<language>` |
-| `MASTODON_URL` | – | Instansen (krävs globalt eller per flöde) |
-| `INTERVAL` | `15m` | Tid mellan hämtningar: sekunder eller till exempel `15m`, `1h30m`. Minst 60 s |
-| `VISIBILITY` | `public` | `public`, `unlisted`, `private` eller `direct` |
-| `TEMPLATE` | `{title}\n\n{link}` | Fält: `{title}`, `{link}`, `{summary}`, `{author}`, `{feed}` |
-| `QUOTE_POLICY` | kontots standard | Vem som får citera: `public`, `followers` eller `nobody` |
-| `MAX_AGE` | `48h` | Äldre poster postas inte. `0` stänger av spärren |
-| `MAX_POSTS_PER_POLL` | `5` | Högst så många per hämtning; resten tas nästa varv |
-| `BACKFILL` | `0` | Antal poster att posta första gången ett flöde körs, oavsett `MAX_AGE` |
-| `SIGNAL_API_URL`, `SIGNAL_NUMBER` | tomma | Aviseringar via [signal-cli-rest-api](https://github.com/bbernhard/signal-cli-rest-api); av om tomma |
-| `FAIL_NOTIFY_AFTER` | `3` | Avisera när ett flöde misslyckats så många gånger i rad |
-| `STATUS_PORT` | `8080` | Port för statussidan; `0` stänger av |
-| `DATA_DIR` | `/data` | Var databasen `masto-rss.db` ligger |
-| `DRY_RUN` | – | `1` = visa vad som skulle postas; inget postas eller sparas |
-| `ONCE` | – | `1` = ett varv och avsluta |
-| `LOG_LEVEL` | `info` | `debug` visar även oförändrade flöden |
+| `FEED_<NAME>_URL` | – | The feed's address (required) |
+| `FEED_<NAME>_TOKEN` | – | Access token for the account (required), with `write:statuses` |
+| `FEED_<NAME>_ENABLED` | `true` | `false` pauses the feed but keeps its history |
+| `FEED_<NAME>_LANGUAGE` | from the feed | ISO 639, for example `en`. Per feed only, since `LANGUAGE` is already a system variable. Without a value, the feed's `<language>` is used |
+| `MASTODON_URL` | – | The instance (required, globally or per feed) |
+| `INTERVAL` | `15m` | Time between fetches: seconds or for example `15m`, `1h30m`. At least 60 s |
+| `VISIBILITY` | `public` | `public`, `unlisted`, `private` or `direct` |
+| `TEMPLATE` | `{title}\n\n{link}` | Fields: `{title}`, `{link}`, `{summary}`, `{author}`, `{feed}` |
+| `QUOTE_POLICY` | the account's default | Who may quote: `public`, `followers` or `nobody` |
+| `MAX_AGE` | `48h` | Older items are not posted. `0` turns the limit off |
+| `MAX_POSTS_PER_POLL` | `5` | At most this many per fetch; the rest go out on the next round |
+| `BACKFILL` | `0` | Number of items to post the first time a feed runs, regardless of `MAX_AGE` |
+| `SIGNAL_API_URL`, `SIGNAL_NUMBER` | empty | Notifications via [signal-cli-rest-api](https://github.com/bbernhard/signal-cli-rest-api); off if empty |
+| `FAIL_NOTIFY_AFTER` | `3` | Notify when a feed has failed this many times in a row |
+| `STATUS_PORT` | `8080` | Port for the status page; `0` turns it off |
+| `DATA_DIR` | `/data` | Where the database `masto-rss.db` lives |
+| `DRY_RUN` | – | `1` = show what would be posted; nothing is posted or saved |
+| `ONCE` | – | `1` = one round, then exit |
+| `LOG_LEVEL` | `info` | `debug` also shows unchanged feeds |
 
-En okänd `FEED_*`-variabel, till exempel ett stavfel, stoppar starten med ett felmeddelande.
+An unknown `FEED_*` variable, for example a typo, stops startup with an error message.
 
-### Skydden
+### Safeguards
 
-- **Nytt flöde** (eller ny databas): allt som redan finns i flödet markeras som sett och postas
-  inte, utom de `BACKFILL` senaste.
-- **Dubbletter:** en post räknas som sedd om dess GUID eller dess länk (utan `utm_*`, `fbclid`,
-  `www.`, fragment och avslutande `/`) har setts förut. Varje inlägg skickas med en
-  `Idempotency-Key`, och väntar ett inlägg längre än en timme på ett omförsök kontrolleras kontots
-  senaste inlägg först.
-- **Gamla poster:** äldre än `MAX_AGE` postas inte.
-- **Avvikelse:** ser mer än hälften av ett flöde med minst tio poster nytt ut på en gång, utan att
-  vara nyare än det senaste som setts i flödet (till exempel om sajten bytt adresser eller GUID),
-  markeras allt som sett och inget postas. Nya poster med senare datum postas som vanligt, även om
-  det är en hel sida på en gång.
-- **Tak:** högst `MAX_POSTS_PER_POLL` per hämtning, äldst först.
-- **Omnämnanden:** `@namn` i text från flödet blir aldrig ett omnämnande.
+- **New feed** (or new database): everything already in the feed is marked as seen and not posted,
+  except the `BACKFILL` most recent.
+- **Duplicates:** an item counts as seen if its GUID or its link (without `utm_*`, `fbclid`,
+  `www.`, fragment and trailing `/`) has been seen before. Every post is sent with an
+  `Idempotency-Key`, and if a post has waited more than an hour for a retry, the account's recent
+  posts are checked first.
+- **Old items:** items older than `MAX_AGE` are not posted.
+- **Anomaly:** if more than half of a feed with at least ten items looks new at once without being
+  newer than the latest item seen in the feed (for example because the site changed its URLs or
+  GUIDs), everything is marked as seen and nothing is posted. New items with later dates are posted
+  as usual, even a whole page at once.
+- **Cap:** at most `MAX_POSTS_PER_POLL` per fetch, oldest first.
+- **Mentions:** `@name` in text from the feed never becomes a mention.
 
-### Aviseringar
+### Notifications
 
-Med `SIGNAL_API_URL` och `SIGNAL_NUMBER` skickas ett Signal-meddelande till numret självt när:
+With `SIGNAL_API_URL` and `SIGNAL_NUMBER`, a Signal message is sent to the number itself when:
 
-- ett flöde har misslyckats `FAIL_NOTIFY_AFTER` gånger i rad, och när det fungerar igen
-- Mastodon nekar ett inlägg (till exempel för långt) eller en token (kontot pausas)
-- mer än hälften av ett flöde ser nytt ut på en gång utan att vara nyare än det som setts
-- instansen byter Mastodon-version eller API-version, eller svarar med ett `Deprecation`-huvud
+- a feed has failed `FAIL_NOTIFY_AFTER` times in a row, and when it works again
+- Mastodon rejects a post (for example, too long) or a token (the account is paused)
+- more than half of a feed looks new at once without being newer than what has been seen
+- the instance changes its Mastodon version or API version, or responds with a `Deprecation` header
 
-## Statussida, Homepage och startsidor
+## Status page, Homepage and dashboards
 
-`GET /status` på `STATUS_PORT` ger JSON med varje flödes konto, följare, senaste inlägg och fel. En
-samlad ruta i [Homepage](https://gethomepage.dev):
+`GET /status` on `STATUS_PORT` returns JSON with each feed's account, followers, latest post and
+errors. A combined widget in [Homepage](https://gethomepage.dev):
 
 ```yaml
 labels:
@@ -96,25 +96,26 @@ labels:
   homepage.widgets[0].mappings.target: "{url}"
 ```
 
-`GET /api/dashboard` på samma port ger en kort sammanfattning för en startsida:
+`GET /api/dashboard` on the same port returns a short summary for a dashboard:
 
 ```json
 {
-  "metrics": [{"k": "konton", "v": 5}, {"k": "senaste dygnet", "v": 12}, {"k": "fel", "v": 1}],
-  "items": [{"name": "@nyheter", "label": "fel: flödet svarar inte (3 i rad)", "href": "https://…"}],
+  "metrics": [{"k": "accounts", "v": 5}, {"k": "last 24 h", "v": 12}, {"k": "errors", "v": 1}],
+  "items": [{"name": "@news", "label": "error: feed not responding (3 in a row)", "href": "https://…"}],
   "status": "warn",
-  "message": "@nyheter: flödet svarar inte (3 i rad)"
+  "message": "@news: feed not responding (3 in a row)"
 }
 ```
 
-`items` har en rad per flöde (högst åtta, de som felar först) med länk till kontot. `status` är `ok`,
-eller `warn` med `message` när något flöde felar, på samma sätt som `fel` i `/status`.
+`items` has one row per feed (at most eight, failing ones first) with a link to the account.
+`status` is `ok`, or `warn` with a `message` when a feed is failing, the same way as `errors` in
+`/status`.
 
-## Köra i Docker
+## Running in Docker
 
-Imagen bygger på `scratch`, kör som 1000:1000 och fungerar med skrivskyddat filsystem. Databasen
-ligger i `/data`, och huvudloopen skriver en hälsofil i `/tmp` som hälsokontrollen
-(`masto-rss healthcheck`) läser:
+The image is based on `scratch`, runs as 1000:1000 and works with a read-only file system. The
+database lives in `/data`, and the main loop writes a health file in `/tmp` that the health check
+(`masto-rss healthcheck`) reads:
 
 ```yaml
 services:
@@ -125,51 +126,52 @@ services:
     volumes:
       - ./data:/data
     environment:
-      # … som ovan
+      # … as above
 ```
 
-## Kommandon
+## Commands
 
 ```sh
-masto-rss                                        # kör tills SIGTERM (ONCE=1: ett varv)
-masto-rss import <namn> <fil>                    # importera den gamla masto-rss:ens processed_entries.txt
-masto-rss post [--language sv] <namn,…|alla> <text>   # posta en fri text till kontona
-masto-rss healthcheck                            # hälsokontrollen: lyckas om loopen är igång
+masto-rss                                             # run until SIGTERM (ONCE=1: one round)
+masto-rss import <name> <file>                        # import processed_entries.txt from the old masto-rss
+masto-rss post [--language en] <name,…|all> <text>    # post free text to the accounts
+masto-rss healthcheck                                 # the health check: succeeds if the loop is running
 ```
 
-I en körande container: `docker exec masto-rss /masto-rss post alla "Hej!"`.
+In a running container: `docker exec masto-rss /masto-rss post all "Hello!"`.
 
-Importen gör att länkarna i den gamla botens `processed_entries.txt` räknas som sedda, så att inget
-postas om efter bytet. I `post` blir `\n` en radbrytning.
+The import marks the links in the old bot's `processed_entries.txt` as seen, so nothing is
+reposted after switching. In `post`, `\n` becomes a line break.
 
-## Mastodon-kompatibilitet
+## Mastodon compatibility
 
-Senast genomgånget mot Mastodon 4.7.3 (API-version 11). Det som används:
+Last tested against Mastodon 4.7.3 (API version 11). The API changes in the 5.0.0-rc.1 changelog
+don't affect any of the endpoints used:
 
-| Endpoint | Till vad |
+| Endpoint | Used for |
 |---|---|
-| `GET /api/v2/instance` | Längdgränser, version och `api_versions` (ingen token) |
-| `GET /api/v1/apps/verify_credentials` | Att token fungerar och har `write:statuses` |
-| `GET /api/v1/accounts/verify_credentials` | Kontot, följare och senaste inlägg (statussidan) |
-| `POST /api/v1/statuses` | Postningen, med `Idempotency-Key`, `visibility`, `language` och vid API-version 7 eller senare `quote_approval_policy` |
-| `GET /api/v1/accounts/:id/statuses` | Kontrollen av ett inlägg som väntat längre än en timme |
+| `GET /api/v2/instance` | Length limits, version and `api_versions` (no token) |
+| `GET /api/v1/apps/verify_credentials` | That the token works and has `write:statuses` |
+| `GET /api/v1/accounts/verify_credentials` | The account, followers and latest post (status page) |
+| `POST /api/v1/statuses` | Posting, with `Idempotency-Key`, `visibility`, `language` and, from API version 7, `quote_approval_policy` |
+| `GET /api/v1/accounts/:id/statuses` | Checking a post that has waited more than an hour |
 
-Andra servrar med Mastodons API (till exempel GoToSocial) bör fungera. Saknar instansen
-`api_versions` räknas länkar i full längd, för säkerhets skull.
+Other servers implementing Mastodon's API (for example GoToSocial) should work. If the instance has
+no `api_versions`, links are counted at full length, to be safe.
 
-## Utveckling
+## Development
 
 ```sh
 go vet ./...
 go test ./...
 ```
 
-Utan Go lokalt går det att köra i Go-imagen:
+Without Go installed, run it in the Go image:
 `docker run --rm -v "$PWD":/src -w /src golang:1.27-alpine go test ./...`.
 
-Mer om test, torrkörning och releaser står i [AGENTS.md](AGENTS.md).
+More on testing, dry runs and releases in [AGENTS.md](AGENTS.md).
 
-## Licens
+## License
 
-[AGPL-3.0](LICENSE). Kör du en ändrad version som en tjänst åt andra ska källkoden till den finnas
-tillgänglig för dem.
+[AGPL-3.0](LICENSE). If you run a modified version as a service for others, its source code must
+be available to them.

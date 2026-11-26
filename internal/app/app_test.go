@@ -26,9 +26,10 @@ import (
 	"github.com/maxbengtzen/masto-rss/internal/testutil"
 )
 
-// Programmet körs här mot en låtsad server som är både flöde, Mastodon och Signal-tjänst, med
-// samma svar som när TypeScript-versionens körningar spelades in (scripts/golden.ts). Loggen,
-// statussidan, inläggen och aviseringarna ska bli desamma. Inget nätverk.
+// The program runs here against a fake server that is the feed, Mastodon and the Signal service
+// at once, with the same responses as when the TypeScript version's runs were recorded
+// (scripts/golden.ts). The log, the status page, the posts and the notifications must match. No
+// network.
 
 type fake struct {
 	*httptest.Server
@@ -36,7 +37,7 @@ type fake struct {
 	posts   []fakePost
 	signals []string
 	count   int
-	feedXML func(path string) string // nil = rss(1, 3, nu \u2212 1 min)
+	feedXML func(path string) string // nil = rss(1, 3, now \u2212 1 min)
 }
 
 type fakePost struct {
@@ -58,7 +59,7 @@ var fakeAccounts = map[string]fakeAccount{
 	"las":  {"2", "gamma", 7, []string{"read"}, true},
 }
 
-// rss är flödet i golden.ts: poster from..to, nyast först, en timme mellan varje.
+// rss is the feed in golden.ts: items from..to, newest first, an hour apart.
 func rss(from, to int, newest time.Time, path string) string {
 	var items []string
 	for n := to; n >= from; n-- {
@@ -95,7 +96,7 @@ func newFake(t *testing.T) *fake {
 			io.WriteString(w, body)
 		case "GET /broken":
 			w.WriteHeader(500)
-			io.WriteString(w, "trasigt")
+			io.WriteString(w, "broken")
 		case "GET /api/v2/instance":
 			send(200, map[string]any{"version": "4.7.3", "api_versions": map[string]any{"mastodon": 11},
 				"configuration": map[string]any{"statuses": map[string]any{"max_characters": 500, "characters_reserved_per_url": 23}}})
@@ -147,7 +148,7 @@ func newFake(t *testing.T) *fake {
 	return f
 }
 
-// freePort ger en ledig port för statussidan.
+// freePort returns a free port for the status page.
 func freePort(t *testing.T) string {
 	l, err := net.Listen("tcp", "127.0.0.1:0")
 	if err != nil {
@@ -159,7 +160,7 @@ func freePort(t *testing.T) string {
 
 func (f *fake) port() string { return f.URL[strings.LastIndex(f.URL, ":")+1:] }
 
-// watcher är stdout, som säger till när en rad som matchar dyker upp.
+// watcher is stdout, which signals when a matching line shows up.
 type watcher struct {
 	mu    sync.Mutex
 	buf   bytes.Buffer
@@ -198,16 +199,16 @@ type runner struct {
 	root string
 }
 
-// clean tar bort tidsstämplar och byter porten och datakatalogen mot fasta ord, som i golden.ts.
+// clean removes timestamps and replaces the port and the data directory with fixed words, as in golden.ts.
 func (r *runner) clean(s string) string {
 	s = versionless(timestamp.ReplaceAllString(s, ""), mastorss.Version())
 	return strings.ReplaceAll(strings.ReplaceAll(s, r.fake.port(), "PORT"), r.root, "DATA")
 }
 
-// goldenVersion är versionen när golden-filerna spelades in.
+// goldenVersion is the version the golden files were recorded with.
 const goldenVersion = "1.0.3"
 
-// versionless byter versionsnumret mot ordet VERSION, så att golden-filerna gäller för varje version.
+// versionless replaces the version number with the word VERSION, so the golden files hold for every version.
 func versionless(s, version string) string {
 	for _, format := range []string{"masto-rss %s ", `"version":"%s"`, "masto-rss/%s"} {
 		s = strings.ReplaceAll(s, fmt.Sprintf(format, version), fmt.Sprintf(format, "VERSION"))
@@ -256,8 +257,8 @@ func TestRunsGolden(t *testing.T) {
 	r := &runner{t: t, fake: fk, root: t.TempDir()}
 	got := map[string]runResult{}
 
-	// Hela programmet med statussida, tills det fjärde flödet är klart, och sedan SIGTERM.
-	stdout := &watcher{re: regexp.MustCompile(`delta: (inget nytt|nytt flöde)`), found: make(chan struct{})}
+	// The whole program with the status page, until the fourth feed is done, and then SIGTERM.
+	stdout := &watcher{re: regexp.MustCompile(`delta: (nothing new|new feed)`), found: make(chan struct{})}
 	signals := make(chan os.Signal, 1)
 	addr := make(chan string, 1)
 	var statusRaw string
@@ -274,7 +275,7 @@ func TestRunsGolden(t *testing.T) {
 	select {
 	case <-stdout.found:
 	case <-time.After(20 * time.Second):
-		t.Fatalf("delta blev aldrig klar:\n%s", stdout.String())
+		t.Fatalf("delta never finished:\n%s", stdout.String())
 	}
 	base := "http://" + <-addr
 	res, err := http.Get(base + "/status")
@@ -287,7 +288,7 @@ func TestRunsGolden(t *testing.T) {
 		t.Errorf("Content-Type %q", ct)
 	}
 	statusRaw = regexp.MustCompile(`"lastPost":"[^"]+"`).ReplaceAllString(r.clean(string(b)), `"lastPost":"TID"`)
-	// Startsidans sammanfattning bygger på samma läge: två flöden felar.
+	// The dashboard summary is built from the same state: two feeds are failing.
 	var dashboard status.Dashboard
 	if res, err := http.Get(base + "/api/dashboard"); err != nil {
 		t.Error(err)
@@ -295,7 +296,7 @@ func TestRunsGolden(t *testing.T) {
 		json.NewDecoder(res.Body).Decode(&dashboard)
 		res.Body.Close()
 	}
-	if dashboard.Status != "warn" || dashboard.Message != "2 flöden felar: @alfa, gamma" || len(dashboard.Items) != 4 {
+	if dashboard.Status != "warn" || dashboard.Message != "2 feeds failing: @alfa, gamma" || len(dashboard.Items) != 4 {
 		t.Errorf("dashboard: %+v", dashboard)
 	}
 	signals <- syscall.SIGTERM
@@ -307,34 +308,34 @@ func TestRunsGolden(t *testing.T) {
 	os.WriteFile(importFile, []byte("\ufeffhttps://example.com/feed-a/post-1/?utm_source=rss\r\nhttps://www.example.com/feed-a/post-2/\n\n  \n"), 0o644)
 	got["import"] = r.run(r.env("imp", "ONCE=1", "STATUS_PORT=0"), []string{"import", "ALPHA", importFile}, Options{})
 	got["afterImport"] = r.run(r.env("imp", "DRY_RUN=1", "ONCE=1", "STATUS_PORT=0"), nil, Options{})
-	got["postDry"] = r.run(r.env("post", "DRY_RUN=1", "STATUS_PORT=0"), []string{"post", "alla", "Hej", `allihop!\nRad två`}, Options{})
+	got["postDry"] = r.run(r.env("post", "DRY_RUN=1", "STATUS_PORT=0"), []string{"post", "all", "Hej", `allihop!\nRad två`}, Options{})
 	got["post"] = r.run(r.env("post", "STATUS_PORT=0"), []string{"post", "--language", "sv", "alpha,delta", `Hej\n\nallihop!`}, Options{})
-	got["postUsage"] = r.run(r.env("post", "STATUS_PORT=0"), []string{"post", "saknas", "text"}, Options{})
+	got["postUsage"] = r.run(r.env("post", "STATUS_PORT=0"), []string{"post", "missing", "text"}, Options{})
 	got["importUsage"] = r.run(r.env("post", "STATUS_PORT=0"), []string{"import", "alpha"}, Options{})
-	got["unknown"] = r.run(r.env("post", "STATUS_PORT=0"), []string{"okänt"}, Options{})
+	got["unknown"] = r.run(r.env("post", "STATUS_PORT=0"), []string{"unknown"}, Options{})
 	got["noConfig"] = r.run([]string{"DATA_DIR=" + filepath.Join(r.root, "none")}, nil, Options{})
-	got["badConfig"] = r.run([]string{"DATA_DIR=" + filepath.Join(r.root, "none"), "FEED_X_URL=nej", "FEED_X_TOKEN=t", "MASTODON_URL=" + fk.URL, "STATUS_PORT=x"}, nil, Options{})
+	got["badConfig"] = r.run([]string{"DATA_DIR=" + filepath.Join(r.root, "none"), "FEED_X_URL=no", "FEED_X_TOKEN=t", "MASTODON_URL=" + fk.URL, "STATUS_PORT=x"}, nil, Options{})
 	got["allPaused"] = r.run([]string{"DATA_DIR=" + filepath.Join(r.root, "paused"), "FEED_X_ENABLED=no", "ONCE=1"}, nil, Options{})
 
 	for name, want := range golden.Runs {
-		// Avsiktlig skillnad: användningstexterna nämner programmet, inte "node src/main.ts".
+		// Intentional difference: the usage texts name the program, not "node src/main.ts".
 		want.Err = strings.ReplaceAll(want.Err, "node src/main.ts", "masto-rss")
 		want.Out, want.Err = versionless(want.Out, goldenVersion), versionless(want.Err, goldenVersion)
 		if got[name] != want {
-			t.Errorf("körningen %s skiljer sig:\n--- fick (slutkod %d)\n%s%s\n--- väntade (slutkod %d)\n%s%s", name,
+			t.Errorf("run %s differs:\n--- got (exit code %d)\n%s%s\n--- want (exit code %d)\n%s%s", name,
 				got[name].Status, got[name].Out, got[name].Err, want.Status, want.Out, want.Err)
 		}
 	}
 	if golden.StatusRaw = versionless(golden.StatusRaw, goldenVersion); statusRaw != golden.StatusRaw {
-		t.Errorf("statussidan:\nfick    %s\nväntade %s", statusRaw, golden.StatusRaw)
+		t.Errorf("status page:\ngot  %s\nwant %s", statusRaw, golden.StatusRaw)
 	}
 
-	// Inläggen: flödets inlägg har samma nyckel som i TypeScript-versionen. Nyckeln för `post`
-	// beror på instansens adress (med porten) och räknas fram här.
+	// The posts: the feed's post has the same key as in the TypeScript version. The key for `post`
+	// depends on the instance's URL (with the port) and is computed here.
 	fk.mu.Lock()
 	defer fk.mu.Unlock()
 	if len(fk.posts) != len(golden.Posts) {
-		t.Fatalf("%d inlägg, väntade %d", len(fk.posts), len(golden.Posts))
+		t.Fatalf("%d posts, want %d", len(fk.posts), len(golden.Posts))
 	}
 	for i, want := range golden.Posts {
 		p := fk.posts[i]
@@ -343,27 +344,27 @@ func TestRunsGolden(t *testing.T) {
 			want.Key = hex.EncodeToString(sum[:])[:32]
 		}
 		if !reflect.DeepEqual(p, want) {
-			t.Errorf("inlägg %d:\nfick    %+v\nväntade %+v", i, p, want)
+			t.Errorf("post %d:\ngot  %+v\nwant %+v", i, p, want)
 		}
 	}
 	sort.Strings(fk.signals)
 	if !reflect.DeepEqual(fk.signals, golden.Signals) {
-		t.Errorf("aviseringar:\nfick    %q\nväntade %q", fk.signals, golden.Signals)
+		t.Errorf("notifications:\ngot  %q\nwant %q", fk.signals, golden.Signals)
 	}
 }
 
-// Ett flöde som inte går att tolka ger fel och slutkoden 1, och nästa försök om ett intervall.
+// A feed that cannot be parsed gives an error and exit code 1, and the next attempt after one interval.
 func TestUnparseableFeed(t *testing.T) {
 	fk := newFake(t)
-	fk.feedXML = func(string) string { return "<html>inget flöde</html>" }
+	fk.feedXML = func(string) string { return "<html>not a feed</html>" }
 	r := &runner{t: t, fake: fk, root: t.TempDir()}
 	res := r.run([]string{"DATA_DIR=" + r.root, "STATUS_PORT=0", "MASTODON_URL=" + fk.URL, "FEED_NEWS_URL=" + fk.URL + "/feed", "FEED_NEWS_TOKEN=bra", "ONCE=1"}, nil, Options{})
-	if res.Status != 1 || !strings.Contains(res.Out, "news: FEL (1 i rad): DetectError: Unrecognized feed format; nästa försök om 15 min") {
-		t.Errorf("slutkod %d:\n%s", res.Status, res.Out)
+	if res.Status != 1 || !strings.Contains(res.Out, "news: ERROR (1 in a row): DetectError: Unrecognized feed format; next attempt in 15 min") {
+		t.Errorf("exit code %d:\n%s", res.Status, res.Out)
 	}
 }
 
-// Ett riktigt varv postar det nya, en gång, med nyckel, språk och synlighet.
+// A real round posts what is new, once, with key, language and visibility.
 func TestPostsOnce(t *testing.T) {
 	fk := newFake(t)
 	r := &runner{t: t, fake: fk, root: t.TempDir()}
@@ -371,18 +372,18 @@ func TestPostsOnce(t *testing.T) {
 		return append([]string{"DATA_DIR=" + r.root, "STATUS_PORT=0", "MASTODON_URL=" + fk.URL, "FEED_NEWS_URL=" + fk.URL + "/feed", "FEED_NEWS_TOKEN=bra", "ONCE=1"}, extra...)
 	}
 	fk.feedXML = func(path string) string { return rss(1, 3, time.Now(), path) }
-	if res := r.run(env("BACKFILL=1"), nil, Options{}); res.Status != 0 || !strings.Contains(res.Out, "news: postat ") {
-		t.Fatalf("slutkod %d:\n%s", res.Status, res.Out)
+	if res := r.run(env("BACKFILL=1"), nil, Options{}); res.Status != 0 || !strings.Contains(res.Out, "news: posted ") {
+		t.Fatalf("exit code %d:\n%s", res.Status, res.Out)
 	}
 	fk.feedXML = func(path string) string { return rss(1, 4, time.Now(), path) }
 	r.run(env(), nil, Options{})
 	r.run(env(), nil, Options{})
 	if len(fk.posts) != 2 {
-		t.Fatalf("%d inlägg", len(fk.posts))
+		t.Fatalf("%d posts", len(fk.posts))
 	}
 	want := map[string]any{"status": "Post 4 från /feed & @\u200banna\n\nhttps://example.com/feed/post-4/?utm_source=rss", "visibility": "public", "language": "sv"}
 	if !reflect.DeepEqual(fk.posts[1].Body, want) || !regexp.MustCompile(`^[0-9a-f]{32}$`).MatchString(fk.posts[1].Key) {
-		t.Errorf("fick %+v", fk.posts[1])
+		t.Errorf("got %+v", fk.posts[1])
 	}
 }
 
@@ -398,7 +399,7 @@ func TestHeartbeatAndStatus404(t *testing.T) {
 			io.Discard, io.Discard, Options{HeartbeatFile: alive, Signals: signals, Listening: func(a string) { addr <- a }, StartDelay: func(int) time.Duration { return time.Hour }})
 	}()
 	a := <-addr
-	for _, path := range []string{"/annat", "/status?x=1"} {
+	for _, path := range []string{"/other", "/status?x=1"} {
 		res, err := http.Get("http://" + a + path)
 		if err != nil {
 			t.Fatal(err)
@@ -409,10 +410,24 @@ func TestHeartbeatAndStatus404(t *testing.T) {
 		}
 	}
 	if _, err := os.Stat(alive); err != nil {
-		t.Errorf("hälsofilen: %v", err)
+		t.Errorf("heartbeat file: %v", err)
 	}
 	signals <- os.Interrupt
 	if code := <-done; code != 0 {
-		t.Errorf("slutkod %d", code)
+		t.Errorf("exit code %d", code)
+	}
+}
+
+// post takes "all" for every feed, and the old Swedish "alla" as an alias.
+func TestPostAllAlias(t *testing.T) {
+	fk := newFake(t)
+	r := &runner{t: t, fake: fk, root: t.TempDir()}
+	env := []string{"DATA_DIR=" + r.root, "STATUS_PORT=0", "DRY_RUN=1", "MASTODON_URL=" + fk.URL,
+		"FEED_NEWS_URL=" + fk.URL + "/feed", "FEED_NEWS_TOKEN=bra", "FEED_MORE_URL=" + fk.URL + "/feed-a", "FEED_MORE_TOKEN=bra3"}
+	want := "more: would post: Hello\nnews: would post: Hello\n"
+	for _, which := range []string{"all", "alla"} {
+		if res := r.run(env, []string{"post", which, "Hello"}, Options{}); res.Status != 0 || res.Out != want || res.Err != "" {
+			t.Errorf("%s: exit code %d:\n%s%s", which, res.Status, res.Out, res.Err)
+		}
 	}
 }

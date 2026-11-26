@@ -4,11 +4,11 @@ import (
 	"strings"
 )
 
-// Param är ett namn och ett värde ur en fråga.
+// Param is a name and a value from a query.
 type Param struct{ Name, Value string }
 
-// ParseQuery tolkar en fråga som URLSearchParams (application/x-www-form-urlencoded): `+` är
-// blanksteg, %XX avkodas och ogiltig UTF-8 blir ersättningstecken.
+// ParseQuery parses a query like URLSearchParams (application/x-www-form-urlencoded): `+` is a
+// space, %XX is decoded and invalid UTF-8 becomes replacement characters.
 func ParseQuery(query string) []Param {
 	var out []Param
 	for _, seq := range strings.Split(query, "&") {
@@ -25,7 +25,7 @@ func decodeForm(s string) string {
 	return DecodeUTF8(PercentDecode(strings.ReplaceAll(s, "+", " ")))
 }
 
-// EncodeQuery skriver parametrarna som URLSearchParams gör.
+// EncodeQuery serializes the parameters the way URLSearchParams does.
 func EncodeQuery(params []Param) string {
 	var b strings.Builder
 	for i, p := range params {
@@ -55,8 +55,8 @@ func encodeForm(b *strings.Builder, s string) {
 	}
 }
 
-// DecodeUTF8 avkodar UTF-8 som WHATWG Encoding Standard: varje ogiltig del blir ett
-// ersättningstecken, och en avbruten sekvens räknas som en del (inte en per byte).
+// DecodeUTF8 decodes UTF-8 like the WHATWG Encoding Standard: each invalid sequence becomes a
+// replacement character, and a truncated sequence counts as one sequence (not one per byte).
 func DecodeUTF8(b []byte) string {
 	var out strings.Builder
 	out.Grow(len(b))
@@ -96,7 +96,7 @@ func DecodeUTF8(b []byte) string {
 			needed, seen, cp = 0, 0, 0
 			lower, upper = 0x80, 0xBF
 			out.WriteRune('\uFFFD')
-			i-- // byten läses om
+			i-- // the byte is read again
 			continue
 		}
 		lower, upper = 0x80, 0xBF

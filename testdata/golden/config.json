@@ -357,7 +357,7 @@
         ],
         [
           "FEED_OLD_URL",
-          "inte en adress"
+          "not a url"
         ]
       ],
       "config": {
@@ -421,16 +421,16 @@
         ]
       ],
       "problems": [
-        "Okänd inställning FEED_NEWS_TEMPLTE (stavfel?)",
-        "FEED_NEWS_URL är ingen http(s)-adress: \"ftp://example.com/feed\"",
-        "FEED_NEWS_TOKEN saknas",
-        "MASTODON_URL saknas (globalt eller som FEED_NEWS_MASTODON_URL)",
-        "FEED_OTHER_TOKEN saknas",
-        "MASTODON_URL saknas (globalt eller som FEED_OTHER_MASTODON_URL)",
-        "FEED_OTHER_INTERVAL är för kort: minst 60 s",
-        "FEED_OTHER_MAX_POSTS_PER_POLL måste vara ett heltal, minst 1: \"0\"",
-        "FEED_OTHER_VISIBILITY måste vara public, unlisted, private, direct: \"everyone\"",
-        "FEED_OTHER_TEMPLATE har okänt fält {body}; giltiga är {title}, {link}, {summary}, {author}, {feed}"
+        "Unknown setting FEED_NEWS_TEMPLTE (typo?)",
+        "FEED_NEWS_URL is not an http(s) URL: \"ftp://example.com/feed\"",
+        "FEED_NEWS_TOKEN is missing",
+        "MASTODON_URL is missing (globally or as FEED_NEWS_MASTODON_URL)",
+        "FEED_OTHER_TOKEN is missing",
+        "MASTODON_URL is missing (globally or as FEED_OTHER_MASTODON_URL)",
+        "FEED_OTHER_INTERVAL is too short: at least 60 s",
+        "FEED_OTHER_MAX_POSTS_PER_POLL must be an integer, at least 1: \"0\"",
+        "FEED_OTHER_VISIBILITY must be public, unlisted, private, direct: \"everyone\"",
+        "FEED_OTHER_TEMPLATE has unknown field {body}; valid fields are {title}, {link}, {summary}, {author}, {feed}"
       ]
     },
     {
@@ -449,11 +449,11 @@
         ],
         [
           "FEED_NEWS_ENABLED",
-          "kanske"
+          "maybe"
         ]
       ],
       "problems": [
-        "FEED_NEWS_ENABLED måste vara true eller false, inte \"kanske\""
+        "FEED_NEWS_ENABLED must be true or false, not \"maybe\""
       ]
     },
     {
@@ -472,7 +472,7 @@
         ]
       ],
       "problems": [
-        "MASTODON_URL ska vara instansens adress, till exempel https://mastodon.nu"
+        "MASTODON_URL must be the instance's URL, for example https://mastodon.nu"
       ]
     },
     {
@@ -499,7 +499,7 @@
         ]
       ],
       "problems": [
-        "FEED_COPY_ och FEED_NEWS_ postar samma flöde till samma konto"
+        "FEED_COPY_ and FEED_NEWS_ post the same feed to the same account"
       ]
     },
     {
@@ -510,13 +510,13 @@
         ]
       ],
       "problems": [
-        "Inga flöden: ange minst FEED_<NAMN>_URL och FEED_<NAMN>_TOKEN"
+        "No feeds: set at least FEED_<NAME>_URL and FEED_<NAME>_TOKEN"
       ]
     },
     {
       "env": [],
       "problems": [
-        "Inga flöden: ange minst FEED_<NAMN>_URL och FEED_<NAMN>_TOKEN"
+        "No feeds: set at least FEED_<NAME>_URL and FEED_<NAME>_TOKEN"
       ]
     },
     {
@@ -567,15 +567,15 @@
         ],
         [
           "FEED_B_QUOTE_POLICY",
-          "alla"
+          "all"
         ],
         [
           "FEED_B_LANGUAGE",
-          "svenska"
+          "swedish"
         ],
         [
           "FEED_B_MAX_AGE",
-          "fem"
+          "five"
         ],
         [
           "FEED_B_BACKFILL",
@@ -583,7 +583,7 @@
         ],
         [
           "FEED_C_ENABLED",
-          "nej"
+          "no"
         ],
         [
           "FEED_",
@@ -607,16 +607,16 @@
         ]
       ],
       "problems": [
-        "Okänd inställning FEED_ (stavfel?)",
-        "Okänd inställning FEED_X_Y (stavfel?)",
-        "FEED_B_MASTODON_URL ska vara instansens adress, till exempel https://mastodon.nu",
-        "FEED_B_MAX_AGE är ingen tid: \"fem\" (till exempel 900, 15m eller 1h30m)",
-        "FEED_B_BACKFILL måste vara ett heltal, minst 0: \"-1\"",
-        "FEED_B_QUOTE_POLICY måste vara public, followers, nobody: \"alla\"",
-        "FEED_B_LANGUAGE ska vara en språkkod som sv eller en: \"svenska\"",
-        "FAIL_NOTIFY_AFTER måste vara ett heltal mellan 1 och Infinity: \"0\"",
-        "STATUS_PORT måste vara ett heltal mellan 0 och 65535: \"70000\"",
-        "SIGNAL_API_URL och SIGNAL_NUMBER behövs båda för Signal-aviseringar"
+        "Unknown setting FEED_ (typo?)",
+        "Unknown setting FEED_X_Y (typo?)",
+        "FEED_B_MASTODON_URL must be the instance's URL, for example https://mastodon.nu",
+        "FEED_B_MAX_AGE is not a duration: \"five\" (for example 900, 15m or 1h30m)",
+        "FEED_B_BACKFILL must be an integer, at least 0: \"-1\"",
+        "FEED_B_QUOTE_POLICY must be public, followers, nobody: \"all\"",
+        "FEED_B_LANGUAGE must be a language code such as sv or en: \"swedish\"",
+        "FAIL_NOTIFY_AFTER must be an integer between 1 and Infinity: \"0\"",
+        "STATUS_PORT must be an integer between 0 and 65535: \"70000\"",
+        "SIGNAL_API_URL and SIGNAL_NUMBER are both required for Signal notifications"
       ]
     },
     {
@@ -651,7 +651,7 @@
         ]
       ],
       "problems": [
-        "SIGNAL_API_URL och SIGNAL_NUMBER behövs båda för Signal-aviseringar"
+        "SIGNAL_API_URL and SIGNAL_NUMBER are both required for Signal notifications"
       ]
     },
     {
@@ -690,8 +690,8 @@
         ]
       ],
       "problems": [
-        "FEED_A_INTERVAL är för kort: minst 60 s",
-        "SIGNAL_API_URL är ingen http(s)-adress: \"ftp://x\""
+        "FEED_A_INTERVAL is too short: at least 60 s",
+        "SIGNAL_API_URL is not an http(s) URL: \"ftp://x\""
       ]
     },
     {
@@ -745,7 +745,7 @@
         ]
       ],
       "problems": [
-        "TEMPLATE har okänt fält {constructor}; giltiga är {title}, {link}, {summary}, {author}, {feed}"
+        "TEMPLATE has unknown field {constructor}; valid fields are {title}, {link}, {summary}, {author}, {feed}"
       ]
     }
   ]

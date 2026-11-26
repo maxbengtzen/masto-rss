@@ -22,12 +22,12 @@ func TestLength(t *testing.T) {
 		{"hej", mastodon, 3},
 		{"läs https://example.com/en/mycket/lang/adress?utm_source=rss här", mastodon, 4 + 23 + 4},
 		{"👨\u200D👩\u200D👧 åäö", mastodon, 5},
-		// Utan känd länklängd räknas länken i sin helhet.
+		// Without a known link length, the link is counted in full.
 		{"https://example.com/a", Limits{MaxCharacters: 500}, 21},
 	}
 	for _, c := range cases {
 		if got := Length(c.text, c.limits); got != c.want {
-			t.Errorf("Length(%q) = %d, väntade %d", c.text, got, c.want)
+			t.Errorf("Length(%q) = %d, want %d", c.text, got, c.want)
 		}
 	}
 }
@@ -40,7 +40,7 @@ func TestDefuseMentions(t *testing.T) {
 		"https://medium.com/@skribent/inlagg": "https://medium.com/@skribent/inlagg",
 	} {
 		if got := DefuseMentions(in); got != want {
-			t.Errorf("DefuseMentions(%q) = %q, väntade %q", in, got, want)
+			t.Errorf("DefuseMentions(%q) = %q, want %q", in, got, want)
 		}
 	}
 }
@@ -53,16 +53,16 @@ func TestRender(t *testing.T) {
 	}
 	for tpl, want := range cases {
 		if got := Render(tpl, fields, mastodon); got != want {
-			t.Errorf("Render(%q) = %q, väntade %q", tpl, got, want)
+			t.Errorf("Render(%q) = %q, want %q", tpl, got, want)
 		}
 	}
 	noSummary := fields
 	noSummary.Summary = ""
 	if got := Render("{title}\n\n{summary}\n\n{link}", noSummary, mastodon); got != "Rubrik\n\nhttps://example.com/a" {
-		t.Errorf("tom sammanfattning: %q", got)
+		t.Errorf("empty summary: %q", got)
 	}
 	if got := Render("{title}\n\n{link}", Fields{Link: "https://example.com/a"}, mastodon); got != "https://example.com/a" {
-		t.Errorf("tom titel: %q", got)
+		t.Errorf("empty title: %q", got)
 	}
 }
 
@@ -71,20 +71,20 @@ func TestRenderShortens(t *testing.T) {
 	small := Limits{MaxCharacters: 60, CharactersPerURL: 23}
 	text := Render("{title}\n{summary}\n{link}", Fields{Title: "Rubrik", Summary: strings.Repeat("x", 100), Link: link}, small)
 	if !strings.HasSuffix(text, "…\n"+link) || !strings.HasPrefix(text, "Rubrik\nxxx") || Length(text, small) != 60 {
-		t.Errorf("sammanfattningen kortas först: %q (%d)", text, Length(text, small))
+		t.Errorf("the summary is shortened first: %q (%d)", text, Length(text, small))
 	}
 	long := Render("{title}\n{link}", Fields{Title: strings.Repeat("Ord ", 30), Link: link}, small)
 	if !strings.HasSuffix(long, "…\n"+link) || Length(long, small) > 60 {
-		t.Errorf("sedan titeln, aldrig länken: %q", long)
+		t.Errorf("then the title, never the link: %q", long)
 	}
 }
 
-// Text och längd ska bli desamma som i TypeScript-versionen för alla kombinationer i golden-filen.
+// Text and length must match the TypeScript version for every combination in the golden file.
 func TestFormatGolden(t *testing.T) {
 	formatGolden(t, testutil.Testdata("golden", "format.json"))
 }
 
-// Text från sparade riktiga flöden, bara lokalt.
+// Text from saved real feeds, local only.
 func TestFormatGoldenLocal(t *testing.T) {
 	formatGolden(t, filepath.Join(testutil.Local(t), "golden", "format.json"))
 }
@@ -109,33 +109,33 @@ func formatGolden(t *testing.T, path string) {
 	}
 	testutil.ReadJSON(t, path, &golden)
 	if len(golden.Render) < 100 {
-		t.Fatalf("för få fall: %d", len(golden.Render))
+		t.Fatalf("too few cases: %d", len(golden.Render))
 	}
 	for _, c := range golden.Render {
 		limits := Limits{MaxCharacters: c.Limits.MaxCharacters, CharactersPerURL: c.Limits.CharactersPerURL}
 		got := Render(c.Template, Fields(c.Fields), limits)
 		if got != c.Out {
-			t.Errorf("Render(%q, %+v, %+v)\nfick    %q\nväntade %q", c.Template, c.Fields, limits, got, c.Out)
+			t.Errorf("Render(%q, %+v, %+v)\ngot  %q\nwant %q", c.Template, c.Fields, limits, got, c.Out)
 			continue
 		}
 		if n := Length(got, limits); n != c.Length {
-			t.Errorf("Length(%q) = %d, väntade %d", got, n, c.Length)
+			t.Errorf("Length(%q) = %d, want %d", got, n, c.Length)
 		}
 	}
 	for _, c := range golden.Lengths {
 		if n := Length(c.Text, mastodon); n != c.Length {
-			t.Errorf("Length(%q) = %d, väntade %d", c.Text, n, c.Length)
+			t.Errorf("Length(%q) = %d, want %d", c.Text, n, c.Length)
 		}
 		if n := Length(c.Text, Limits{MaxCharacters: 500}); n != c.Graphemes {
-			t.Errorf("grafem i %q: %d, väntade %d", c.Text, n, c.Graphemes)
+			t.Errorf("graphemes in %q: %d, want %d", c.Text, n, c.Graphemes)
 		}
 		if d := DefuseMentions(c.Text); d != c.Defused {
-			t.Errorf("DefuseMentions(%q) = %q, väntade %q", c.Text, d, c.Defused)
+			t.Errorf("DefuseMentions(%q) = %q, want %q", c.Text, d, c.Defused)
 		}
 	}
 }
 
-// Grafemklustren ska följa Unicodes egna testfall för samma version.
+// Grapheme clusters must follow Unicode's own test cases for the same version.
 func TestGraphemeBreakConformance(t *testing.T) {
 	f, err := os.Open(testutil.Testdata("unicode", "GraphemeBreakTest.txt"))
 	if err != nil {
@@ -167,14 +167,14 @@ func TestGraphemeBreakConformance(t *testing.T) {
 		}
 		got := graphemes(input.String())
 		if strings.Join(got, "|") != strings.Join(want, "|") {
-			t.Errorf("%s: fick %q, väntade %q", line, got, want)
+			t.Errorf("%s: got %q, want %q", line, got, want)
 		}
 		n++
 	}
 	if n < 500 {
-		t.Fatalf("för få testfall: %d", n)
+		t.Fatalf("too few test cases: %d", n)
 	}
 	if unicodeVersion == "" {
-		t.Fatal("ingen Unicode-version")
+		t.Fatal("no Unicode version")
 	}
 }

@@ -10,32 +10,33 @@ import (
 	"github.com/maxbengtzen/masto-rss/internal/js"
 )
 
-// Ett XML-träd byggt så som TypeScript-versionens tolk (feedsmith ovanpå fast-xml-parser) såg
-// dokumentet. encoding/xml delar upp texten i taggar, text, kommentarer och CDATA, men resten görs
-// här för att bli likadant:
+// An XML tree built the way the TypeScript version's parser (feedsmith on top of fast-xml-parser)
+// saw the document. encoding/xml splits the text into tags, text, comments and CDATA, but the rest
+// is done here to come out the same:
 //
-//   - Namn görs till gemener, och prefix för kända namnrymder byts mot de kanoniska (ett flöde som
-//     kallar Dublin Core för "d:" får ändå "dc:creator"). Formatets egen namnrymd tas bort.
-//   - Varje sluttagg stänger det senast öppnade elementet, oavsett namn.
-//   - Text och attributvärden sparas som de står, med entiteter. De avkodas först när ett fält läses.
-//   - Fält som feedsmith läser som rå text ("stoppnoder", till exempel title och description)
-//     tolkas inte alls: innehållet fram till sluttaggen sparas som det står, även trasig HTML.
+//   - Names are lowercased, and prefixes for known namespaces are replaced with the canonical ones (a
+//     feed that calls Dublin Core "d:" still gets "dc:creator"). The format's own namespace is removed.
+//   - Every end tag closes the most recently opened element, whatever its name.
+//   - Text and attribute values are stored as they are, with entities. They are decoded only when a
+//     field is read.
+//   - Fields that feedsmith reads as raw text ("stop nodes", for example title and description)
+//     are not parsed at all: the content up to the end tag is stored as is, even broken HTML.
 
-// xnode är ett element.
+// xnode is an element.
 type xnode struct {
 	name     string
-	attrs    map[string]string // namn (med "@") → rått värde
+	attrs    map[string]string // name (with "@") → raw value
 	children []*xnode
-	// text är elementets text: för en stoppnod hela innehållet som det står, annars textbitarna
-	// (CDATA utan markörer) ihopslagna.
+	// text is the element's text: for a stop node the whole content as is, otherwise the text
+	// pieces (CDATA without markers) joined together.
 	text string
 }
 
-// isObject är sant när elementet blev ett objekt i feedsmith (har attribut eller barn), och inte
-// bara en sträng.
+// isObject reports whether the element became an object in feedsmith (has attributes or children),
+// and not just a string.
 func (n *xnode) isObject() bool { return n != nil && (len(n.attrs) > 0 || len(n.children) > 0) }
 
-// first är det första barnet med namnet, som parseSingular i feedsmith.
+// first returns the first child with the name, like parseSingular in feedsmith.
 func (n *xnode) first(name string) *xnode {
 	if n == nil {
 		return nil
@@ -48,7 +49,7 @@ func (n *xnode) first(name string) *xnode {
 	return nil
 }
 
-// all är alla barn med namnet.
+// all returns all children with the name.
 func (n *xnode) all(name string) []*xnode {
 	if n == nil {
 		return nil
@@ -62,7 +63,7 @@ func (n *xnode) all(name string) []*xnode {
 	return out
 }
 
-// rawText är retrieveText i feedsmith: elementets text. Ett objekt utan text har ingen.
+// rawText is retrieveText in feedsmith: the element's text. An object without text has none.
 func (n *xnode) rawText() (string, bool) {
 	if n == nil {
 		return "", false
@@ -73,7 +74,7 @@ func (n *xnode) rawText() (string, bool) {
 	return n.text, true
 }
 
-// str är parseString(retrieveText(n)): texten avkodad och trimmad, eller tom.
+// str is parseString(retrieveText(n)): the text decoded and trimmed, or empty.
 func (n *xnode) str() string {
 	text, ok := n.rawText()
 	if !ok {
@@ -82,7 +83,7 @@ func (n *xnode) str() string {
 	return parseString(text)
 }
 
-// attr är parseString av ett attribut.
+// attr is parseString of an attribute.
 func (n *xnode) attr(name string) string {
 	if n == nil {
 		return ""
@@ -90,13 +91,13 @@ func (n *xnode) attr(name string) string {
 	return parseString(n.attrs["@"+name])
 }
 
-// MalformedError och de andra felen heter som i feedsmith, eftersom namnet syns i loggen.
+// MalformedError and the other errors are named as in feedsmith, since the name shows in the log.
 type feedError struct{ name, msg, cause string }
 
 func (e *feedError) Error() string { return e.msg }
 func (e *feedError) Name() string  { return e.name }
 
-// CauseMessage är meddelandet från felet bakom, som visas inom parentes i loggen.
+// CauseMessage is the message from the underlying error, shown in parentheses in the log.
 func (e *feedError) CauseMessage() string { return e.cause }
 
 var (
@@ -108,7 +109,7 @@ func malformed(cause string) error {
 	return &feedError{name: "MalformedError", msg: "Invalid feed format", cause: cause}
 }
 
-// nsResolver är feedsmiths createNamespaceResolver: vilket kanoniskt prefix varje prefix har.
+// nsResolver is feedsmith's createNamespaceResolver: which canonical prefix each prefix maps to.
 type nsResolver struct {
 	primary          map[string]bool
 	prefixMap        map[string]string
@@ -129,7 +130,7 @@ func newResolver(doc string, primary []string) *nsResolver {
 			}
 		}
 	}
-	// Deklarationerna i början av dokumentet läses i förväg, som i feedsmith.
+	// The declarations at the start of the document are read in advance, as in feedsmith.
 	head := doc
 	if len(head) > 65536 {
 		head = js.Slice16(head, 0, 65536)
@@ -159,7 +160,7 @@ func newResolver(doc string, primary []string) *nsResolver {
 	return r
 }
 
-// rootIndex är var rotelementet börjar: första "<" som inte är <? eller <!.
+// rootIndex is where the root element starts: the first "<" that isn't <? or <!.
 func rootIndex(doc string) int {
 	i := strings.IndexByte(doc, '<')
 	for i >= 0 {
@@ -205,7 +206,7 @@ func (r *nsResolver) record(prefix, uri string) {
 	}
 }
 
-// declare tar hand om ett xmlns-attribut.
+// declare handles an xmlns attribute.
 func (r *nsResolver) declare(rawName, value string) {
 	if rawName == "" || rawName[0] != 'x' && rawName[0] != 'X' {
 		return
@@ -255,10 +256,10 @@ func (r *nsResolver) transform(name string, useDefault bool) string {
 	return canonical + ":" + local
 }
 
-// attrRE är fast-xml-parsers mönster för attribut.
+// attrRE is fast-xml-parser's pattern for attributes.
 var attrRE = regexp.MustCompile(`([^\t\n\v\f\r \x{A0}\x{1680}\x{2000}-\x{200A}\x{2028}\x{2029}\x{202F}\x{205F}\x{3000}\x{FEFF}=]+)[\t\n\v\f\r \x{A0}\x{1680}\x{2000}-\x{200A}\x{2028}\x{2029}\x{202F}\x{205F}\x{3000}\x{FEFF}]*(=[\t\n\v\f\r \x{A0}\x{1680}\x{2000}-\x{200A}\x{2028}\x{2029}\x{202F}\x{205F}\x{3000}\x{FEFF}]*(?:"([^"]*)"|'([^']*)'))?`)
 
-// splitTag delar en tagg (texten mellan < och >) i namn och attribut, som readTagExp.
+// splitTag splits a tag (the text between < and >) into name and attributes, like readTagExp.
 func splitTag(exp string) (name, attrs string, selfClosing bool) {
 	exp = strings.ReplaceAll(exp, "\t", " ")
 	name = exp
@@ -283,13 +284,13 @@ func splitTag(exp string) (name, attrs string, selfClosing bool) {
 	return name, attrs, selfClosing
 }
 
-// sanitize byter tecken som encoding/xml vägrar läsa mot blanksteg, med samma längd i bytes, så
-// att positionerna stämmer mot originalet.
+// sanitize replaces characters that encoding/xml refuses to read with spaces, keeping the same
+// length in bytes, so that the positions match the original.
 func sanitize(s string) string {
 	return strings.Map(func(r rune) rune {
 		switch {
 		case r == 0xFFFE || r == 0xFFFF:
-			return 0xFFFD // samma längd i UTF-8
+			return 0xFFFD // same length in UTF-8
 		case r < 0x20 && r != '\t' && r != '\n' && r != '\r':
 			return ' '
 		}
@@ -297,7 +298,8 @@ func sanitize(s string) string {
 	}, s)
 }
 
-// buildTree tolkar dokumentet. stopPaths är formatets stoppnoder (utöver de som gäller överallt).
+// buildTree parses the document. stopPaths are the format's stop nodes (in addition to the ones
+// that apply everywhere).
 func buildTree(doc string, primary []string, stopPaths map[string]bool) (*xnode, error) {
 	src := strings.ReplaceAll(strings.ReplaceAll(doc, "\r\n", "\n"), "\r", "\n")
 	clean := sanitize(src)
@@ -326,7 +328,7 @@ func buildTree(doc string, primary []string, stopPaths map[string]bool) (*xnode,
 			attrs := map[string]string{}
 			for _, m := range attrRE.FindAllStringSubmatchIndex(attrStr, -1) {
 				if m[4] < 0 {
-					continue // attribut utan värde räknas inte
+					continue // attributes without a value don't count
 				}
 				name := attrStr[m[2]:m[3]]
 				value := ""
@@ -354,7 +356,7 @@ func buildTree(doc string, primary []string, stopPaths map[string]bool) (*xnode,
 					base = end
 					dec = newDecoder(clean[base:], base)
 				} else {
-					// encoding/xml ger ett sluttecken för <a/> också; det ska inte stänga föräldern.
+					// encoding/xml emits an end token for <a/> too; it must not close the parent.
 					dec.RawToken()
 				}
 				continue
@@ -386,13 +388,13 @@ func buildTree(doc string, primary []string, stopPaths map[string]bool) (*xnode,
 func newDecoder(s string, base int) *xml.Decoder {
 	d := xml.NewDecoder(strings.NewReader(s))
 	d.Strict = false
-	// Texten är redan avkodad till UTF-8 (decodeBody), vad XML-deklarationen än säger.
+	// The text is already decoded to UTF-8 (decodeBody), whatever the XML declaration says.
 	d.CharsetReader = func(_ string, r io.Reader) (io.Reader, error) { return r, nil }
 	return d
 }
 
-// readStopNode läser innehållet i en stoppnod fram till dess sluttagg, som readStopNodeData i
-// fast-xml-parser. Den returnerar innehållet och positionen efter sluttaggen.
+// readStopNode reads the content of a stop node up to its end tag, like readStopNodeData in
+// fast-xml-parser. It returns the content and the position after the end tag.
 func readStopNode(src, tagName string, i int) (string, int, bool) {
 	start, open := i, 1
 	for ; i < len(src); i++ {
@@ -445,7 +447,7 @@ func readStopNode(src, tagName string, i int) (string, int, bool) {
 	return "", 0, false
 }
 
-// tagExpression läser en tagg fram till ">" utanför citattecken.
+// tagExpression reads a tag up to a ">" outside quotes.
 func tagExpression(src string, i int) (string, int, bool) {
 	var quote byte
 	for j := i; j < len(src); j++ {

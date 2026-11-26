@@ -1,4 +1,4 @@
-name: Test och publicera image
+name: Test and publish image
 
 on:
   push:
@@ -31,11 +31,11 @@ jobs:
       packages: write # ghcr
     steps:
       - uses: actions/checkout@v7
-      - name: Taggen måste matcha VERSION och finnas i CHANGELOG.md
+      - name: Tag must match VERSION and exist in CHANGELOG.md
         run: |
           version="${GITHUB_REF_NAME#v}"
           test "$version" = "$(cat VERSION)" \
-            || { echo "::error::Taggen $GITHUB_REF_NAME matchar inte VERSION"; exit 1; }
+            || { echo "::error::Tag $GITHUB_REF_NAME does not match VERSION"; exit 1; }
           scripts/changelog.sh notes "$version" > release-notes.md
       - uses: docker/login-action@v4
         with:

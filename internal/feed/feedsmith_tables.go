@@ -1,9 +1,9 @@
-// Kod genererad ur feedsmith 3.0.1 (TypeScript-versionens flödestolk), så att samma element
-// läses som rå text och samma namnrymder känns igen. Ändra inte för hand.
+// Code generated from feedsmith 3.0.1 (the TypeScript version's feed parser), so that the same
+// elements are read as raw text and the same namespaces are recognized. Do not edit by hand.
 
 package feed
 
-// namespacePrefixes ger det kanoniska prefixet för varje känd namnrymd (adressen med gemener).
+// namespacePrefixes gives the canonical prefix for each known namespace (the URI in lowercase).
 var namespacePrefixes = map[string]string{
 	"http://webns.net/mvcb/":                                                      "admin",
 	"https://webns.net/mvcb/":                                                     "admin",
@@ -226,7 +226,7 @@ var namespacePrefixes = map[string]string{
 	"http://schema.acast.com/1.0":                                                 "acast",
 }
 
-// stopAnywhere är element som läses som rå text var de än står ("*.namn" i feedsmith).
+// stopAnywhere holds elements that are read as raw text wherever they appear ("*.name" in feedsmith).
 var stopAnywhere = map[string]bool{
 	"acast:episodeid":                         true,
 	"acast:episodeurl":                        true,
@@ -598,7 +598,7 @@ var stopAnywhere = map[string]bool{
 	"yt:videoid":                              true,
 }
 
-// stopPathsRSS är element som läses som rå text på just den sökvägen.
+// stopPathsRSS holds elements that are read as raw text at exactly that path.
 var stopPathsRSS = map[string]bool{
 	"rss.channel.category":              true,
 	"rss.channel.cloud":                 true,
@@ -659,7 +659,7 @@ var stopPathsRSS = map[string]bool{
 	"rss.textinput.title":               true,
 }
 
-// stopPathsATOM är element som läses som rå text på just den sökvägen.
+// stopPathsATOM holds elements that are read as raw text at exactly that path.
 var stopPathsATOM = map[string]bool{
 	"feed.author.email":                   true,
 	"feed.author.name":                    true,
@@ -722,7 +722,7 @@ var stopPathsATOM = map[string]bool{
 	"feed.updated":                        true,
 }
 
-// stopPathsRDF är element som läses som rå text på just den sökvägen.
+// stopPathsRDF holds elements that are read as raw text at exactly that path.
 var stopPathsRDF = map[string]bool{
 	"rdf.channel.description":   true,
 	"rdf.channel.link":          true,

@@ -1,4 +1,4 @@
-// Package mastorss håller versionen, som läses ur filen VERSION när programmet byggs.
+// Package mastorss holds the version, which is read from the file VERSION when the program is built.
 package mastorss
 
 import (
@@ -9,8 +9,8 @@ import (
 //go:embed VERSION
 var version string
 
-// Version är versionen, till exempel "1.1.0".
+// Version returns the version, for example "1.1.0".
 func Version() string { return strings.TrimSpace(version) }
 
-// UserAgent skickas med varje anrop.
+// UserAgent is sent with every request.
 func UserAgent() string { return "masto-rss/" + Version() }

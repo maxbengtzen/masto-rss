@@ -1,9 +1,9 @@
-// Package feed hämtar och tolkar flöden.
+// Package feed fetches and parses feeds.
 //
-// Hämtningen följer omdirigeringar själv, så att den kan säga till när en adress flyttat
-// permanent. Den skickar ETag/Last-Modified så att ett oförändrat flöde ger 304, har en total
-// timeout och en storleksgräns, och avkodar teckenkodningen ur BOM, Content-Type eller
-// XML-deklarationen. Tolkningen gör RSS, Atom, RDF och JSON Feed till samma form.
+// Fetching follows redirects itself, so that it can report when an address has moved
+// permanently. It sends ETag/Last-Modified so that an unchanged feed returns 304, has an overall
+// timeout and a size limit, and decodes the character encoding from the BOM, Content-Type or the
+// XML declaration. Parsing turns RSS, Atom, RDF and JSON Feed into the same shape.
 package feed
 
 import (
@@ -28,21 +28,21 @@ const (
 	maxRedirects = 5
 )
 
-// Validators är ETag och Last-Modified från förra hämtningen.
+// Validators are the ETag and Last-Modified from the previous fetch.
 type Validators struct {
 	ETag         string
 	LastModified string
 }
 
-// Redirect är vart flödet omdirigerades.
+// Redirect is where the feed was redirected to.
 type Redirect struct {
-	// To är slutadressen efter alla omdirigeringar.
+	// To is the final address after all redirects.
 	To string
-	// Permanent är sant om varje steg var 301 eller 308.
+	// Permanent is true if every step was a 301 or 308.
 	Permanent bool
 }
 
-// Result är en hämtning. NotModified betyder 304: då är resten tomt utom Redirect.
+// Result is a fetch. NotModified means 304: everything else is then empty except Redirect.
 type Result struct {
 	NotModified  bool
 	Text         string
@@ -52,11 +52,11 @@ type Result struct {
 	Redirect     *Redirect
 }
 
-// HTTPError är ett svar som inte är 2xx eller 304.
+// HTTPError is a response that is neither 2xx nor 304.
 type HTTPError struct {
 	Status     int
 	StatusText string
-	// RetryAfter är sekunder enligt Retry-After, -1 om servern inte skickade det.
+	// RetryAfter is the number of seconds from Retry-After, -1 if the server didn't send it.
 	RetryAfter int64
 }
 
@@ -64,7 +64,7 @@ func (e *HTTPError) Error() string {
 	return strings.TrimSpace(fmt.Sprintf("HTTP %d %s", e.Status, e.StatusText))
 }
 
-// Name är felets namn i loggen, som i TypeScript-versionen.
+// Name is the error's name in the log, as in the TypeScript version.
 func (e *HTTPError) Name() string { return "HttpError" }
 
 func retryAfterSeconds(value string) int64 {
@@ -86,8 +86,8 @@ func retryAfterSeconds(value string) int64 {
 	return max(0, secs)
 }
 
-// Fetch hämtar flödet. client är normalt http.DefaultClient; den får inte följa omdirigeringar
-// själv (det görs här), så CheckRedirect sätts om.
+// Fetch fetches the feed. client is normally http.DefaultClient; it must not follow redirects
+// itself (that is done here), so CheckRedirect is overridden.
 func Fetch(ctx context.Context, client *http.Client, url string, v Validators) (*Result, error) {
 	ctx, cancel := context.WithTimeout(ctx, Timeout)
 	defer cancel()
@@ -117,7 +117,7 @@ func Fetch(ctx context.Context, client *http.Client, url string, v Validators) (
 		if res.StatusCode >= 300 && res.StatusCode < 400 && res.StatusCode != 304 && location != "" {
 			res.Body.Close()
 			if hops >= maxRedirects {
-				return nil, netx.Errorf("Fler än %d omdirigeringar", maxRedirects)
+				return nil, netx.Errorf("More than %d redirects", maxRedirects)
 			}
 			if res.StatusCode != 301 && res.StatusCode != 308 {
 				permanent = false
@@ -158,7 +158,7 @@ func Fetch(ctx context.Context, client *http.Client, url string, v Validators) (
 
 func readLimited(res *http.Response) ([]byte, error) {
 	defer res.Body.Close()
-	tooBig := netx.Errorf("Flödet är större än %d MB", MaxBytes/1024/1024)
+	tooBig := netx.Errorf("The feed is larger than %d MB", MaxBytes/1024/1024)
 	if n, err := strconv.ParseFloat(res.Header.Get("Content-Length"), 64); err == nil && n > MaxBytes {
 		return nil, tooBig
 	}
@@ -167,12 +167,12 @@ func readLimited(res *http.Response) ([]byte, error) {
 		return nil, netx.FetchError(err)
 	}
 	if len(body) > MaxBytes {
-		return nil, tooBig // att sluta läsa avbryter nedladdningen
+		return nil, tooBig // stopping reading aborts the download
 	}
 	return body, nil
 }
 
-// IsHTTPError ger HTTP-felet bakom err, om det finns ett.
+// IsHTTPError returns the HTTP error behind err, if there is one.
 func IsHTTPError(err error) (*HTTPError, bool) {
 	var h *HTTPError
 	ok := errors.As(err, &h)

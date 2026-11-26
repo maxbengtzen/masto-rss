@@ -6,12 +6,13 @@ import (
 	"unicode/utf16"
 )
 
-// ParseDate är Date.parse i V8 (Node): först ES-formatet (ISO 8601), sedan V8:s förlåtande äldre
-// tolkning som klarar RFC 822 och det mesta däremellan. Utan tidszon gäller lokal tid (TZ), utom
-// för ett ISO-datum utan klockslag, som är UTC. Andra värdet är false där JavaScript ger NaN.
+// ParseDate is Date.parse in V8 (Node): first the ES format (ISO 8601), then V8's forgiving legacy
+// parser, which handles RFC 822 and most things in between. Without a time zone, local time (TZ)
+// applies, except for an ISO date without a time of day, which is UTC. The second value is false
+// where JavaScript returns NaN.
 //
-// Det här är en översättning av V8:s dateparser-inl.h, så att flöden med udda datum tolkas
-// likadant som förut.
+// This is a translation of V8's dateparser-inl.h, so that feeds with odd dates are parsed the same
+// way as before.
 func ParseDate(s string) (int64, bool) {
 	sc := &dateScanner{in: utf16.Encode([]rune(s))}
 	sc.next = sc.scan()
@@ -62,7 +63,7 @@ func ParseDate(s string) (int64, bool) {
 				tz.minute = n
 			} else if tm.isExpecting(n) {
 				tm.addFinal(n)
-				// Efter ett klockslag måste det komma slut, blanktecken, Z, + eller -.
+				// A time of day must be followed by the end, whitespace, Z, + or -.
 				p := sc.Peek()
 				if p.kind != tokEnd && p.kind != tokSpace && !p.isKeywordZ() && !p.isSign() {
 					return 0, false
@@ -83,13 +84,13 @@ func ParseDate(s string) (int64, bool) {
 			case tok.keyword == kwZone && hasReadNumber:
 				tz.set(tok.value)
 			default:
-				// Okända ord går bra före första talet, men inte direkt intill det.
+				// Unknown words are fine before the first number, but not directly adjacent to it.
 				if hasReadNumber || sc.Peek().kind == tokNumber {
 					return 0, false
 				}
 			}
 		case tok.isSign() && (tz.isUTC() || tm.index != 0):
-			// Tidszon efter UTC/GMT eller efter ett klockslag.
+			// Time zone after UTC/GMT or after a time of day.
 			tz.setSign(tok.sign())
 			n, length := 0, 0
 			if sc.Peek().kind == tokNumber {
@@ -130,9 +131,9 @@ func ParseDate(s string) (int64, bool) {
 
 const none = math.MaxInt32
 
-// makeDate räknar fram millisekunder sedan 1970 som MakeDay/MakeTime/UTC i ECMAScript.
+// makeDate computes milliseconds since 1970 like MakeDay/MakeTime/UTC in ECMAScript.
 func makeDate(year, month, day, hour, minute, second, ms, offset int, local bool) (int64, bool) {
-	// Månader utanför 0–11 och dagar utanför månaden rullar över, som i JavaScript.
+	// Months outside 0–11 and days outside the month roll over, as in JavaScript.
 	y := int64(year) + int64(month)/12
 	m := month % 12
 	days := daysFromCivil(y, m+1, 1) + int64(day) - 1
@@ -151,9 +152,9 @@ func makeDate(year, month, day, hour, minute, second, ms, offset int, local bool
 	return t, true
 }
 
-// localToUTC gör lokal tid (ms räknat som om den vore UTC) till UTC, som V8 med ICU: en tid som
-// finns två gånger (när sommartiden slutar) blir den första, och en tid som inte finns (när den
-// börjar) räknas med förskjutningen från före bytet.
+// localToUTC converts local time (ms computed as if it were UTC) to UTC, like V8 with ICU: a time
+// that occurs twice (when daylight saving time ends) becomes the first one, and a time that does
+// not exist (when it begins) uses the offset from before the change.
 func localToUTC(local int64) int64 {
 	offset := func(ms int64) int64 {
 		_, secs := time.UnixMilli(ms).In(time.Local).Zone()
@@ -172,7 +173,7 @@ func localToUTC(local int64) int64 {
 	return c1
 }
 
-// daysFromCivil ger antalet dagar från 1970-01-01 till datumet (proleptisk gregoriansk kalender).
+// daysFromCivil returns the number of days from 1970-01-01 to the date (proleptic Gregorian calendar).
 func daysFromCivil(y int64, m, d int) int64 {
 	if m <= 2 {
 		y--
@@ -189,7 +190,7 @@ func daysFromCivil(y int64, m, d int) int64 {
 }
 
 func parseES5(sc *dateScanner, day *dayComposer, tm *timeComposer, tz *tzComposer) dateToken {
-	// Datum: [('-'|'+')yy]yyyy[-MM[-DD]]
+	// Date: [('-'|'+')yy]yyyy[-MM[-DD]]
 	if sc.Peek().isSign() {
 		sign := sc.Next()
 		if !sc.Peek().isFixedNumber(6) {
@@ -217,7 +218,7 @@ func parseES5(sc *dateScanner, day *dayComposer, tm *timeComposer, tz *tzCompose
 			day.add(sc.Next().value)
 		}
 	}
-	// Klockslag: THH:mm[:ss[.sss]] och tidszon Z eller ±hh:mm.
+	// Time of day: THH:mm[:ss[.sss]] and time zone Z or ±hh:mm.
 	if p := sc.Peek(); !(p.kind == tokKeyword && p.keyword == kwTimeSep) {
 		if p.kind != tokEnd {
 			return sc.Next()
@@ -278,7 +279,7 @@ func parseES5(sc *dateScanner, day *dayComposer, tm *timeComposer, tz *tzCompose
 			return dateToken{kind: tokInvalid}
 		}
 	}
-	// Ett ISO-datum utan klockslag och tidszon är UTC, med klockslag lokal tid.
+	// An ISO date without time of day and time zone is UTC; with a time of day, it is local time.
 	if tz.hour == none && tm.index == 0 {
 		tz.set(0)
 	}
@@ -403,7 +404,7 @@ func (t *timeComposer) write() (hour, minute, second, ms int, ok bool) {
 		hour = hour%12 + t.hourOffset
 	}
 	if hour < 0 || hour > 23 || minute < 0 || minute > 59 || second < 0 || second > 59 || ms < 0 || ms > 999 {
-		// Timme 24 går bara om resten är noll.
+		// Hour 24 is only allowed if the rest is zero.
 		if hour != 24 || minute != 0 || second != 0 || ms != 0 {
 			return 0, 0, 0, 0, false
 		}
@@ -435,7 +436,7 @@ func (z *tzComposer) isExpecting(n int) bool {
 
 func (z *tzComposer) isUTC() bool { return z.hour == 0 && z.minute == 0 }
 
-// write ger förskjutningen i sekunder, eller local = true om ingen tidszon angavs.
+// write returns the offset in seconds, or local = true if no time zone was given.
 func (z *tzComposer) write() (offset int, local, ok bool) {
 	if z.sign == none {
 		return 0, true, true
@@ -481,14 +482,14 @@ const (
 type dateToken struct {
 	kind    tokenKind
 	keyword keywordKind
-	value   int // talet, tecknet (för symboler) eller nyckelordets värde
+	value   int // the number, the character (for symbols) or the keyword's value
 	length  int
 }
 
 func (t dateToken) isSymbol(c rune) bool { return t.kind == tokSymbol && rune(t.value) == c }
 func (t dateToken) isSign() bool         { return t.kind == tokSymbol && (t.value == '+' || t.value == '-') }
 
-// sign är 1 för + och -1 för -.
+// sign is 1 for + and -1 for -.
 func (t dateToken) sign() int {
 	if t.value == '-' {
 		return -1
@@ -556,7 +557,7 @@ func (s *dateScanner) scan() dateToken {
 	c := s.ch()
 	switch {
 	case c >= '0' && c <= '9':
-		// Högst nio siffror räknas; inledande nollor räknas inte men syns i längden.
+		// At most nine digits count; leading zeros don't count but show in the length.
 		n, digits := 0, 0
 		for s.ch() == '0' && s.pos < len(s.in) {
 			s.pos++
@@ -601,7 +602,7 @@ func (s *dateScanner) scan() dateToken {
 		}
 		return dateToken{kind: tokSpace, length: s.pos - start}
 	case c == '(':
-		// Parenteser hoppas över, med nästling.
+		// Parentheses are skipped, with nesting.
 		balance := 0
 		for {
 			switch s.ch() {

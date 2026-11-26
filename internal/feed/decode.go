@@ -14,11 +14,12 @@ var (
 	xmlEncRE  = regexp.MustCompile(`^[` + jsSpace + `]*<\?(?i:xml)[^>]*\b(?i:encoding)[` + jsSpace + `]*=[` + jsSpace + `]*["']([\w.:-]+)["']`)
 )
 
-// DecodeBody avkodar svaret: BOM först, sedan Content-Type, sedan XML-deklarationen, annars UTF-8.
+// DecodeBody decodes the response: BOM first, then Content-Type, then the XML declaration,
+// otherwise UTF-8.
 //
-// Teckenkodningarna är de vanliga i flöden: UTF-8, UTF-16 och windows-1252 (som också är vad
-// ISO-8859-1, latin1 och ascii betyder i webbläsare och i TextDecoder), samt ISO-8859-15. Andra
-// avkodas som UTF-8, precis som en okänd teckenkodning gjorde i TypeScript-versionen.
+// The character encodings are the common ones in feeds: UTF-8, UTF-16 and windows-1252 (which is
+// also what ISO-8859-1, latin1 and ascii mean in browsers and in TextDecoder), plus ISO-8859-15.
+// Others are decoded as UTF-8, just as an unknown character encoding was in the TypeScript version.
 func DecodeBody(b []byte, contentType string) string {
 	var label string
 	switch {
@@ -53,14 +54,14 @@ func DecodeBody(b []byte, contentType string) string {
 	case "iso-8859-15":
 		return decodeSingleByte(b, &iso885915)
 	}
-	// TextDecoder tar bort en inledande BOM.
+	// TextDecoder strips a leading BOM.
 	if len(b) >= 3 && b[0] == 0xEF && b[1] == 0xBB && b[2] == 0xBF {
 		b = b[3:]
 	}
 	return weburl.DecodeUTF8(b)
 }
 
-// encodingFor ger teckenkodningen för en etikett enligt WHATWG Encoding Standard.
+// encodingFor returns the character encoding for a label according to the WHATWG Encoding Standard.
 func encodingFor(label string) string {
 	switch strings.ToLower(js.Trim(label)) {
 	case "unicode-1-1-utf-8", "unicode11utf8", "unicode20utf8", "utf-8", "utf8", "x-unicode20utf8":
@@ -79,7 +80,7 @@ func encodingFor(label string) string {
 }
 
 func decodeUTF16(b []byte, bigEndian bool) string {
-	// TextDecoder tar bort en BOM som stämmer med ordningen.
+	// TextDecoder strips a BOM that matches the byte order.
 	if len(b) >= 2 && (bigEndian && b[0] == 0xFE && b[1] == 0xFF || !bigEndian && b[0] == 0xFF && b[1] == 0xFE) {
 		b = b[2:]
 	}
@@ -111,7 +112,7 @@ func decodeSingleByte(b []byte, high *[128]rune) string {
 	return sb.String()
 }
 
-// windows1252 är tecknen för 0x80–0xFF.
+// windows1252 holds the characters for 0x80–0xFF.
 var windows1252 = [128]rune{
 	0x20AC, 0x81, 0x201A, 0x0192, 0x201E, 0x2026, 0x2020, 0x2021, 0x02C6, 0x2030, 0x0160, 0x2039, 0x0152, 0x8D, 0x017D, 0x8F,
 	0x90, 0x2018, 0x2019, 0x201C, 0x201D, 0x2022, 0x2013, 0x2014, 0x02DC, 0x2122, 0x0161, 0x203A, 0x0153, 0x9D, 0x017E, 0x0178,
@@ -123,7 +124,7 @@ var windows1252 = [128]rune{
 	0xF0, 0xF1, 0xF2, 0xF3, 0xF4, 0xF5, 0xF6, 0xF7, 0xF8, 0xF9, 0xFA, 0xFB, 0xFC, 0xFD, 0xFE, 0xFF,
 }
 
-// iso885915 är ISO-8859-1 med euro och några franska och finska bokstäver.
+// iso885915 is ISO-8859-1 with the euro sign and a few French and Finnish letters.
 var iso885915 = func() [128]rune {
 	var t [128]rune
 	for i := range t {

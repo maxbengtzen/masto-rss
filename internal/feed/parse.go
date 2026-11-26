@@ -10,35 +10,36 @@ import (
 	"github.com/maxbengtzen/masto-rss/internal/weburl"
 )
 
-// Item är en post i flödet.
+// Item is an item in the feed.
 type Item struct {
-	// Keys är nycklarna för dubblettkontrollen: "g:" + GUID och "l:" + normaliserad länk.
+	// Keys are the keys for the duplicate check: "g:" + GUID and "l:" + normalized link.
 	Keys    []string `json:"keys"`
 	Title   string   `json:"title"`
 	Link    string   `json:"link,omitempty"`
 	Summary string   `json:"summary"`
 	Author  string   `json:"author,omitempty"`
-	// Published är publiceringstiden i ms, om flödet anger en giltig.
+	// Published is the publication time in ms, if the feed gives a valid one.
 	Published *int64 `json:"published,omitempty"`
 }
 
-// Parsed är ett tolkat flöde.
+// Parsed is a parsed feed.
 type Parsed struct {
 	Title string `json:"title,omitempty"`
-	// Language är flödets språk som ISO 639-kod, till exempel "sv".
+	// Language is the feed's language as an ISO 639 code, for example "sv".
 	Language string  `json:"language,omitempty"`
 	Items    []*Item `json:"items"`
-	// Skipped är poster utan både id och länk. De går inte att känna igen och hoppas över.
+	// Skipped counts items with neither id nor link. They cannot be recognized and are skipped.
 	Skipped int `json:"skipped"`
 }
 
-// raw är en post som formatet beskriver den, innan den görs om till Item.
+// raw is an item as the format describes it, before it is turned into an Item.
 type raw struct{ id, link, title, summary, author, date string }
 
-// Parse tolkar ett flöde i valfritt format. base är adressen som relativa länkar utgår från.
+// Parse parses a feed in any format. base is the address that relative links are resolved against.
 //
-// Tolkningen ska ge samma resultat som TypeScript-versionen, som använde feedsmith: samma format
-// känns igen i samma ordning (RSS, Atom, RDF, JSON Feed), och samma fält läses på samma sätt.
+// Parsing must give the same result as the TypeScript version, which used feedsmith: the same
+// formats are recognized in the same order (RSS, Atom, RDF, JSON Feed), and the same fields are
+// read the same way.
 func Parse(text, base string) (*Parsed, error) {
 	var title, language string
 	var raws []raw
@@ -114,7 +115,7 @@ func languageCode(value string) string {
 	return strings.ToLower(m[1])
 }
 
-// --- Igenkänning, som feedsmiths detect --------------------------------------------------
+// --- Detection, like feedsmith's detect ---------------------------------------------------
 
 const jsSpace = `\t\n\v\f\r \x{A0}\x{1680}\x{2000}-\x{200A}\x{2028}\x{2029}\x{202F}\x{205F}\x{3000}\x{FEFF}`
 
@@ -161,7 +162,7 @@ func detectRDF(s string) bool {
 	return s != "" && rdfElementRE.MatchString(s) && (containsAny(s, rdfURIs) || rdfElementsRE.MatchString(s))
 }
 
-// --- RSS 2.0 (och 0.9x) -----------------------------------------------------------------
+// --- RSS 2.0 (and 0.9x) -----------------------------------------------------------------
 
 func parseRSS(text string) (title, language string, items []raw, err error) {
 	root, err := buildTree(text, nil, stopPathsRSS)
@@ -222,7 +223,7 @@ func firstNonEmpty(nodes []*xnode) string {
 	return ""
 }
 
-// validItems är parseArrayOf(…, parseItem): bara poster som blev objekt med något i.
+// validItems is parseArrayOf(…, parseItem): only items that became objects with something in them.
 func validItems(nodes []*xnode, hasContent func(*xnode) bool) []*xnode {
 	var out []*xnode
 	for _, n := range nodes {
@@ -233,8 +234,8 @@ func validItems(nodes []*xnode, hasContent func(*xnode) bool) []*xnode {
 	return out
 }
 
-// hasContent är sant om något barn eller attribut ger ett värde. feedsmith läser många fler fält
-// än de som används här, och en post utan något av dem räknas inte alls.
+// hasContent reports whether any child or attribute yields a value. feedsmith reads many more
+// fields than the ones used here, and an item without any of them doesn't count at all.
 func hasContent(n *xnode, known map[string]bool) bool {
 	for name := range n.attrs {
 		if strings.HasPrefix(name, "@xml:") && parseString(n.attrs[name]) != "" {
@@ -271,7 +272,7 @@ var rssChannelFields = map[string]bool{
 func rssItemHasContent(n *xnode) bool { return hasContent(n, rssItemFields) }
 func channelHasContent(n *xnode) bool { return hasContent(n, rssChannelFields) }
 
-// person är en författare som feedsmith tolkar ett RSS-<author> (namn, e-post, länk).
+// person is an author as feedsmith parses an RSS <author> (name, email, link).
 type person struct{ name, email, link string }
 
 func firstPerson(nodes []*xnode) *person {
@@ -301,7 +302,7 @@ func stripMailto(s string) string {
 	return stripped
 }
 
-// parsePerson är feedsmiths tolkning av ett RSS-<author>, till exempel "anna@example.com (Anna)".
+// parsePerson is feedsmith's parsing of an RSS <author>, for example "anna@example.com (Anna)".
 func parsePerson(n *xnode) *person {
 	var rawText string
 	if name := n.first("name"); name != nil {
@@ -494,8 +495,8 @@ func anyAttr(n *xnode, names ...string) bool {
 	return false
 }
 
-// hasPersonContent är sant när en atom-författare blev ett objekt i feedsmith (har namn, adress
-// eller e-post); bara då räknas den som första författaren.
+// hasPersonContent reports whether an Atom author became an object in feedsmith (has a name, URI
+// or email); only then does it count as the first author.
 func hasPersonContent(n *xnode) bool {
 	for _, f := range []string{"name", "uri", "url", "email"} {
 		if n.first(f).str() != "" {
@@ -519,7 +520,7 @@ var atomFeedFields = map[string]bool{
 var xhtmlDivRE = regexp.MustCompile(`^\s*<(?:([a-zA-Z][\w.-]*):)?div[\s/>]`)
 var cdataSectionRE = regexp.MustCompile(`<!\[CDATA\[([\s\S]*?)\]\]>`)
 
-// atomText är värdet av en textkonstruktion (title, summary, content): text, html eller xhtml.
+// atomText is the value of a text construct (title, summary, content): text, html or xhtml.
 func atomText(n *xnode) string {
 	if n == nil {
 		return ""
@@ -542,7 +543,7 @@ func typedText(n *xnode) string {
 	if !ok {
 		return ""
 	}
-	// XHTML: innehållet i den omslutande <div> används som det står, utan avkodning.
+	// XHTML: the content of the wrapping <div> is used as is, without decoding.
 	escaped := cdataSectionRE.ReplaceAllStringFunc(text, func(m string) string {
 		inner := m[9 : len(m)-3]
 		return strings.ReplaceAll(strings.ReplaceAll(inner, "&", "&amp;"), "<", "&lt;")
@@ -556,8 +557,8 @@ func typedText(n *xnode) string {
 	return parseString(text)
 }
 
-// unwrapXHTMLDiv tar fram innehållet i en ensam omslutande <div>, med div-prefixet borttaget från
-// taggarna inuti.
+// unwrapXHTMLDiv extracts the content of a single wrapping <div>, with the div's prefix removed from
+// the tags inside.
 func unwrapXHTMLDiv(s string) (string, bool) {
 	m := xhtmlDivRE.FindStringSubmatch(s)
 	if m == nil {
@@ -586,7 +587,7 @@ func unwrapXHTMLDiv(s string) (string, bool) {
 	return inner, true
 }
 
-// --- RDF (RSS 1.0 och 0.90) -------------------------------------------------------------
+// --- RDF (RSS 1.0 and 0.90) -------------------------------------------------------------
 
 func parseRDF(text string) (title, language string, items []raw, err error) {
 	root, err := buildTree(text, []string{"rdf", "rss"}, stopPathsRDF)
@@ -601,7 +602,7 @@ func parseRDF(text string) (title, language string, items []raw, err error) {
 	title = channel.first("title").str()
 	language = firstNonEmpty(channel.all("dc:language"))
 
-	// Ordningen kommer från kanalens <items><rdf:Seq>, om den finns.
+	// The order comes from the channel's <items><rdf:Seq>, if there is one.
 	var nodes []*xnode
 	var seq *xnode
 	if itemsNode := channel.first("items"); itemsNode != nil {
@@ -659,7 +660,7 @@ func rdfItemHasContent(n *xnode) bool {
 
 // --- JSON Feed --------------------------------------------------------------------------
 
-// jsonObject är feedsmiths parseJsonObject: texten måste se ut som ett JSON-objekt.
+// jsonObject is feedsmith's parseJsonObject: the text must look like a JSON object.
 func jsonObject(text string) (map[string]any, bool) {
 	t := strings.TrimFunc(text, js.IsSpace)
 	if len(text) < 2 || !(strings.HasPrefix(t, "{") && strings.HasSuffix(t, "}") || strings.HasPrefix(t, "[") && strings.HasSuffix(t, "]")) {
@@ -673,7 +674,7 @@ func jsonObject(text string) (map[string]any, bool) {
 	return obj, ok
 }
 
-// get är feedsmiths skiftlägesokänsliga uppslag.
+// get is feedsmith's case-insensitive lookup.
 func get(obj map[string]any, key string) any {
 	if v, ok := obj[key]; ok {
 		return v
@@ -710,8 +711,8 @@ func truthy(v any) bool {
 	return true
 }
 
-// verbatim är parseVerbatimString: en sträng trimmad, ett tal som text, annat inget. En lista ger
-// sitt första värde (parseSingular).
+// verbatim is parseVerbatimString: a string trimmed, a number as text, anything else nothing. A
+// list gives its first value (parseSingular).
 func verbatim(v any) string {
 	if list, ok := v.([]any); ok {
 		if len(list) == 0 {

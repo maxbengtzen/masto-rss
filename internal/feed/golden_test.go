@@ -11,14 +11,14 @@ import (
 	"github.com/maxbengtzen/masto-rss/internal/testutil"
 )
 
-// Golden-filerna är TypeScript-versionens svar (feedsmith + normaliseringen i feed.ts), inspelade
-// inför omskrivningen. Go-versionen ska ge samma.
+// The golden files are the TypeScript version's output (feedsmith + the normalization in feed.ts),
+// recorded before the rewrite. The Go version must produce the same.
 
 func TestParseGolden(t *testing.T) {
 	parseGolden(t, testutil.Testdata("golden", "feeds.json"), testutil.Testdata("fixtures"), 18)
 }
 
-// Sparade riktiga flöden, bara lokalt.
+// Saved real feeds, local only.
 func TestParseGoldenLocal(t *testing.T) {
 	dir := testutil.Local(t)
 	parseGolden(t, filepath.Join(dir, "golden", "feeds.json"), filepath.Join(dir, "fixtures"), 1)
@@ -29,7 +29,7 @@ func parseGolden(t *testing.T, goldenFile, fixtures string, minFeeds int) {
 	var golden map[string]json.RawMessage
 	testutil.ReadJSON(t, goldenFile, &golden)
 	if len(golden) < minFeeds {
-		t.Fatalf("för få flöden i golden-filen: %d", len(golden))
+		t.Fatalf("too few feeds in the golden file: %d", len(golden))
 	}
 	for file, want := range golden {
 		b, err := os.ReadFile(filepath.Join(fixtures, file))
@@ -58,7 +58,7 @@ func describe(err error) string {
 	return "Error: " + err.Error()
 }
 
-// compareJSON jämför v (som JSON) med want, oavsett nyckelordning.
+// compareJSON compares v (as JSON) with want, regardless of key order.
 func compareJSON(t *testing.T, name string, v any, want json.RawMessage) {
 	t.Helper()
 	b, err := json.Marshal(v)
@@ -68,14 +68,14 @@ func compareJSON(t *testing.T, name string, v any, want json.RawMessage) {
 	var got, exp any
 	json.Unmarshal(b, &got)
 	json.Unmarshal(want, &exp)
-	// Orsaken till ett MalformedError är fast-xml-parsers text och jämförs inte.
+	// The cause of a MalformedError is fast-xml-parser's text and is not compared.
 	if m, ok := exp.(map[string]any); ok {
 		delete(m, "cause")
 	}
 	if !reflect.DeepEqual(got, exp) {
 		g, _ := json.MarshalIndent(got, "", " ")
 		e, _ := json.MarshalIndent(exp, "", " ")
-		t.Errorf("%s:\nfick     %s\nväntade  %s", name, g, e)
+		t.Errorf("%s:\ngot   %s\nwant  %s", name, g, e)
 	}
 }
 
@@ -93,17 +93,17 @@ func TestTextGolden(t *testing.T) {
 	testutil.Golden(t, "text.json", &golden)
 	for _, c := range golden.NormalizeLink {
 		if got := NormalizeLink(c.Link); got != c.Key {
-			t.Errorf("NormalizeLink(%q) = %q, väntade %q", c.Link, got, c.Key)
+			t.Errorf("NormalizeLink(%q) = %q, want %q", c.Link, got, c.Key)
 		}
 	}
 	for _, c := range golden.DecodeEntities {
 		if got := DecodeEntities(c.HTML); got != c.Text {
-			t.Errorf("DecodeEntities(%q) = %q, väntade %q", c.HTML, got, c.Text)
+			t.Errorf("DecodeEntities(%q) = %q, want %q", c.HTML, got, c.Text)
 		}
 	}
 	for _, c := range golden.HTMLToText {
 		if got := HTMLToText(c.HTML); got != c.Text {
-			t.Errorf("HTMLToText(%q) = %q, väntade %q", c.HTML, got, c.Text)
+			t.Errorf("HTMLToText(%q) = %q, want %q", c.HTML, got, c.Text)
 		}
 	}
 	for _, c := range golden.DecodeBody {
@@ -113,7 +113,7 @@ func TestTextGolden(t *testing.T) {
 			ct = *c.ContentType
 		}
 		if got := DecodeBody(b, ct); got != c.Text {
-			t.Errorf("DecodeBody(%s, %q) = %q, väntade %q", c.Hex, ct, got, c.Text)
+			t.Errorf("DecodeBody(%s, %q) = %q, want %q", c.Hex, ct, got, c.Text)
 		}
 	}
 }

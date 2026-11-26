@@ -84,6 +84,14 @@
     ],
     "skipped": 0
   },
+  "broken.xml": {
+    "title": "Trasig",
+    "items": [],
+    "skipped": 1
+  },
+  "empty.xml": {
+    "error": "DetectError: Unrecognized feed format"
+  },
   "html.html": {
     "error": "DetectError: Unrecognized feed format"
   },
@@ -218,7 +226,7 @@
     ],
     "skipped": 0
   },
-  "rss-cms-exempel.xml": {
+  "rss-cms-example.xml": {
     "title": "Exempelbloggen",
     "language": "sv",
     "items": [
@@ -357,7 +365,7 @@
     ],
     "skipped": 0
   },
-  "rss-kantfall.xml": {
+  "rss-edge-cases.xml": {
     "title": "Sajten & co",
     "language": "en",
     "items": [
@@ -464,6 +472,12 @@
     ],
     "skipped": 2
   },
+  "rss-empty.xml": {
+    "error": "ParseError: Invalid feed format"
+  },
+  "rss-no-channel.xml": {
+    "error": "ParseError: Invalid feed format"
+  },
   "rss-ns.xml": {
     "title": "Andra prefix",
     "language": "sv",
@@ -490,13 +504,7 @@
     ],
     "skipped": 0
   },
-  "rss-tom.xml": {
-    "error": "ParseError: Invalid feed format"
-  },
-  "rss-utan-kanal.xml": {
-    "error": "ParseError: Invalid feed format"
-  },
-  "rss-wordpress-exempel.xml": {
+  "rss-wordpress-example.xml": {
     "title": "Exempelsajten",
     "language": "sv",
     "items": [
@@ -612,13 +620,5 @@
       }
     ],
     "skipped": 0
-  },
-  "tom.xml": {
-    "error": "DetectError: Unrecognized feed format"
-  },
-  "trasig.xml": {
-    "title": "Trasig",
-    "items": [],
-    "skipped": 1
   }
 }

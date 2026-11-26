@@ -1,6 +1,6 @@
-// Package netx beskriver fel som TypeScript-versionen gjorde i loggen: "Namn: meddelande
-// (orsak)". Namnen (HttpError, MastodonError, TypeError och så vidare) står kvar så att loggen ser
-// ut som förut.
+// Package netx describes errors the way the TypeScript version did in the log: "Name: message
+// (cause)". The names (HttpError, MastodonError, TypeError and so on) are kept so that the log looks
+// the same as before.
 package netx
 
 import (
@@ -14,7 +14,7 @@ import (
 	"strings"
 )
 
-// Error är ett fel med namn och, om det finns, orsaken bakom.
+// Error is an error with a name and, if there is one, the cause behind it.
 type Error struct {
 	name, msg string
 	cause     error
@@ -24,7 +24,7 @@ func (e *Error) Error() string { return e.msg }
 func (e *Error) Name() string  { return e.name }
 func (e *Error) Unwrap() error { return e.cause }
 
-// CauseMessage är orsakens meddelande, som visas inom parentes.
+// CauseMessage is the cause's message, shown in parentheses.
 func (e *Error) CauseMessage() string {
 	if e.cause == nil {
 		return ""
@@ -32,16 +32,16 @@ func (e *Error) CauseMessage() string {
 	return e.cause.Error()
 }
 
-// Named skapar ett fel med namn.
+// Named creates a named error.
 func Named(name, msg string) error { return &Error{name: name, msg: msg} }
 
-// Errorf är `new Error(...)`.
+// Errorf is `new Error(...)`.
 func Errorf(format string, args ...any) error {
 	return &Error{name: "Error", msg: fmt.Sprintf(format, args...)}
 }
 
-// FetchError gör ett nätverksfel till det fetch gav i Node: TimeoutError vid timeout, annars
-// "TypeError: fetch failed" med orsaken. Orsaken är Go:s egen text.
+// FetchError turns a network error into what fetch returned in Node: TimeoutError on timeout,
+// otherwise "TypeError: fetch failed" with the cause. The cause is Go's own text.
 func FetchError(err error) error {
 	if err == nil {
 		return nil
@@ -57,7 +57,7 @@ func FetchError(err error) error {
 	return &Error{name: "TypeError", msg: "fetch failed", cause: err}
 }
 
-// Describe är en kort beskrivning av ett fel för loggen, med orsaken om det finns en.
+// Describe returns a short description of an error for the log, with the cause if there is one.
 func Describe(err error) string {
 	if err == nil {
 		return ""
@@ -73,7 +73,7 @@ func Describe(err error) string {
 	return s
 }
 
-// StatusText är svarets statustext (res.statusText): det servern skrev efter koden.
+// StatusText is the response's status text (res.statusText): what the server wrote after the code.
 func StatusText(res *http.Response) string {
 	return strings.TrimSpace(strings.TrimPrefix(res.Status, strconv.Itoa(res.StatusCode)))
 }
