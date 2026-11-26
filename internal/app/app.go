@@ -252,7 +252,7 @@ func (a *app) importCommand(args []string, stderr io.Writer) int {
 	if a.cfg.DryRun {
 		verb = "would import"
 	}
-	a.log.Printf("%s: %s %d links from %s (%d new keys)", f.Name, verb, len(lines), file, added)
+	a.log.Printf("%s: %s %s from %s (%s)", f.Name, verb, count(len(lines), "link", "links"), file, count(added, "new key", "new keys"))
 	return 0
 }
 
@@ -506,7 +506,7 @@ func (a *app) checkAccount(ctx context.Context, acc *account, first bool) {
 		if info.Bot {
 			bot = ""
 		}
-		a.log.Printf("%s: @%s@%s, %d followers%s", names(acc), info.Acct, host(acc.instance), info.Followers, bot)
+		a.log.Printf("%s: @%s@%s, %s%s", names(acc), info.Acct, host(acc.instance), count(info.Followers, "follower", "followers"), bot)
 	}
 }
 
@@ -530,7 +530,7 @@ func (a *app) report(f config.Feed, r *poll.Result) {
 	}
 	d := r.Decision
 	if r.Unrecognized > 0 {
-		a.log.Debugf("%s: %d items lack both id and link and are skipped", name, r.Unrecognized)
+		a.log.Debugf("%s: skipping %s with neither id nor link", name, count(r.Unrecognized, "item", "items"))
 	}
 	switch {
 	case d.Reason == "first-run":
@@ -538,11 +538,11 @@ func (a *app) report(f config.Feed, r *poll.Result) {
 		if len(d.Post) > 0 {
 			rest = fmt.Sprintf(", %d added to the outbox (BACKFILL)", len(d.Post))
 		}
-		a.log.Printf("%s: new feed, %d items marked as seen%s", name, len(d.Skipped), rest)
+		a.log.Printf("%s: new feed, %s marked as seen%s", name, count(len(d.Skipped), "item", "items"), rest)
 	case d.Reason == "anomaly":
 		a.log.Printf("%s: WARNING: %d of %d items look new at once. Everything is marked as seen and nothing is posted. Has the site changed its addresses or GUIDs?", name, len(d.Skipped), r.Items)
 	case len(d.Skipped) > 0:
-		a.log.Printf("%s: skipping %d items older than %s", name, len(d.Skipped), duration(f.MaxAgeMs))
+		a.log.Printf("%s: skipping %s older than %s", name, count(len(d.Skipped), "item", "items"), duration(f.MaxAgeMs))
 	}
 	for _, q := range r.Queued {
 		if a.cfg.DryRun {
@@ -555,7 +555,7 @@ func (a *app) report(f config.Feed, r *poll.Result) {
 		a.log.Printf("%s: %d more wait until the next round (at most %d per round)", name, len(d.Deferred), f.MaxPostsPerPoll)
 	}
 	if len(d.Post) == 0 && len(d.Skipped) == 0 && len(d.Deferred) == 0 {
-		quiet("%s: nothing new (%d items)", name, r.Items)
+		quiet("%s: nothing new (%s)", name, count(r.Items, "item", "items"))
 	}
 }
 
@@ -642,7 +642,7 @@ func (a *app) runFeed(ctx context.Context, f config.Feed) outcome {
 		next := math.Min(math.Max(float64(f.IntervalMs)*math.Pow(2, float64(failures-1)), retryAfterMs), maxBackoffMs)
 		a.log.Printf("%s: ERROR (%d in a row): %s; next attempt in %d min", f.Name, failures, netx.Describe(cause), max(1, int64(math.Round(next/60_000))))
 		if failures == a.cfg.FailNotifyAfter {
-			a.notify.Send(fmt.Sprintf("%s: the feed could not be fetched %d times in a row (%s)", f.Name, failures, netx.Describe(cause)))
+			a.notify.Send(fmt.Sprintf("%s: the feed could not be fetched %s in a row (%s)", f.Name, count(failures, "time", "times"), netx.Describe(cause)))
 		}
 		out = outcome{ok: false, nextMs: int64(next)}
 	}
@@ -865,4 +865,12 @@ func (a *app) serve(ctx context.Context) int {
 	}
 	background.Wait()
 	return 0
+}
+
+// count writes n with the singular or plural noun: "1 item", "3 items".
+func count(n int, singular, plural string) string {
+	if n == 1 {
+		return "1 " + singular
+	}
+	return strconv.Itoa(n) + " " + plural
 }

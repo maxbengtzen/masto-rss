@@ -7,6 +7,10 @@ All changes noticeable to whoever runs the service. The format follows
 
 ## [Unreleased]
 
+### Fixed
+- Log lines and notifications use the singular for one: "1 follower", "1 item marked as seen",
+  "could not be fetched 1 time in a row".
+
 ## [1.3.0] - 2026-11-26
 
 ### Changed

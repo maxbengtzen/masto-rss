@@ -36,7 +36,8 @@ is described below.
   updated by hand with the English texts; nothing else in them changed. Some invented input values
   in `config.json` were translated along with them (for example `kanske` → `maybe`), and fixtures
   with Swedish file names were renamed, which changes the keys in `feeds.json`. `post` takes `all`
-  as well as the old `alla`.
+  as well as the old `alla`. Counts use the singular for one ("1 item", "1 time"), which the Swedish
+  text didn't need.
 - **The usage texts** say `masto-rss import …` and `masto-rss post …` instead of
   `node src/main.ts …`. The test replaces the text in the golden file before comparing.
 - **A lone surrogate** from a numeric entity (`&#xD800;`) becomes U+FFFD. JavaScript kept it in the
