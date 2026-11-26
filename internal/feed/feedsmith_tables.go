@@ -1,5 +1,8 @@
 // Code generated from feedsmith 3.0.1 (the TypeScript version's feed parser), so that the same
 // elements are read as raw text and the same namespaces are recognized. Do not edit by hand.
+//
+// feedsmith is Copyright (c) 2025 Maciej Lamberski and licensed under the MIT License
+// (https://github.com/macieklamberski/feedsmith).
 
 package feed
 

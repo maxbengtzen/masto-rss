@@ -14,6 +14,8 @@ All changes noticeable to whoever runs the service. The format follows
   or on the dashboard's metric names, update those matches. Follower counts are written as
   `12,345 followers`.
 - `masto-rss post` takes `all` to post to every account. The old Swedish keyword `alla` still works.
+- The license is now MIT instead of AGPL-3.0. Versions up to and including 1.2.0 remain available
+  under AGPL-3.0.
 
 ## [1.2.0] - 2026-11-16
 

@@ -173,5 +173,8 @@ More on testing, dry runs and releases in [AGENTS.md](AGENTS.md).
 
 ## License
 
-[AGPL-3.0](LICENSE). If you run a modified version as a service for others, its source code must
-be available to them.
+[MIT](LICENSE). Versions up to and including 1.2.0 were released under AGPL-3.0.
+
+The tables in `internal/feed/feedsmith_tables.go` are generated from
+[feedsmith](https://github.com/macieklamberski/feedsmith), Copyright (c) 2025 Maciej Lamberski,
+under the MIT License.
