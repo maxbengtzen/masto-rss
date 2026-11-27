@@ -7,6 +7,8 @@ All changes noticeable to whoever runs the service. The format follows
 
 ## [Unreleased]
 
+## [1.3.2] - 2026-11-27
+
 ### Changed
 - modernc.org/sqlite 1.63.0: faster row reads (connections open without SQLite's internal mutex).
 
